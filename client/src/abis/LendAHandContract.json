@@ -1,0 +1,89 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_usdtTokenAddress",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "directCommissionWallet",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "referralCommissionWallet",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "directCommissionFee",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "referralCommissionFee",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "registerFee",
+        "type": "uint256"
+      }
+    ],
+    "name": "Transaction",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_registerFee",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address payable",
+        "name": "_directCommissionWallet",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_directCommissionFee",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address payable",
+        "name": "_referralCommissionWallet",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_referralCommissionFee",
+        "type": "uint256"
+      }
+    ],
+    "name": "processTransaction",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
