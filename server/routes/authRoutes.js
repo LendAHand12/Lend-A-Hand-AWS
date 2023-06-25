@@ -17,7 +17,7 @@ import {
 const router = express.Router();
 
 router.route("/ref").post(checkLinkRef);
-router.route("/checkSendMail").get(checkSendMail);
+router.route("/checkSendMail").post(checkSendMail);
 router.route("/updateData").get(updateData);
 router.route("/getNewPass").get(getNewPass);
 router.route("/register").post(registerUser);
