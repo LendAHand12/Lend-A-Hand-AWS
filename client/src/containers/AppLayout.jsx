@@ -11,7 +11,7 @@ import AppNav from "@/components/AppNavbar";
 import User from "@/api/User";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
-import { UPDATE_USER_INFO } from "@/slices/authSlice";
+import { UPDATE_USER_INFO, LOGOUT } from "@/slices/authSlice";
 
 const AppLayout = () => {
   const { t } = useTranslation();
@@ -37,12 +37,9 @@ const AppLayout = () => {
         .then((response) => {
           dispatch(UPDATE_USER_INFO(response.data));
         })
-        .catch((error) => {
-          let message =
-            error.response && error.response.data.error
-              ? error.response.data.error
-              : error.message;
-          toast.error(t(message));
+        .catch(() => {
+          toast.error(t("Token expired"));
+          dispatch(LOGOUT());
         });
     })();
   }, []);
