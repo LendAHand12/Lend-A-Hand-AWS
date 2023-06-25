@@ -1,0 +1,1 @@
+import{A as t,l as r}from"./index-4749bbbd.js";const s={getPaymentInfo:()=>t.get(`${r}/info`),addPayment:e=>t.post(`${r}`,e),onDonePayment:e=>t.post(`${r}/done`,e),getAllPayments:(e,n,a)=>t.get(`${r}/user/?pageNumber=${e}&keyword=${n}&status=${a}`),getPaymentsOfUser:e=>t.get(`${r}/?pageNumber=${e}`)};export{s as P};
