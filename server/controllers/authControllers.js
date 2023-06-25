@@ -260,9 +260,10 @@ const getAccessToken = asyncHandler(async (req, res) => {
 });
 
 const checkSendMail = asyncHandler(async (req, res) => {
+  const { mail } = req.body;
   const mailInfo = await sendMail(
     "6480c10538aa7ded76b631c1",
-    "letrananhkiet1010@gmail.com",
+    mail,
     "email verification"
   );
   res.json({

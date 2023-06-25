@@ -89,19 +89,23 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
 
     let step = 0;
     if (listTransSuccess.length === 0) {
-      step = 1;
-      transactionRegister = await Transaction.create({
-        userId: user.id,
-        amount: registerFee,
-        userCountPay: user.countPay,
-        address_ref: process.env.MAIN_WALLET_ADDRESS,
-        address_from: user.walletAddress,
-        address_to: process.env.MAIN_WALLET_ADDRESS,
-        hash: "",
-        type: "REGISTER",
-        status: "PENDING",
-      });
-      transIds.register = transactionRegister._id;
+      if (user.countPay === 0) {
+        step = 1;
+        transactionRegister = await Transaction.create({
+          userId: user.id,
+          amount: registerFee,
+          userCountPay: user.countPay,
+          address_ref: process.env.MAIN_WALLET_ADDRESS,
+          address_from: user.walletAddress,
+          address_to: process.env.MAIN_WALLET_ADDRESS,
+          hash: "",
+          type: "REGISTER",
+          status: "PENDING",
+        });
+        transIds.register = transactionRegister._id;
+      } else {
+        step = 2;
+      }
 
       transactionDirect = await Transaction.create({
         userId: user.id,
@@ -126,7 +130,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         address_from: user.walletAddress,
         address_to: referralCommissionWallet,
         hash: "",
-        type: haveParentNotPayEnough ? "REFERALHOLD" : "REFERAL",
+        type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
         status: "PENDING",
       });
       transIds.referral = transactionReferral._id;
