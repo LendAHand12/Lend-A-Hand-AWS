@@ -1,1 +1,0 @@
-import{i as n}from"./is-property-a3b90be8.js";var e=n,i=function(r,t){return e(t)?r+"."+t:r+"["+JSON.stringify(t)+"]"};i.valid=e;i.property=function(r){return e(r)?r:JSON.stringify(r)};var s=i;export{s as g};

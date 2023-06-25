@@ -1,1 +1,0 @@
-import{A as _,d as s,e as t,f as A,g as e,h as R,i as o,j as U,k as n}from"./index-4749bbbd.js";const P={checkLinkRef:r=>_.post(s,r),login:r=>_.post(t,r),register:r=>_.post(A,r),confirm:r=>_.get(`${e}/${r}`),forgotPassword:r=>_.post(R,r),resetPassword:r=>_.put(o,r),refresh:r=>_.post(U,r),getLinkVerify:r=>_.post(n,r)};export{P as A};
