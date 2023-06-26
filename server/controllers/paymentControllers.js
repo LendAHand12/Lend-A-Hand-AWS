@@ -136,65 +136,98 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       transIds.referral = transactionReferral._id;
     }
     if (listTransSuccess.length === 1) {
-      step = 2;
-      transIds.register = listTransSuccess[0]._id;
-      transactionDirect = await Transaction.create({
-        userId: user.id,
-        amount: directCommissionFee,
-        userCountPay: user.countPay,
-        address_ref: refUser.walletAddress,
-        address_from: user.walletAddress,
-        address_to: directCommissionWallet,
-        hash: "",
-        type: haveRefNotPayEnough ? "DIRECTHOLD" : "DIRECT",
-        status: "PENDING",
-      });
-      transIds.direct = transactionDirect._id;
+      if (user.countPay === 0) {
+        step = 2;
+        transIds.register = listTransSuccess[0]._id;
+        transactionDirect = await Transaction.create({
+          userId: user.id,
+          amount: directCommissionFee,
+          userCountPay: user.countPay,
+          address_ref: refUser.walletAddress,
+          address_from: user.walletAddress,
+          address_to: directCommissionWallet,
+          hash: "",
+          type: haveRefNotPayEnough ? "DIRECTHOLD" : "DIRECT",
+          status: "PENDING",
+        });
+        transIds.direct = transactionDirect._id;
 
-      transactionReferral = await Transaction.create({
-        userId: user.id,
-        amount: referralCommissionFee,
-        userCountPay: user.countPay,
-        address_ref: haveParentNotPayEnough
-          ? parentUser.walletAddress
-          : referralCommissionWallet,
-        address_from: user.walletAddress,
-        address_to: referralCommissionWallet,
-        hash: "",
-        type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
-        status: "PENDING",
-      });
-      transIds.referral = transactionReferral._id;
+        transactionReferral = await Transaction.create({
+          userId: user.id,
+          amount: referralCommissionFee,
+          userCountPay: user.countPay,
+          address_ref: haveParentNotPayEnough
+            ? parentUser.walletAddress
+            : referralCommissionWallet,
+          address_from: user.walletAddress,
+          address_to: referralCommissionWallet,
+          hash: "",
+          type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
+          status: "PENDING",
+        });
+        transIds.referral = transactionReferral._id;
+      } else {
+        const directTrans = listTransSuccess.find(
+          (ele) => ele.type === "DIRECT" || ele.type === "DIRECTHOLD"
+        );
+        transIds.direct = directTrans._id;
+        transactionReferral = await Transaction.create({
+          userId: user.id,
+          amount: referralCommissionFee,
+          userCountPay: user.countPay,
+          address_ref: haveParentNotPayEnough
+            ? parentUser.walletAddress
+            : referralCommissionWallet,
+          address_from: user.walletAddress,
+          address_to: referralCommissionWallet,
+          hash: "",
+          type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
+          status: "PENDING",
+        });
+        transIds.referral = transactionReferral._id;
+      }
     }
     if (listTransSuccess.length === 2) {
-      step = 3;
+      if (user.countPay === 0) {
+        step = 3;
+        const registerTrans = listTransSuccess.find(
+          (ele) => ele.type === "REGISTER"
+        );
+        transIds.register = registerTrans._id;
 
-      const registerTrans = listTransSuccess.find(
-        (ele) => ele.type === "REGISTER"
-      );
-      transIds.register = registerTrans._id;
+        const directTrans = listTransSuccess.find(
+          (ele) => ele.type === "DIRECT" || ele.type === "DIRECTHOLD"
+        );
+        transIds.direct = directTrans._id;
 
-      const directTrans = listTransSuccess.find(
-        (ele) => ele.type === "DIRECT" || ele.type === "DIRECTHOLD"
-      );
-      transIds.direct = directTrans._id;
+        transactionReferral = await Transaction.create({
+          userId: user.id,
+          amount: referralCommissionFee,
+          userCountPay: user.countPay,
+          address_ref: haveParentNotPayEnough
+            ? parentUser.walletAddress
+            : referralCommissionWallet,
+          address_from: user.walletAddress,
+          address_to: referralCommissionWallet,
+          hash: "",
+          type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
+          status: "PENDING",
+        });
+        transIds.referral = transactionReferral._id;
+      } else {
+        step = 4;
+        const directTrans = listTransSuccess.find(
+          (ele) => ele.type === "DIRECT" || ele.type === "DIRECTHOLD"
+        );
+        transIds.direct = directTrans._id;
 
-      transactionReferral = await Transaction.create({
-        userId: user.id,
-        amount: referralCommissionFee,
-        userCountPay: user.countPay,
-        address_ref: haveParentNotPayEnough
-          ? parentUser.walletAddress
-          : referralCommissionWallet,
-        address_from: user.walletAddress,
-        address_to: referralCommissionWallet,
-        hash: "",
-        type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
-        status: "PENDING",
-      });
-      transIds.referral = transactionReferral._id;
+        const referral = listTransSuccess.find(
+          (ele) => ele.type === "REFERRAL" || ele.type === "REFERRALHOLD"
+        );
+        transIds.register = referral._id;
+      }
     }
-    if (listTransSuccess.length === 3) {
+    if (listTransSuccess.length === 3 && user.countPay === 0) {
       step = 4;
       const registerTrans = listTransSuccess.find(
         (ele) => ele.type === "REGISTER"

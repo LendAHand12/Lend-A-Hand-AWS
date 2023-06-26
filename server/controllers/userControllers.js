@@ -75,13 +75,17 @@ const getUserById = asyncHandler(async (req, res) => {
 
 const updateUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({ _id: req.params.id }).select("-password");
-  const { walletAddress } = req.body;
+  const { walletAddress, imgFront, imgBack } = req.body;
   if (user) {
     user.walletAddress = walletAddress || user.walletAddress;
-    if (req.files) {
-      user.status = "PENDING";
-      user.imgFront = req.files.imgFront[0].path || user.imgFront;
-      user.imgBack = req.files.imgBack[0].path || user.imgBack;
+    if (imgFront !== "" && imgBack !== "") {
+      if (
+        imgFront.includes("https://res.cloudinary.com/dhqggkmto") &&
+        imgFront.includes("https://res.cloudinary.com/dhqggkmto")
+      )
+        user.status = "PENDING";
+      user.imgFront = imgFront || user.imgFront;
+      user.imgBack = imgBack || user.imgBack;
     }
     const updatedUser = await user.save();
     if (updatedUser) {

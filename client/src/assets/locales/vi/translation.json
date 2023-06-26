@@ -40,7 +40,7 @@
   "Password updated. Please login with new password": "Mật khẩu được cập nhật. Vui lòng đăng nhập bằng mật khẩu mới",
   "Unable to update password": "Không thể cập nhật mật khẩu",
   "User not found": "Không tìm thấy người dùng",
-  "Token expired": "Phiên đăng nhập đã hết hạn.Vui lòng đăng nhập lại",
+  "Token expired": "Phiên đăng nhập đã hết hạn",
   "Refresh token not found, login again": "Không tìm thấy mã thông báo làm mới, đăng nhập lại",
   "Invalid refresh token": "Mã thông báo làm mới không hợp lệ",
   "User removed from DB": "Đã xoá người dùng khỏi Data",

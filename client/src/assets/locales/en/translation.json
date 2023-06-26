@@ -40,7 +40,7 @@
   "Password updated. Please login with new password": "Password updated. Please login with new password",
   "Unable to update password": "Unable to update password",
   "User not found": "User not found",
-  "Token expired": "Token has expired.Please login again",
+  "Token expired": "Token has expired",
   "Refresh token not found, login again": "Refresh token not found, login again",
   "Invalid refresh token": "Invalid refresh token",
   "User removed from DB": "User removed from Data",

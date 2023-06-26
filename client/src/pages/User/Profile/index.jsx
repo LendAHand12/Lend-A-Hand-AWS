@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useDisconnect } from "wagmi";
+import axios from "axios";
 
 import User from "@/api/User";
 import Loading from "@/components/Loading";
@@ -13,11 +14,14 @@ const Profile = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState();
+  const [loadingUploadFileFront, setLoadingUploadFileFront] = useState(false);
+  const [loadingUploadFileBack, setLoadingUploadFileBack] = useState(false);
   const { userInfo } = useSelector((state) => state.auth);
   let { email, userId, walletAddress, createdAt, id, status, tier, fine } =
     userInfo;
   const [imgFront, setImgFront] = useState("");
   const [imgBack, setImgBack] = useState("");
+
   const {
     register,
     handleSubmit,
@@ -25,6 +29,8 @@ const Profile = () => {
   } = useForm({
     defaultValues: {
       walletAddress: walletAddress,
+      imgBackData: "",
+      imgFrontData: "",
     },
   });
   const { disconnect } = useDisconnect();
@@ -34,28 +40,74 @@ const Profile = () => {
     dispatch(LOGOUT());
   };
 
-  const onSubmit = async (data) => {
-    const { walletAddress, imgFront, imgBack } = data;
-    setLoading(true);
-    await User.update(id, {
-      walletAddress,
-      imgFront: imgFront && imgFront[0] ? imgFront[0] : "",
-      imgBack: imgBack && imgBack[0] ? imgBack[0] : "",
-    })
+  const uploadFile = (file, forData) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "sdblmpca");
+
+    if (forData === "front") {
+      setLoadingUploadFileFront(true);
+    } else {
+      setLoadingUploadFileBack(true);
+    }
+    axios
+      .post(`${import.meta.env.VITE_CLOUDINARY_URL}/image/upload`, formData, {
+        headers: {
+          "content-type": "multipart/form-data",
+        },
+      })
       .then((response) => {
-        setLoading(false);
-        toast.success(t(response.data.message));
-        dispatch(UPDATE_USER_INFO(response.data.data));
+        console.log(response);
+        if (forData === "front") {
+          setLoadingUploadFileFront(false);
+          setImgFront(response.data.secure_url);
+        } else {
+          setLoadingUploadFileBack(false);
+          setImgBack(response.data.secure_url);
+        }
       })
       .catch((error) => {
+        console.log(error);
         let message =
-          error.response && error.response.data.error
-            ? error.response.data.error
+          error.response && error.response.data.message
+            ? error.response.data.message
             : error.message;
-        toast.error(t(message));
-        setLoading(false);
+        toast.error(message);
+        if (forData === "front") {
+          setLoadingUploadFileFront(false);
+        } else {
+          setLoadingUploadFileBack(false);
+        }
       });
   };
+
+  const onSubmit = useCallback(
+    async (data) => {
+      console.log("submit");
+      const { walletAddress } = data;
+      console.log({ data });
+      setLoading(true);
+      await User.update(id, {
+        walletAddress,
+        imgFront,
+        imgBack,
+      })
+        .then((response) => {
+          setLoading(false);
+          toast.success(t(response.data.message));
+          dispatch(UPDATE_USER_INFO(response.data.data));
+        })
+        .catch((error) => {
+          let message =
+            error.response && error.response.data.error
+              ? error.response.data.error
+              : error.message;
+          toast.error(t(message));
+          setLoading(false);
+        });
+    },
+    [imgFront, imgBack]
+  );
 
   return (
     <div>
@@ -189,36 +241,31 @@ const Profile = () => {
                                       />
                                     </svg>
                                     <p className="pt-1 text-sm tracking-wider text-gray-400 group-hover:text-gray-600">
-                                      Attach a file
+                                      {loadingUploadFileFront
+                                        ? "Uploading..."
+                                        : "Attach a file"}
                                     </p>
                                   </div>
                                 )}
                                 <input
-                                  {...register("imgFront", {
-                                    required:
-                                      "The front of identity card is required",
-                                  })}
+                                  // {...register("imgFrontData", {
+                                  //   required:
+                                  //     "The front of identity card is required",
+                                  // })}
                                   type="file"
                                   onChange={(e) => {
                                     e.preventDefault();
-                                    let reader = new FileReader();
                                     let file = e.target.files[0];
                                     if (file && file.type.match("image.*")) {
-                                      reader.readAsDataURL(file);
-                                    } else {
-                                      setImgFront(imgFront);
+                                      uploadFile(file, "front");
                                     }
-                                    reader.onloadend = function () {
-                                      // setValue("imgFront", file);
-                                      setImgFront(reader.result);
-                                    };
                                   }}
                                   accept="image/png, imgage/jpg, image/jpeg"
                                   className="opacity-0"
                                 />
                               </label>
                               <p className="error-message-text">
-                                {errors.imgFront?.message}
+                                {errors.imgFrontData?.message}
                               </p>
                             </div>
                           </div>
@@ -255,36 +302,31 @@ const Profile = () => {
                                       />
                                     </svg>
                                     <p className="pt-1 text-sm tracking-wider text-gray-400 group-hover:text-gray-600">
-                                      Attach a file
+                                      {loadingUploadFileBack
+                                        ? "Uploading..."
+                                        : "Attach a file"}
                                     </p>
                                   </div>
                                 )}
                                 <input
-                                  {...register("imgBack", {
-                                    required:
-                                      "The back of identity card is required",
-                                  })}
+                                  // {...register("imgBackData", {
+                                  //   required:
+                                  //     "The back of identity card is required",
+                                  // })}
                                   type="file"
                                   onChange={(e) => {
                                     e.preventDefault();
-                                    let reader = new FileReader();
                                     let file = e.target.files[0];
                                     if (file && file.type.match("image.*")) {
-                                      reader.readAsDataURL(file);
-                                    } else {
-                                      setImgBack(imgBack);
+                                      uploadFile(file, "back");
                                     }
-                                    reader.onloadend = function () {
-                                      // setValue("imgBack", file);
-                                      setImgBack(reader.result);
-                                    };
                                   }}
                                   accept="image/png, imgage/jpg, image/jpeg"
                                   className="opacity-0"
                                 />
                               </label>
                               <p className="error-message-text">
-                                {errors.imgBack?.message}
+                                {errors.imgBackData?.message}
                               </p>
                             </div>
                           </div>
@@ -317,6 +359,9 @@ const Profile = () => {
               </div>
               <button
                 type="submit"
+                disabled={
+                  loading || loadingUploadFileFront || loadingUploadFileBack
+                }
                 className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
               >
                 {loading && <Loading />}

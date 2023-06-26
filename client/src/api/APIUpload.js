@@ -4,21 +4,20 @@ import queryString from "query-string";
 import store from "@/store";
 import i18n from "@/i18n";
 
-const API = axios.create({
+const APIUpload = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "",
   timeout: 120000,
   paramsSerializer: (params) => queryString.stringify(params),
 });
 
-API.interceptors.request.use(
+APIUpload.interceptors.request.use(
   function (config) {
     const { accessToken } = store.getState().auth;
     if (accessToken) {
       config.headers["Authorization"] = `Bearer ${accessToken}`;
     }
     config.headers["Accept-Language"] = i18n.language;
-    config.headers["Content-Type"] = "application/json";
-
+    config.headers["Content-Type"] = "multipart/form-data";
     // if (config.method === "get" && !config.data) {
     //   config.headers["Content-Type"] = "application/json";
     // } else {
@@ -45,4 +44,4 @@ API.interceptors.request.use(
   }
 );
 
-export default API;
+export default APIUpload;
