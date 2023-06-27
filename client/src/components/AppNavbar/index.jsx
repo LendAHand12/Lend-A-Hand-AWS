@@ -167,8 +167,7 @@ const AppNav = () => {
                   </li>
                 ))}
 
-              {!auth.userInfo.isAdmin &&
-                auth.accessToken &&
+              {auth.accessToken &&
                 (auth.userInfo.status === "APPROVED" ||
                   auth.userInfo.status === "LOCKED") &&
                 (isConnected ? (

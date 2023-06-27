@@ -57,7 +57,6 @@ const Profile = () => {
         },
       })
       .then((response) => {
-        console.log(response);
         if (forData === "front") {
           setLoadingUploadFileFront(false);
           setImgFront(response.data.secure_url);
@@ -83,12 +82,10 @@ const Profile = () => {
 
   const onSubmit = useCallback(
     async (data) => {
-      console.log("submit");
       const { walletAddress } = data;
-      console.log({ data });
       setLoading(true);
       await User.update(id, {
-        walletAddress,
+        walletAddress: walletAddress.trim(),
         imgFront,
         imgBack,
       })

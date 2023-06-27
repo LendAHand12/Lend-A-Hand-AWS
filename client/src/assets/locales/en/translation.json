@@ -94,5 +94,15 @@
   "Please enter the correct wallet format": "Please enter the correct wallet format",
 
   "REFERRALHOLD": "LAH Fund",
-  "DIRECTHOLD": "Direct Commission"
+  "DIRECTHOLD": "Direct Commission",
+
+  "SUCCESS": "Success",
+  "refunded": "Refunded",
+  "not refunded": "Not refunded",
+  "transType": "Transaction type",
+  "createTime": "Create Time",
+  "refundStatus": "Refund Status",
+  "checkCanRefund": "Check return conditions",
+  "changeToRefunded": "Convert to refunded",
+  "refund": "Process refund"
 }

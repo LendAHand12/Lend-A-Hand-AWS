@@ -5,6 +5,10 @@ import {
   onDonePayment,
   getAllPayments,
   getPaymentsOfUser,
+  getPaymentDetail,
+  checkCanRefundPayment,
+  changeToRefunded,
+  onAdminDoneRefund,
 } from "../controllers/paymentControllers.js";
 import { protectRoute, isAdmin } from "../middleware/authMiddleware.js";
 
@@ -17,5 +21,15 @@ router
   .get(protectRoute, getPaymentsOfUser)
   .post(protectRoute, addPayment);
 router.route("/done").post(protectRoute, onDonePayment);
+
+router.route("/:id").get(protectRoute, isAdmin, getPaymentDetail);
+router
+  .route("/checkCanRefund")
+  .post(protectRoute, isAdmin, checkCanRefundPayment);
+
+router.route("/changeToRefunded").post(protectRoute, isAdmin, changeToRefunded);
+router
+  .route("/onAdminDoneRefund")
+  .post(protectRoute, isAdmin, onAdminDoneRefund);
 
 export default router;

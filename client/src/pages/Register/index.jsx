@@ -37,12 +37,12 @@ const Register = () => {
     setLoading(true);
     const { userId, email, password, ref, receiveId, walletAddress } = data;
     await Auth.register({
-      userId,
-      email,
+      userId: userId.trim(),
+      email: email.trim(),
       password,
       ref,
       receiveId,
-      walletAddress,
+      walletAddress: walletAddress.trim(),
     })
       .then((response) => {
         setLoading(false);

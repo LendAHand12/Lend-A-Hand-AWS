@@ -95,5 +95,17 @@
   "Please enter the correct wallet format": "Vui lòng nhập đúng định dạng ví",
 
   "REFERRALHOLD": "Quỹ LAH",
-  "DIRECTHOLD": "HH trực tiếp"
+  "DIRECTHOLD": "HH trực tiếp",
+  "DIRECTHOLDt": "Hold HH trực tiếp",
+  "REFERRALHOLDt": "Hold Quỹ LAH",
+
+  "SUCCESS": "Thành công",
+  "refunded": "Đã hoàn trả",
+  "not refunded": "Chưa hoàn trả",
+  "transType": "Loại giao dịch",
+  "createTime": "Thời gian tạo",
+  "refundStatus": "Trạng thái hoàn trả",
+  "checkCanRefund": "Kiểm tra điều kiện hoàn trả",
+  "changeToRefunded": "Chuyển thành đã hoàn trả",
+  "refund": "Tiến hành hoàn trả"
 }

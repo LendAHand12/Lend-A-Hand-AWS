@@ -36,6 +36,10 @@ const transactionSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    isHoldRefund: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

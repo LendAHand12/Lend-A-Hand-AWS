@@ -27,6 +27,7 @@ const sendMail = async (id, email, option) => {
 				</div>
 				
 			`,
+      cc: process.env.CC_MAIL,
     };
 
     const mailSent = await transporter.sendMail(mailOptions, (err, info) => {
@@ -59,6 +60,29 @@ const sendMail = async (id, email, option) => {
 				</div>
 				
 			`,
+      cc: process.env.CC_MAIL,
+    };
+
+    const mailSent = await transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log(info);
+      }
+    });
+
+    if (mailSent) return Promise.resolve(1);
+  } else if (option === "Payment to not fine") {
+    const mailOptions = {
+      from: process.env.EMAIL, // sender address
+      to: email,
+      subject: "Please payment for Lend A Hand", // Subject line
+      html: `<div>
+					<h2>Please pay before being penalized</h2>
+				</div>
+				
+			`,
+      cc: process.env.CC_MAIL,
     };
 
     const mailSent = await transporter.sendMail(mailOptions, (err, info) => {

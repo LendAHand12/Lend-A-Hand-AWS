@@ -19,6 +19,18 @@ const Payment = {
   getPaymentsOfUser: (pageNumber) => {
     return API.get(`${URL_API_PAYMENT}/?pageNumber=${pageNumber}`);
   },
+  getPaymentDetail: (id) => {
+    return API.get(`${URL_API_PAYMENT}/${id}`);
+  },
+  checkCanRefund: (body) => {
+    return API.post(`${URL_API_PAYMENT}/checkCanRefund`, body);
+  },
+  changeToRefunded: (body) => {
+    return API.post(`${URL_API_PAYMENT}/changeToRefunded`, body);
+  },
+  onAdminDoneRefund: (body) => {
+    return API.post(`${URL_API_PAYMENT}/onAdminDoneRefund`, body);
+  },
 };
 
 export default Payment;

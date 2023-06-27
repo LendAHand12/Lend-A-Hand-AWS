@@ -6,14 +6,16 @@ import NoContent from "@/components/NoContent";
 import transStatus from "@/constants/transStatus";
 import { useTranslation } from "react-i18next";
 import { ToastContainer, toast } from "react-toastify";
-import { shortenWalletAddress } from "@/utils";
+import { useHistory } from "react-router-dom";
+// import { shortenWalletAddress } from "@/utils";
 
 const Transactions = () => {
   const { t } = useTranslation();
+  const history = useHistory();
   const [pageNumber, setPageNumber] = useState(1);
   const [totalPage, setTotalPage] = useState(0);
   const [keyword, setKeyword] = useState("");
-  const [searchStatus, setSearchStatus] = useState("all");
+  const [searchStatus, setSearchStatus] = useState("DIRECTHOLD");
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
 
@@ -25,7 +27,6 @@ const Transactions = () => {
           const { payments, pages } = response.data;
           setData(payments);
           setTotalPage(pages);
-
           setLoading(false);
         })
         .catch((error) => {
@@ -55,6 +56,10 @@ const Transactions = () => {
     setPageNumber((pageNumber) => pageNumber - 1);
   };
 
+  const handleRowClick = (id) => {
+    history.push(`/admin/transactions/${id}`);
+  };
+
   return (
     <div>
       <ToastContainer />
@@ -64,12 +69,15 @@ const Transactions = () => {
             <select
               className="block p-2 pr-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none active:outline-none"
               onChange={onChangeStatus}
-              defaultValue={"all"}
+              defaultValue={"DIRECTHOLD"}
             >
-              <option value="all">All</option>
               {transStatus.map((status) => (
                 <option value={status.status} key={status.status}>
-                  {t(status.status)}
+                  {status.status === "DIRECTHOLD"
+                    ? t("DIRECTHOLDt")
+                    : status.status === "REFERRALHOLD"
+                    ? t("REFERRALHOLDt")
+                    : t(status.status)}
                 </option>
               ))}
             </select>
@@ -105,11 +113,16 @@ const Transactions = () => {
           <thead className="text-xs text-gray-700 uppercase bg-gray-50">
             <tr>
               <th scope="col" className="px-6 py-3">
-                User ID
+                Send
               </th>
-              <th scope="col" className="px-6 py-3">
+              {searchStatus !== "REGISTER" && (
+                <th scope="col" className="px-6 py-3">
+                  Receive
+                </th>
+              )}
+              {/* <th scope="col" className="px-6 py-3">
                 Hash
-              </th>
+              </th> */}
               <th scope="col" className="px-6 py-3">
                 Amount
               </th>
@@ -119,6 +132,12 @@ const Transactions = () => {
               <th scope="col" className="px-6 py-3">
                 Time
               </th>
+              {(searchStatus === "DIRECTHOLD" ||
+                searchStatus === "REFERRALHOLD") && (
+                <th scope="col" className="px-6 py-3">
+                  REFUND
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -128,6 +147,7 @@ const Transactions = () => {
                 <tr
                   className="bg-white border-b hover:bg-gray-50"
                   key={ele._id}
+                  onClick={() => handleRowClick(ele._id)}
                 >
                   <th
                     scope="row"
@@ -142,7 +162,19 @@ const Transactions = () => {
                       </div>
                     </div>
                   </th>
-                  <td className="px-6 py-4 text-blue-600">
+                  {searchStatus !== "REGISTER" && (
+                    <td className="px-6 py-4">
+                      <div className="">
+                        <div className="text-base font-semibold">
+                          {ele.userReceiveId}
+                        </div>
+                        <div className="font-normal text-gray-500">
+                          {ele.userReceiveEmail}
+                        </div>
+                      </div>
+                    </td>
+                  )}
+                  {/* <td className="px-6 py-4 text-blue-600">
                     <a
                       href={`https://bscscan.com/tx/${ele.hash}`}
                       target="_blank"
@@ -150,7 +182,7 @@ const Transactions = () => {
                     >
                       {shortenWalletAddress(ele.hash)}
                     </a>
-                  </td>
+                  </td> */}
                   <td className="px-6 py-4">{ele.amount} USDT</td>
                   <td className="px-6 py-4">
                     <div
@@ -163,6 +195,18 @@ const Transactions = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4">{ele.createdAt}</td>
+                  {(searchStatus === "DIRECTHOLD" ||
+                    searchStatus === "REFERRALHOLD") && (
+                    <td className="px-6 py-4">
+                      <div
+                        className={`max-w-fit text-white rounded-sm py-1 px-2 text-sm ${
+                          ele.isHoldRefund ? "bg-green-500" : "bg-red-500"
+                        } mr-2`}
+                      >
+                        {ele.isHoldRefund ? t("refunded") : t("not refunded")}
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
           </tbody>

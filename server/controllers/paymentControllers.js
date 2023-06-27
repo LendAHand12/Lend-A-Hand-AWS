@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
 import Transaction from "../models/transactionModel.js";
 import getParentWithCountPay from "../utils/getParentWithCountPay.js";
+import Refund from "../models/refundModel.js";
 
 const getPaymentInfo = asyncHandler(async (req, res) => {
   const { user } = req;
@@ -308,9 +309,8 @@ const onDonePayment = asyncHandler(async (req, res) => {
 const getAllPayments = asyncHandler(async (req, res) => {
   const { pageNumber, keyword, status } = req.query;
   const page = Number(pageNumber) || 1;
-  const searchStatus = status === "all" ? "" : status;
 
-  const pageSize = 20;
+  const pageSize = 10;
 
   const count = await Transaction.countDocuments({
     $and: [
@@ -320,6 +320,9 @@ const getAllPayments = asyncHandler(async (req, res) => {
           { address_from: { $regex: keyword, $options: "i" } }, // Tìm theo địa chỉ ví
           { address_to: { $regex: keyword, $options: "i" } }, // Tìm theo địa chỉ ví
         ],
+      },
+      {
+        type: status,
       },
       {
         status: "SUCCESS",
@@ -337,6 +340,9 @@ const getAllPayments = asyncHandler(async (req, res) => {
         ],
       },
       {
+        type: status,
+      },
+      {
         status: "SUCCESS",
       },
     ],
@@ -348,18 +354,48 @@ const getAllPayments = asyncHandler(async (req, res) => {
 
   const result = [];
   for (let pay of allPayments) {
-    const user = await User.findById(pay.userId);
-    result.push({
-      _id: pay._id,
-      address_from: pay.address_from,
-      address_to: pay.address_to,
-      hash: pay.hash,
-      amount: pay.amount,
-      userId: user.userId,
-      email: user.email,
-      type: pay.type,
-      createdAt: pay.createdAt,
-    });
+    let user = await User.findById(pay.userId);
+    if (status === "REGISTER") {
+      result.push({
+        _id: pay._id,
+        address_from: pay.address_from,
+        // hash: pay.hash,
+        amount: pay.amount,
+        userId: user.userId,
+        email: user.email,
+        type: pay.type,
+        createdAt: pay.createdAt,
+      });
+    } else if (status === "DIRECT" || status === "REFERRAL") {
+      const userRef = await User.findOne({ walletAddress: pay.address_ref });
+      result.push({
+        _id: pay._id,
+        address_from: pay.address_from,
+        // hash: pay.hash,
+        amount: pay.amount,
+        userId: user.userId,
+        email: user.email,
+        userReceiveId: userRef.userId,
+        userReceiveEmail: userRef.email,
+        type: pay.type,
+        createdAt: pay.createdAt,
+      });
+    } else if (status === "DIRECTHOLD" || status === "REFERRALHOLD") {
+      const userRef = await User.findOne({ walletAddress: pay.address_ref });
+      result.push({
+        _id: pay._id,
+        address_from: pay.address_from,
+        // hash: pay.hash,
+        amount: pay.amount,
+        userId: user.userId,
+        email: user.email,
+        userReceiveId: userRef.userId,
+        userReceiveEmail: userRef.email,
+        type: pay.type,
+        createdAt: pay.createdAt,
+        isHoldRefund: pay.isHoldRefund,
+      });
+    }
   }
 
   res.json({
@@ -393,10 +429,142 @@ const getPaymentsOfUser = asyncHandler(async (req, res) => {
   });
 });
 
+const getPaymentDetail = asyncHandler(async (req, res) => {
+  const trans = await Transaction.findById(req.params.id);
+  if (trans) {
+    let user = await User.findById(trans.userId);
+    if (trans.type === "REGISTER") {
+      res.json({
+        _id: trans._id,
+        address_from: trans.address_from,
+        hash: trans.hash,
+        amount: trans.amount,
+        userId: user.userId,
+        email: user.email,
+        type: trans.type,
+        status: trans.status,
+        createdAt: trans.createdAt,
+      });
+    } else if (trans.type === "DIRECT" || trans.type === "REFERRAL") {
+      const userRef = await User.findOne({ walletAddress: trans.address_ref });
+      res.json({
+        _id: trans._id,
+        address_from: trans.address_from,
+        address_to: trans.address_ref,
+        hash: trans.hash,
+        amount: trans.amount,
+        userId: user.userId,
+        email: user.email,
+        userReceiveId: userRef.userId,
+        userReceiveEmail: userRef.email,
+        type: trans.type,
+        status: trans.status,
+        createdAt: trans.createdAt,
+      });
+    } else if (trans.type === "DIRECTHOLD" || trans.type === "REFERRALHOLD") {
+      const userRef = await User.findOne({ walletAddress: trans.address_ref });
+      res.json({
+        _id: trans._id,
+        address_from: trans.address_from,
+        address_to: trans.address_ref,
+        hash: trans.hash,
+        amount: trans.amount,
+        userId: user.userId,
+        email: user.email,
+        userReceiveId: userRef.userId,
+        userReceiveEmail: userRef.email,
+        type: trans.type,
+        status: trans.status,
+        createdAt: trans.createdAt,
+        isHoldRefund: trans.isHoldRefund,
+      });
+    }
+  } else {
+    res.status(404);
+    throw new Error("Transaction does not exist");
+  }
+});
+
+const checkCanRefundPayment = asyncHandler(async (req, res) => {
+  const { id } = req.body;
+  const trans = await Transaction.findById(id);
+  if (trans) {
+    const { userCountPay, address_ref } = trans;
+    const userReceive = await User.findOne({ walletAddress: address_ref });
+    if (userReceive) {
+      if (userReceive.status === "LOCKED") {
+        res.status(404);
+        throw new Error(`User parent locked`);
+      } else if (userReceive.countPay < userCountPay) {
+        res.status(404);
+        throw new Error(
+          `User parent pay = ${userReceive.countPay} time but user pay = ${userCountPay} time`
+        );
+      } else {
+        res.json({
+          message: "User is OK for a refund",
+        });
+      }
+    } else {
+      res.status(404);
+      throw new Error("Cannot get user parent");
+    }
+  } else {
+    res.status(404);
+    throw new Error("Transaction does not exist");
+  }
+});
+
+const changeToRefunded = asyncHandler(async (req, res) => {
+  const { id } = req.body;
+  const trans = await Transaction.findById(id);
+  if (trans) {
+    trans.isHoldRefund = true;
+    await trans.save();
+    res.json({
+      message: "Update successful",
+    });
+  } else {
+    res.status(404);
+    throw new Error("Transaction does not exist");
+  }
+});
+
+const onAdminDoneRefund = asyncHandler(async (req, res) => {
+  console.log({ body: req.body });
+  const { transId, transHash, transType, fromWallet, receiveWallet } = req.body;
+  const trans = await Transaction.findById(transId);
+  if (trans) {
+    trans.isHoldRefund = true;
+    await trans.save();
+
+    const refund = await Refund.create({
+      transId: transId,
+      hash: transHash,
+      address_from: fromWallet,
+      address_to: receiveWallet,
+      type: transType,
+    });
+
+    console.log({ refund });
+
+    res.json({
+      message: "Refund successful",
+    });
+  } else {
+    res.status(404);
+    throw new Error("Transaction does not exist");
+  }
+});
+
 export {
   getPaymentInfo,
   addPayment,
   onDonePayment,
   getAllPayments,
   getPaymentsOfUser,
+  getPaymentDetail,
+  checkCanRefundPayment,
+  changeToRefunded,
+  onAdminDoneRefund,
 };
