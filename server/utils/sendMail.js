@@ -17,13 +17,43 @@ const sendMail = async (id, email, option) => {
     const mailOptions = {
       from: process.env.EMAIL, // sender address
       to: email,
-      subject: "Confirm your email for Lend A Hand", // Subject line
-      html: `<div>
-					<h2>Account Created!</h2>
-					Click this link to 
-					<a href="${url}">verify your account</a>
+      subject: "LEND A HAND",
+      html: `<div style="font-size: 18px">
+					<h2>XIN CHÀO QUÝ KHÁCH !</h2>
+					-Tài khoản LEND A HAND (THE POWER OF UNITED ) của quý khách đang chờ được kích hoạt.
+          <br></br>
+          -Để kích hoạt tài khoản quý khách vui lòng nhấp vào link bên dưới để kích hoạt tài khoản.
+          <br></br>
+          LINK KÍCH HOẠT: <a href="${url}">Link</a>
 					<br>
-					Note that this link is valid only for the next 15 minutes.
+          -Sau khi kích hoạt tài khoản thành công quý khách đăng nhập tài khoản của mình trên website: <a href="https://lah12.com">https://lah12.com</a> vừa mới đăng ký để  KYC.
+          <br></br>
+          -Để KYC quý khách vui lòng upload CCCD 2 mặt và cập nhật, khi trên tài khoản hiện thị trạng thái CHỜ XÁC THỰC là đã KYC thành công. Sau đó bạn chờ để cty Duyệt, khi tài khoản ở trạng thái ĐÃ XÁC THỰC thì bạn có thể bắt đầu thanh toán. (Nếu quý khách KYC trên điện thoại mà tài khoản vẫn ở trạng thái CHƯA XÁC THỰC thì quý khách có thể KYC trên laptop hoặc máy tính bàn).
+          <br></br>
+          -ĐỂ LẤY LINK GIỚI THIỆU QUÝ KHÁCH VUI LÒNG LÀM THEO HƯỚNG DẪN BÊN DƯỚI:
+          <br></br>
+          Bạn có thể lấy link giới thiệu bằng cách đăng nhập tài khoản vào thư mục GIỚI THIỆU rồi COPY để lấy link giới thiệu, quý khách có thể tham khảo như hình bên dưới.
+          <br></br>
+          <br></br>
+					<img width="80%" height="auto" src="https://res.cloudinary.com/dhqggkmto/image/upload/v1687975045/unnamed_cvg8fk.png"/>
+          <br></br>
+          <br></br>
+          <b>Best Regards & Thanks!</b>
+          <br></br>
+          <br></br>
+          <b>Van Truong (Mr.)</b>
+          <br></br>
+          <br></br>
+          IT CHIEF OF SECURITY OFFICER | AMERITECJSC
+          <br></br>
+          29 VO VAN TAN, Ward VO THI SAU, District 3 | Ho Chi Minh City, Vietnam
+          <br></br>
+          T: (+84-28) 2250.8166
+          <br></br>
+          Email: support@lah12.com
+          <br></br>
+          <br></br>
+          Website: <a href="https://lah12.com">www.lah12.com</a>
 				</div>
 				
 			`,

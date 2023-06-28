@@ -104,5 +104,25 @@
   "refundStatus": "Refund Status",
   "checkCanRefund": "Check return conditions",
   "changeToRefunded": "Convert to refunded",
-  "refund": "Process refund"
+  "refund": "Process refund",
+
+  "HOLD": "HOLD",
+  "times": "Times",
+  "Send User Name": "Sender Name",
+  "Send User Email": "Sender Email",
+  "Send User Wallet": "Sender Wallet",
+  "Receive User Name": "Receiver Name",
+  "Receive User Email": "Receiver Email",
+  "Receive User Wallet": "Receiver Wallet",
+  "amount": "Amount",
+  "count pay": "count pay",
+  "send": "Sender",
+  "receive": "Recipient",
+  "type": "Type",
+  "time": "Time",
+  "search with user ref code": "Search with referral code",
+  "search with user name or email": "Search by username or email",
+  "ref code": "Referral code",
+  "username": "Name",
+  "Invalid receiving wallet address!": "Invalid receiving wallet address!"
 }

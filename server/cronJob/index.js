@@ -15,7 +15,6 @@ export const checkUnpayUser = asyncHandler(async () => {
     const diffDays = currentDay.diff(userCreatedDay, "days") + 1; // ngày đăng ký đến hôm nay
     const { countPay } = u;
     const countPayWithDays = 7 * (countPay + 1); // số ngày thanh toán theo lần thanh toán
-    console.log({ days: countPayWithDays - diffDays });
     if (countPayWithDays - diffDays < -7) {
       u.fine = u.fine + 2;
       u.status = "LOCKED";
@@ -28,5 +27,4 @@ export const checkUnpayUser = asyncHandler(async () => {
       sendMail(u._id, u.email, "Payment to not fine");
     }
   }
-  //   console.log(listUser.length);
 });

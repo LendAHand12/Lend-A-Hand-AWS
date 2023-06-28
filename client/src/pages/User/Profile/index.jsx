@@ -17,8 +17,17 @@ const Profile = () => {
   const [loadingUploadFileFront, setLoadingUploadFileFront] = useState(false);
   const [loadingUploadFileBack, setLoadingUploadFileBack] = useState(false);
   const { userInfo } = useSelector((state) => state.auth);
-  let { email, userId, walletAddress, createdAt, id, status, tier, fine } =
-    userInfo;
+  let {
+    email,
+    userId,
+    walletAddress,
+    createdAt,
+    id,
+    status,
+    tier,
+    fine,
+    countPay,
+  } = userInfo;
   const [imgFront, setImgFront] = useState("");
   const [imgBack, setImgBack] = useState("");
 
@@ -163,11 +172,15 @@ const Profile = () => {
               <div className="text-gray-700">
                 <div className="grid grid-cols-1 text-sm">
                   <div className="grid lg:grid-cols-2 grid-cols-1">
-                    <div className="px-4 py-2 font-semibold">Ref code</div>
+                    <div className="px-4 py-2 font-semibold">
+                      {t("ref code")}
+                    </div>
                     <div className="px-4 py-2">{id}</div>
                   </div>
                   <div className="grid lg:grid-cols-2 grid-cols-1">
-                    <div className="px-4 py-2 font-semibold">User Name</div>
+                    <div className="px-4 py-2 font-semibold">
+                      {t("username")}
+                    </div>
                     <div className="px-4 py-2">{userId}</div>
                   </div>
                   <div className="grid lg:grid-cols-2 grid-cols-1">
@@ -194,6 +207,14 @@ const Profile = () => {
                       <p className="error-message-text">
                         {errors.walletAddress?.message}
                       </p>
+                    </div>
+                  </div>
+                  <div className="grid lg:grid-cols-2 grid-cols-1">
+                    <div className="px-4 py-2 font-semibold">
+                      {t("count pay")}
+                    </div>
+                    <div className="px-4 py-2">
+                      {countPay} {t("times")}
                     </div>
                   </div>
                   <div className="grid lg:grid-cols-2 grid-cols-1">

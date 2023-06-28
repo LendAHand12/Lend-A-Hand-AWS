@@ -42,6 +42,7 @@ const PaymentPage = () => {
         setPayStep(2);
         setLoadingAddRegister(false);
       } catch (error) {
+        toast.error(t(error.message));
         setLoadingAddRegister(false);
       }
     }
@@ -59,6 +60,7 @@ const PaymentPage = () => {
       setPayStep(3);
       setLoadingAddDirectCommission(false);
     } catch (error) {
+      toast.error(t(error.message));
       setLoadingAddDirectCommission(false);
     }
   }, [paymentInfo]);
@@ -79,6 +81,7 @@ const PaymentPage = () => {
       setPayStep(4);
       setLoadingAddReferralCommission(false);
     } catch (error) {
+      toast.error(t(error.message));
       setLoadingAddReferralCommission(false);
     }
   };
@@ -242,7 +245,7 @@ const PaymentPage = () => {
                   <span className="sr-only">Info</span>
                   <div>
                     <span className="font-medium">{t("registerFee")}!</span>{" "}
-                    {t("pleasePay")}.
+                    {t("pleasePay")}. (7 USDT)
                   </div>
                 </div>
                 <div>
@@ -280,7 +283,7 @@ const PaymentPage = () => {
                     <span className="sr-only">Info</span>
                     <div>
                       <span className="font-medium">{t("registerFee")}!</span>{" "}
-                      {t("Payment successful")}.
+                      {t("Payment successful")}. (7 USDT)
                     </div>
                   </div>
                 )}
@@ -304,7 +307,7 @@ const PaymentPage = () => {
                   <span className="sr-only">Info</span>
                   <div>
                     <span className="font-medium">{t("commissionFee")}!</span>{" "}
-                    {t("pleasePay")}.
+                    {t("pleasePay")}. ({paymentInfo.directCommissionFee} USDT)
                   </div>
                 </div>
                 <div>
@@ -342,7 +345,7 @@ const PaymentPage = () => {
                     <span className="sr-only">Info</span>
                     <div>
                       <span className="font-medium">{t("registerFee")}!</span>{" "}
-                      {t("Payment successful")}.
+                      {t("Payment successful")}. (7 USDT)
                     </div>
                   </div>
                 )}
@@ -366,7 +369,8 @@ const PaymentPage = () => {
                   <span className="sr-only">Info</span>
                   <div>
                     <span className="font-medium">{t("commissionFee")}!</span>{" "}
-                    {t("Payment successful")}.
+                    {t("Payment successful")}. (
+                    {paymentInfo.directCommissionFee} USDT)
                   </div>
                 </div>
                 <div
@@ -389,7 +393,7 @@ const PaymentPage = () => {
                   <span className="sr-only">Info</span>
                   <div>
                     <span className="font-medium">{t("lahFuns")}!</span>{" "}
-                    {t("pleasePay")}.
+                    {t("pleasePay")}. ({paymentInfo.referralCommissionFee} USDT)
                   </div>
                 </div>
                 <div>
@@ -427,7 +431,7 @@ const PaymentPage = () => {
                     <span className="sr-only">Info</span>
                     <div>
                       <span className="font-medium">{t("registerFee")}!</span>{" "}
-                      {t("Payment successful")}.
+                      {t("Payment successful")}. (7 USDT)
                     </div>
                   </div>
                 )}
@@ -452,7 +456,8 @@ const PaymentPage = () => {
                   <span className="sr-only">Info</span>
                   <div>
                     <span className="font-medium">{t("commissionFee")}!</span>{" "}
-                    {t("Payment successful")}.
+                    {t("Payment successful")}. (
+                    {paymentInfo.directCommissionFee} USDT)
                   </div>
                 </div>
                 <div
@@ -475,7 +480,8 @@ const PaymentPage = () => {
                   <span className="sr-only">Info</span>
                   <div>
                     <span className="font-medium">{t("lahFuns")}!</span>{" "}
-                    {t("Payment successful")}.
+                    {t("Payment successful")}. (
+                    {paymentInfo.referralCommissionFee} USDT)
                   </div>
                 </div>
                 <div>

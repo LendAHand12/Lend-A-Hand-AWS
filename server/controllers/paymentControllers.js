@@ -58,7 +58,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       } else {
         directCommissionWallet = refUser.walletAddress;
       }
-      directCommissionFee = 5;
+      directCommissionFee = 5 * Math.pow(2, user.tier);
       const parentWithCountPay = await getParentWithCountPay(
         user.id,
         user.countPay
@@ -71,7 +71,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       } else {
         referralCommissionWallet = parentWithCountPay.walletAddress;
       }
-      referralCommissionFee = 10;
+      referralCommissionFee = 10 * Math.pow(2, user.tier);
     }
 
     let transactionRegister = null;
@@ -279,7 +279,6 @@ const onDonePayment = asyncHandler(async (req, res) => {
   const { transIds } = req.body;
 
   const transIdsList = Object.values(transIds);
-  console.log({ transIdsList });
   for (let transId of transIdsList) {
     try {
       await Transaction.findOne({
@@ -293,8 +292,20 @@ const onDonePayment = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({ _id: req.user.id }).select("-password");
   user.countPay = user.countPay + 1;
-  if (user.countPay > 12) {
-    user.tier = user.tier + 1;
+  if (user.countPay % 12 === 0) {
+    const currentDay = moment(new Date());
+    const userCreatedDay = moment(user.createdAt);
+    const diffDays = currentDay.diff(userCreatedDay, "days") + 1;
+    const diffWeeks = Math.floor(diffDays / 7);
+    const tier = user.tier;
+    let increated = false;
+    if (diffWeeks >= (tier + 1) * 12) {
+      user.tier = tier + 1;
+      increated = true;
+    }
+    // if(!increated) {
+
+    // }
   }
 
   const updatedUser = await user.save();
@@ -322,7 +333,7 @@ const getAllPayments = asyncHandler(async (req, res) => {
         ],
       },
       {
-        type: status,
+        type: { $regex: status, $options: "i" },
       },
       {
         status: "SUCCESS",
@@ -340,7 +351,7 @@ const getAllPayments = asyncHandler(async (req, res) => {
         ],
       },
       {
-        type: status,
+        type: { $regex: status, $options: "i" },
       },
       {
         status: "SUCCESS",
@@ -349,7 +360,7 @@ const getAllPayments = asyncHandler(async (req, res) => {
   })
     .limit(pageSize)
     .skip(pageSize * (page - 1))
-    .sort("-createdAt")
+    .sort("isHoldRefund -createdAt")
     .select("-password");
 
   const result = [];
@@ -377,10 +388,11 @@ const getAllPayments = asyncHandler(async (req, res) => {
         email: user.email,
         userReceiveId: userRef.userId,
         userReceiveEmail: userRef.email,
+        userCountPay: pay.userCountPay,
         type: pay.type,
         createdAt: pay.createdAt,
       });
-    } else if (status === "DIRECTHOLD" || status === "REFERRALHOLD") {
+    } else if (status === "HOLD") {
       const userRef = await User.findOne({ walletAddress: pay.address_ref });
       result.push({
         _id: pay._id,
@@ -392,6 +404,7 @@ const getAllPayments = asyncHandler(async (req, res) => {
         userReceiveId: userRef.userId,
         userReceiveEmail: userRef.email,
         type: pay.type,
+        userCountPay: pay.userCountPay,
         createdAt: pay.createdAt,
         isHoldRefund: pay.isHoldRefund,
       });
@@ -459,6 +472,7 @@ const getPaymentDetail = asyncHandler(async (req, res) => {
         userReceiveEmail: userRef.email,
         type: trans.type,
         status: trans.status,
+        userCountPay: trans.userCountPay,
         createdAt: trans.createdAt,
       });
     } else if (trans.type === "DIRECTHOLD" || trans.type === "REFERRALHOLD") {
@@ -475,6 +489,7 @@ const getPaymentDetail = asyncHandler(async (req, res) => {
         userReceiveEmail: userRef.email,
         type: trans.type,
         status: trans.status,
+        userCountPay: trans.userCountPay,
         createdAt: trans.createdAt,
         isHoldRefund: trans.isHoldRefund,
       });
@@ -557,6 +572,23 @@ const onAdminDoneRefund = asyncHandler(async (req, res) => {
   }
 });
 
+// const updateHoldPayment = asyncHandler(async (req, res) => {
+//   const listTrans = await Transaction.find({
+//     type: "REFERRALHOLD",
+//   });
+
+//   for (let trans of listTrans) {
+//     const parentWithLevelOfUser = await getParentWithCountPay(
+//       trans.userId,
+//       trans.userCountPay
+//     );
+//     trans.address_ref = parentWithLevelOfUser.walletAddress;
+//     await trans.save();
+//   }
+
+//   res.send("updated");
+// });
+
 export {
   getPaymentInfo,
   addPayment,
@@ -567,4 +599,5 @@ export {
   checkCanRefundPayment,
   changeToRefunded,
   onAdminDoneRefund,
+  // updateHoldPayment,
 };

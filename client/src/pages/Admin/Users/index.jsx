@@ -39,7 +39,30 @@ const Users = () => {
           setLoading(false);
         });
     })();
-  }, [pageNumber, keyword, searchStatus, refresh]);
+  }, [pageNumber, refresh]);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      setPageNumber(1);
+      await User.getAllUsers(1, keyword, searchStatus)
+        .then((response) => {
+          const { users, pages } = response.data;
+          setData(users);
+          setTotalPage(pages);
+
+          setLoading(false);
+        })
+        .catch((error) => {
+          let message =
+            error.response && error.response.data.error
+              ? error.response.data.error
+              : error.message;
+          toast.error(t(message));
+          setLoading(false);
+        });
+    })();
+  }, [searchStatus, keyword]);
 
   const onChangeStatus = (e) => setSearchStatus(e.target.value);
 
@@ -139,7 +162,7 @@ const Users = () => {
               type="text"
               onChange={onSearch}
               className="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50"
-              placeholder="Search for users"
+              placeholder={t("search with user name or email")}
             />
           </div>
         </div>
@@ -147,13 +170,13 @@ const Users = () => {
           <thead className="text-xs text-gray-700 uppercase bg-gray-50">
             <tr>
               <th scope="col" className="px-6 py-3">
-                Name
+                Username
               </th>
               <th scope="col" className="px-6 py-3">
                 Email
               </th>
               <th scope="col" className="px-6 py-3">
-                Status
+                {t("status")}
               </th>
               <th scope="col" className="px-6 py-3">
                 Action

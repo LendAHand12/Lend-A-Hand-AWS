@@ -65,22 +65,33 @@ export const getBalance = async (account) => {
   return web3.utils.fromWei(balance, "ether");
 };
 
+const isValidAddress = async (address) => {
+  const web3 = await loadWeb3();
+  return web3.utils.isAddress(address);
+};
+
 export const transfer = async (address, amount) => {
   const account = await getAccount();
   const web3 = await loadWeb3();
 
-  const token = await getToken(
-    ContractToken,
-    import.meta.env.VITE_TOKEN_ADDRESS
-  );
+  const validAddress = await isValidAddress(address);
 
-  return token.methods
-    .transfer(address, web3.utils.toWei(amount.toString(), "ether"))
-    .send({ from: account })
-    .then((transactionHash) => {
-      return transactionHash;
-    })
-    .catch((error) => {
-      toast.error(error.message);
-    });
+  if (!validAddress) {
+    throw new Error("Invalid receiving wallet address!");
+  } else {
+    const token = await getToken(
+      ContractToken,
+      import.meta.env.VITE_TOKEN_ADDRESS
+    );
+
+    return token.methods
+      .transfer(address, web3.utils.toWei(amount.toString(), "ether"))
+      .send({ from: account })
+      .then((transactionHash) => {
+        return transactionHash;
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
+  }
 };

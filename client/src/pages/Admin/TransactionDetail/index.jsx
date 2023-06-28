@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import Loading from "@/components/Loading";
 import { useTranslation } from "react-i18next";
-import { useHistory, useLocation } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import Payment from "@/api/Payment";
 import { transfer, getAccount } from "@/utils/smartContract.js";
@@ -15,7 +15,7 @@ const TransactionDetail = () => {
     history.push("/admin/transactions");
   }
   const [trans, setTrans] = useState(null);
-  const [loading, setLoading] = useState();
+  const [loading, setLoading] = useState(true);
   const { t } = useTranslation();
   const [refresh, setRefresh] = useState(false);
   const [checkRefundMess, setCheckRefundMess] = useState("");
@@ -26,6 +26,7 @@ const TransactionDetail = () => {
 
   useEffect(() => {
     (async () => {
+      setLoading(true);
       await Payment.getPaymentDetail(transId)
         .then((response) => {
           setTrans(response.data);
@@ -33,8 +34,8 @@ const TransactionDetail = () => {
         })
         .catch((error) => {
           let message =
-            error.response && error.response.data.error
-              ? error.response.data.error
+            error.response && error.response.data.message
+              ? error.response.data.message
               : error.message;
           toast.error(t(message));
           setLoading(false);
@@ -132,9 +133,34 @@ const TransactionDetail = () => {
   return (
     <div>
       <ToastContainer />
-      {loading && <Loading />}
+      {loading && (
+        <div className="w-full flex justify-center">
+          <Loading />
+        </div>
+      )}
       {!loading && trans !== null && (
         <div className="container mx-auto p-5">
+          <div className="mb-3 lg:mb-6">
+            <Link
+              to="/admin/transactions"
+              className="max-w-fit flex text-blue-500 gap-4 hover:underline items-center"
+            >
+              <svg
+                fill="currentColor"
+                className="w-4 h-auto"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 52 52"
+                enableBackground="new 0 0 52 52"
+              >
+                <path
+                  d="M48.6,23H15.4c-0.9,0-1.3-1.1-0.7-1.7l9.6-9.6c0.6-0.6,0.6-1.5,0-2.1l-2.2-2.2c-0.6-0.6-1.5-0.6-2.1,0
+	L2.5,25c-0.6,0.6-0.6,1.5,0,2.1L20,44.6c0.6,0.6,1.5,0.6,2.1,0l2.1-2.1c0.6-0.6,0.6-1.5,0-2.1l-9.6-9.6C14,30.1,14.4,29,15.3,29
+	h33.2c0.8,0,1.5-0.6,1.5-1.4v-3C50,23.8,49.4,23,48.6,23z"
+                />
+              </svg>
+              Transactions
+            </Link>
+          </div>
           <div className="md:flex no-wrap md:-mx-2 ">
             <div className="w-full lg:w-3/12 lg:mx-2 mb-4 lg:mb-0">
               <div className="bg-white shadow-md p-3 border-t-4 border-primary">
@@ -197,19 +223,19 @@ const TransactionDetail = () => {
                   <div className="grid grid-cols-1 text-sm">
                     <div className="grid lg:grid-cols-2 grid-cols-1">
                       <div className="px-4 py-2 font-semibold">
-                        Send User Name
+                        {t("Send User Name")}
                       </div>
                       <div className="px-4 py-2">{trans.userId}</div>
                     </div>
                     <div className="grid lg:grid-cols-2 grid-cols-1">
                       <div className="px-4 py-2 font-semibold">
-                        Send User Email
+                        {t("Send User Email")}
                       </div>
                       <div className="px-4 py-2">{trans.email}</div>
                     </div>
                     <div className="grid lg:grid-cols-2 grid-cols-1">
                       <div className="px-4 py-2 font-semibold">
-                        Send User Wallet
+                        {t("Send User Wallet")}
                       </div>
                       <div className="px-4 py-2">{trans.address_from}</div>
                     </div>
@@ -217,13 +243,13 @@ const TransactionDetail = () => {
                       <>
                         <div className="grid lg:grid-cols-2 grid-cols-1">
                           <div className="px-4 py-2 font-semibold">
-                            Receive User Name
+                            {t("Receive User Name")}
                           </div>
                           <div className="px-4 py-2">{trans.userReceiveId}</div>
                         </div>
                         <div className="grid lg:grid-cols-2 grid-cols-1">
                           <div className="px-4 py-2 font-semibold">
-                            Receive User Email
+                            {t("Receive User Email")}
                           </div>
                           <div className="px-4 py-2">
                             {trans.userReceiveEmail}
@@ -231,16 +257,29 @@ const TransactionDetail = () => {
                         </div>
                         <div className="grid lg:grid-cols-2 grid-cols-1">
                           <div className="px-4 py-2 font-semibold">
-                            Receive User Wallet
+                            {t("Receive User Wallet")}
                           </div>
                           <div className="px-4 py-2">{trans.address_to}</div>
                         </div>
                       </>
                     )}
                     <div className="grid lg:grid-cols-2 grid-cols-1">
-                      <div className="px-4 py-2 font-semibold">Amount</div>
+                      <div className="px-4 py-2 font-semibold">
+                        {t("amount")}
+                      </div>
                       <div className="px-4 py-2">{trans.amount} USDT</div>
                     </div>
+                    {trans.type !== "REGISTER" && (
+                      <div className="grid lg:grid-cols-2 grid-cols-1">
+                        <div className="px-4 py-2 font-semibold">
+                          {t("count pay")}
+                        </div>
+                        <div className="px-4 py-2">
+                          {t("times")} {trans.userCountPay}
+                        </div>
+                      </div>
+                    )}
+
                     <div className="grid lg:grid-cols-2 grid-cols-1">
                       <div className="px-4 py-2 font-semibold">Hash</div>
                       <div className="px-4 py-2">

@@ -5,7 +5,6 @@ import connectDB from "./config/db.js";
 import morgan from "morgan"; // show the API endpoints
 import cors from "cors"; // allow cross origin requests
 import cookieSession from "cookie-session"; // for implementing cookie sessions for passport
-import path from "path";
 import helmet from "helmet";
 import { CronJob } from "cron";
 

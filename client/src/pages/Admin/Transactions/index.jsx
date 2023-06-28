@@ -15,7 +15,7 @@ const Transactions = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [totalPage, setTotalPage] = useState(0);
   const [keyword, setKeyword] = useState("");
-  const [searchStatus, setSearchStatus] = useState("DIRECTHOLD");
+  const [searchStatus, setSearchStatus] = useState("HOLD");
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
 
@@ -38,7 +38,29 @@ const Transactions = () => {
           setLoading(false);
         });
     })();
-  }, [pageNumber, keyword, searchStatus]);
+  }, [pageNumber]);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      setPageNumber(1);
+      await Payment.getAllPayments(1, keyword, searchStatus)
+        .then((response) => {
+          const { payments, pages } = response.data;
+          setData(payments);
+          setTotalPage(pages);
+          setLoading(false);
+        })
+        .catch((error) => {
+          let message =
+            error.response && error.response.data.error
+              ? error.response.data.error
+              : error.message;
+          toast.error(t(message));
+          setLoading(false);
+        });
+    })();
+  }, [keyword, searchStatus]);
 
   const onChangeStatus = (e) => setSearchStatus(e.target.value);
 
@@ -69,17 +91,20 @@ const Transactions = () => {
             <select
               className="block p-2 pr-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none active:outline-none"
               onChange={onChangeStatus}
-              defaultValue={"DIRECTHOLD"}
+              defaultValue={"HOLD"}
             >
-              {transStatus.map((status) => (
-                <option value={status.status} key={status.status}>
-                  {status.status === "DIRECTHOLD"
-                    ? t("DIRECTHOLDt")
-                    : status.status === "REFERRALHOLD"
-                    ? t("REFERRALHOLDt")
-                    : t(status.status)}
-                </option>
-              ))}
+              <option value="REGISTER" key="REGISTER">
+                {t("REGISTER")}{" "}
+              </option>
+              <option value="DIRECT" key="DIRECT">
+                {t("DIRECT")}{" "}
+              </option>
+              <option value="REFERRAL" key="REFERRAL">
+                {t("REFERRAL")}{" "}
+              </option>
+              <option value="HOLD" key="HOLD">
+                {t("HOLD")}{" "}
+              </option>
             </select>
           </div>
           <label htmlFor="table-search" className="sr-only">
@@ -105,7 +130,7 @@ const Transactions = () => {
               type="text"
               onChange={onSearch}
               className="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50"
-              placeholder="Search for transactions"
+              placeholder={t("search with user ref code")}
             />
           </div>
         </div>
@@ -113,29 +138,31 @@ const Transactions = () => {
           <thead className="text-xs text-gray-700 uppercase bg-gray-50">
             <tr>
               <th scope="col" className="px-6 py-3">
-                Send
+                {t("send")}
               </th>
               {searchStatus !== "REGISTER" && (
                 <th scope="col" className="px-6 py-3">
-                  Receive
+                  {t("receive")}
                 </th>
               )}
               {/* <th scope="col" className="px-6 py-3">
                 Hash
               </th> */}
               <th scope="col" className="px-6 py-3">
-                Amount
+                {t("count pay")}
               </th>
               <th scope="col" className="px-6 py-3">
-                Type
+                {t("amount")}
               </th>
               <th scope="col" className="px-6 py-3">
-                Time
+                {t("type")}
               </th>
-              {(searchStatus === "DIRECTHOLD" ||
-                searchStatus === "REFERRALHOLD") && (
+              <th scope="col" className="px-6 py-3">
+                {t("time")}
+              </th>
+              {searchStatus === "HOLD" && (
                 <th scope="col" className="px-6 py-3">
-                  REFUND
+                  {t("refundStatus")}
                 </th>
               )}
             </tr>
@@ -157,9 +184,9 @@ const Transactions = () => {
                       <div className="text-base font-semibold">
                         {ele.userId}
                       </div>
-                      <div className="font-normal text-gray-500">
+                      {/* <div className="font-normal text-gray-500">
                         {ele.email}
-                      </div>
+                      </div> */}
                     </div>
                   </th>
                   {searchStatus !== "REGISTER" && (
@@ -168,9 +195,9 @@ const Transactions = () => {
                         <div className="text-base font-semibold">
                           {ele.userReceiveId}
                         </div>
-                        <div className="font-normal text-gray-500">
+                        {/* <div className="font-normal text-gray-500">
                           {ele.userReceiveEmail}
-                        </div>
+                        </div> */}
                       </div>
                     </td>
                   )}
@@ -183,6 +210,9 @@ const Transactions = () => {
                       {shortenWalletAddress(ele.hash)}
                     </a>
                   </td> */}
+                  <td className="px-6 py-4">
+                    {ele.userCountPay} {t("times")}
+                  </td>
                   <td className="px-6 py-4">{ele.amount} USDT</td>
                   <td className="px-6 py-4">
                     <div
@@ -195,8 +225,7 @@ const Transactions = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4">{ele.createdAt}</td>
-                  {(searchStatus === "DIRECTHOLD" ||
-                    searchStatus === "REFERRALHOLD") && (
+                  {searchStatus === "HOLD" && (
                     <td className="px-6 py-4">
                       <div
                         className={`max-w-fit text-white rounded-sm py-1 px-2 text-sm ${
