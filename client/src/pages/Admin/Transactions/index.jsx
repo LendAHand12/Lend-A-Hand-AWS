@@ -178,15 +178,15 @@ const Transactions = () => {
                 >
                   <th
                     scope="row"
-                    className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap "
+                    className="px-6 py-4 text-gray-900 whitespace-nowrap "
                   >
                     <div className="">
                       <div className="text-base font-semibold">
                         {ele.userId}
                       </div>
-                      {/* <div className="font-normal text-gray-500">
+                      <div className="font-normal text-gray-500">
                         {ele.email}
-                      </div> */}
+                      </div>
                     </div>
                   </th>
                   {searchStatus !== "REGISTER" && (
@@ -195,9 +195,9 @@ const Transactions = () => {
                         <div className="text-base font-semibold">
                           {ele.userReceiveId}
                         </div>
-                        {/* <div className="font-normal text-gray-500">
+                        <div className="font-normal text-gray-500">
                           {ele.userReceiveEmail}
-                        </div> */}
+                        </div>
                       </div>
                     </td>
                   )}

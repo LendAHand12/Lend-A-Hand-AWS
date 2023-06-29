@@ -93,7 +93,7 @@ const Users = () => {
   };
 
   const handleTree = (id) => {
-    console.log({ id });
+    history.push(`/admin/tree/${id}`);
   };
 
   const handleBlock = async (id) => {
@@ -259,7 +259,10 @@ const Users = () => {
                       )}
 
                       {ele.status === "APPROVED" && (
-                        <button className="font-medium text-gray-500 hover:text-primary">
+                        <button
+                          onClick={() => handleTree(ele._id)}
+                          className="font-medium text-gray-500 hover:text-primary"
+                        >
                           <svg
                             className="w-6 h-auto"
                             viewBox="0 0 48 48"

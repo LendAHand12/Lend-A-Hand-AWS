@@ -5,8 +5,10 @@ import connectDB from "./config/db.js";
 import morgan from "morgan"; // show the API endpoints
 import cors from "cors"; // allow cross origin requests
 import cookieSession from "cookie-session"; // for implementing cookie sessions for passport
+import path from "path";
 import helmet from "helmet";
 import { CronJob } from "cron";
+import getParentWithCountPay from "./utils/getParentWithCountPay.js";
 
 // middleware
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
@@ -62,6 +64,9 @@ const cron1 = new CronJob("00 08 * * *", () => {
 });
 
 cron1.start();
+
+// const parent = await getParentWithCountPay("64967a59b06c488b173e349d", 3);
+// console.log({ parent });
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>

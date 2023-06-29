@@ -1,21 +1,9 @@
 import API from "./API";
-import APIUpload from "./APIUpload";
 import { URL_API_USER } from "./URL";
 
 const User = {
   update: (userId, body) => {
-    // if (body.imgFront === "") {
-    // console.log("not file");
     return API.put(`${URL_API_USER}/${userId}`, body);
-    // } else {
-    //   console.log("have file");
-    //   const formData = new FormData();
-    //   formData.append("walletAddress", body.walletAddress);
-    //   formData.append("imgFront", body.imgFront);
-    //   formData.append("imgBack", body.imgBack);
-
-    //   return APIUpload.put(`${URL_API_USER}/${userId}`, formData);
-    // }
   },
   getAllUsers: (pageNumber, keyword, statusSearch) => {
     return API.get(
@@ -36,6 +24,9 @@ const User = {
   },
   getListChild: () => {
     return API.get(`${URL_API_USER}/listChild`);
+  },
+  getTreeOfUser: (id) => {
+    return API.get(`${URL_API_USER}/tree/${id}`);
   },
 };
 

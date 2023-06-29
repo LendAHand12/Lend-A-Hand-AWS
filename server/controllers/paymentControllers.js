@@ -63,6 +63,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         user.id,
         user.countPay
       );
+
       if (!parentWithCountPay) {
         referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
       } else if (parentWithCountPay.countPay < user.countPay + 1) {
@@ -168,10 +169,12 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         });
         transIds.referral = transactionReferral._id;
       } else {
+        step = 3;
         const directTrans = listTransSuccess.find(
           (ele) => ele.type === "DIRECT" || ele.type === "DIRECTHOLD"
         );
         transIds.direct = directTrans._id;
+
         transactionReferral = await Transaction.create({
           userId: user.id,
           amount: referralCommissionFee,
@@ -360,7 +363,7 @@ const getAllPayments = asyncHandler(async (req, res) => {
   })
     .limit(pageSize)
     .skip(pageSize * (page - 1))
-    .sort("isHoldRefund -createdAt")
+    .sort(status === "HOLD" ? "isHoldRefund -createdAt" : "-createdAt")
     .select("-password");
 
   const result = [];
@@ -572,22 +575,24 @@ const onAdminDoneRefund = asyncHandler(async (req, res) => {
   }
 });
 
-// const updateHoldPayment = asyncHandler(async (req, res) => {
-//   const listTrans = await Transaction.find({
-//     type: "REFERRALHOLD",
-//   });
+const updateHoldPayment = asyncHandler(async (req, res) => {
+  const listTrans = await Transaction.find({
+    type: "REFERRALHOLD",
+  });
 
-//   for (let trans of listTrans) {
-//     const parentWithLevelOfUser = await getParentWithCountPay(
-//       trans.userId,
-//       trans.userCountPay
-//     );
-//     trans.address_ref = parentWithLevelOfUser.walletAddress;
-//     await trans.save();
-//   }
+  const transIds = [];
+  for (let trans of listTrans) {
+    transIds.push(trans._id);
+    const parentWithLevelOfUser = await getParentWithCountPay(
+      trans.userId,
+      trans.userCountPay
+    );
+    trans.address_ref = parentWithLevelOfUser.walletAddress;
+    await trans.save();
+  }
 
-//   res.send("updated");
-// });
+  res.send("updated");
+});
 
 export {
   getPaymentInfo,
@@ -599,5 +604,5 @@ export {
   checkCanRefundPayment,
   changeToRefunded,
   onAdminDoneRefund,
-  // updateHoldPayment,
+  updateHoldPayment,
 };

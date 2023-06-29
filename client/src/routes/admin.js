@@ -22,7 +22,6 @@ const routes = [
   },
   {
     path: "/tree/:id",
-    title: "tree",
     component: Tree,
   },
   {

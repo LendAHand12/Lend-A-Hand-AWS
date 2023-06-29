@@ -145,6 +145,24 @@ const getTree = asyncHandler(async (req, res) => {
   res.status(200).json(tree);
 });
 
+const getTreeOfUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const user = await User.findOne({ _id: id }).select("userId children");
+  if (user) {
+    const tree = { _id: user._id, name: user.userId, children: [] };
+
+    for (const childId of user.children) {
+      const childNode = await buildUserTree(childId);
+      tree.children.push(childNode);
+    }
+
+    res.status(200).json(tree);
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
+});
+
 const buildUserTree = async (userId) => {
   const user = await User.findOne({ _id: userId }).select("userId children");
   const tree = { _id: user._id, name: user.userId, children: [] };
@@ -217,4 +235,5 @@ export {
   changeStatusUser,
   getTree,
   getListChildOfUser,
+  getTreeOfUser,
 };

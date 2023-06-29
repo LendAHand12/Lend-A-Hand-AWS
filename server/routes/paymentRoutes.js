@@ -9,7 +9,7 @@ import {
   checkCanRefundPayment,
   changeToRefunded,
   onAdminDoneRefund,
-  // updateHoldPayment,
+  updateHoldPayment,
 } from "../controllers/paymentControllers.js";
 import { protectRoute, isAdmin } from "../middleware/authMiddleware.js";
 
