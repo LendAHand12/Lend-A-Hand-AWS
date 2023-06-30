@@ -1,9 +1,12 @@
 import asyncHandler from "express-async-handler";
 import moment from "moment";
+import mongoose from "mongoose";
 
 import User from "../models/userModel.js";
-import Transaction from "../models/transactionModel.js";
+import DeleteUser from "../models/deleteUserModel.js";
 import sendMail from "../utils/sendMail.js";
+
+const ObjectId = mongoose.Types.ObjectId;
 
 export const checkUnpayUser = asyncHandler(async () => {
   const listUser = await User.find({
@@ -27,4 +30,33 @@ export const checkUnpayUser = asyncHandler(async () => {
       sendMail(u._id, u.email, "Payment to not fine");
     }
   }
+});
+
+export const deleteUserNotKYC = asyncHandler(async () => {
+  const listUser = await User.find({ status: "UNVERIFY" });
+
+  for (let u of listUser) {
+    let parent = await User.findById(u.parentId);
+    if (parent) {
+      let childs = parent.children;
+      let newChilds = childs.filter((item) => {
+        if (item.toString() !== u._id.toString()) return item;
+      });
+      parent.children = [...newChilds];
+      await parent.save();
+
+      const userDelete = await DeleteUser.create({
+        oldId: u._id,
+        email: u.email,
+        password: u.password,
+        walletAddress: u.walletAddress,
+        parentId: u.parentId,
+        refId: u.refId,
+      });
+
+      await User.deleteOne({ _id: u._id });
+    }
+  }
+
+  console.log("Remove unveify done");
 });

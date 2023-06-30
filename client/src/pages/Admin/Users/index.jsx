@@ -130,6 +130,7 @@ const Users = () => {
               className="block p-2 pr-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none active:outline-none"
               onChange={onChangeStatus}
               defaultValue={"all"}
+              disabled={loading}
             >
               <option value="all">All</option>
               {userStatus.map((status) => (
@@ -163,6 +164,7 @@ const Users = () => {
               onChange={onSearch}
               className="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50"
               placeholder={t("search with user name or email")}
+              disabled={loading}
             />
           </div>
         </div>

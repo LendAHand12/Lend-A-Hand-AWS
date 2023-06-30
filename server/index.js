@@ -8,7 +8,7 @@ import cookieSession from "cookie-session"; // for implementing cookie sessions 
 import path from "path";
 import helmet from "helmet";
 import { CronJob } from "cron";
-import getParentWithCountPay from "./utils/getParentWithCountPay.js";
+// import getParentWithCountPay from "./utils/getParentWithCountPay.js";
 
 // middleware
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
@@ -17,7 +17,7 @@ import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 
-import { checkUnpayUser } from "./cronJob/index.js";
+import { checkUnpayUser, deleteUserNotKYC } from "./cronJob/index.js";
 
 const app = express();
 
@@ -39,15 +39,6 @@ app.use(
   })
 );
 
-// i18n.configure({
-//   locales: ["en", "vi"],
-//   directory: "." + "/public",
-//   defaultLocale: "en",
-//   cookie: "language",
-// });
-
-// app.use(i18n.init);
-
 // configure all the routes
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
@@ -58,15 +49,18 @@ app.use(notFound);
 // configure a custome error handler middleware
 app.use(errorHandler);
 
-const cron1 = new CronJob("00 08 * * *", () => {
+const cron1 = new CronJob("00 18 * * *", () => {
   console.log("Check unpay user");
   checkUnpayUser();
 });
 
-cron1.start();
+const cron2 = new CronJob("00 19 * * *", () => {
+  console.log("Delete un KYC user");
+  deleteUserNotKYC();
+});
 
-// const parent = await getParentWithCountPay("64967a59b06c488b173e349d", 3);
-// console.log({ parent });
+cron1.start();
+cron2.start();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>

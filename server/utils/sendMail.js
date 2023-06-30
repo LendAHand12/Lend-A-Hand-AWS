@@ -28,14 +28,13 @@ const sendMail = async (id, email, option) => {
 					<br>
           -Sau khi kích hoạt tài khoản thành công quý khách đăng nhập tài khoản của mình trên website: <a href="https://lah12.com">https://lah12.com</a> vừa mới đăng ký để  KYC.
           <br></br>
-          -Để KYC quý khách vui lòng upload CCCD 2 mặt và cập nhật, khi trên tài khoản hiện thị trạng thái CHỜ XÁC THỰC là đã KYC thành công. Sau đó bạn chờ để cty Duyệt, khi tài khoản ở trạng thái ĐÃ XÁC THỰC thì bạn có thể bắt đầu thanh toán. (Nếu quý khách KYC trên điện thoại mà tài khoản vẫn ở trạng thái CHƯA XÁC THỰC thì quý khách có thể KYC trên laptop hoặc máy tính bàn).
-          <br></br>
+          -Để KYC quý khách vui lòng upload CCCD 2 mặt và cập nhật, khi trên tài khoản hiện thị trạng thái CHỜ XÁC THỰC là đã KYC thành công. Sau đó bạn chờ để cty Duyệt, khi tài khoản ở trạng thái ĐÃ XÁC THỰC thì bạn có thể bắt đầu thanh toán. <br></br>
           -ĐỂ LẤY LINK GIỚI THIỆU QUÝ KHÁCH VUI LÒNG LÀM THEO HƯỚNG DẪN BÊN DƯỚI:
           <br></br>
-          Bạn có thể lấy link giới thiệu bằng cách đăng nhập tài khoản vào thư mục GIỚI THIỆU rồi COPY để lấy link giới thiệu, quý khách có thể tham khảo như hình bên dưới.
+          -LINK GIỚI THIỆU:
           <br></br>
+          Bạn có thể lấy link giới thiệu bằng cách đăng nhập tài khoản vào thư mục GIỚI THIỆU / chọn cấp dưới ( KHÔNG CHỌN), rồi COPY để lấy link giới thiệu của mình.
           <br></br>
-					<img width="80%" height="auto" src="https://res.cloudinary.com/dhqggkmto/image/upload/v1687975045/unnamed_cvg8fk.png"/>
           <br></br>
           <br></br>
           <b>Best Regards & Thanks!</b>

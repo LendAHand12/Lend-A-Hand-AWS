@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
-import { useForm } from "react-hook-form";
 import User from "@/api/User";
-import { ToastContainer, toast } from "react-toastify";
-import Loading from "@/components/Loading";
-import { useTranslation } from "react-i18next";
-import FsLightbox from "fslightbox-react";
 import { UPDATE_USER_INFO } from "@/slices/authSlice";
+import FsLightbox from "fslightbox-react";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { ToastContainer, toast } from "react-toastify";
 
 const UserProfile = (match) => {
   const { id } = match.match.params;
@@ -31,7 +30,6 @@ const UserProfile = (match) => {
     (async () => {
       await User.getUserById(id)
         .then((response) => {
-          console.log(response.data);
           setLoading(false);
           setData(response.data);
         })

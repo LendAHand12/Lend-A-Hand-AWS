@@ -163,10 +163,30 @@ const getTreeOfUser = asyncHandler(async (req, res) => {
   }
 });
 
+const getChildsOfUserForTree = asyncHandler(async (req, res) => {
+  const { id } = req.body;
+  const user = await User.findOne({ _id: id }).select("userId children");
+  if (user) {
+    if (user.children.length === 0) {
+      res.status(404);
+      throw new Error("User not have child");
+    } else {
+      const tree = { _id: user._id, name: user.userId, children: [] };
+      for (const childId of user.children) {
+        const child = await User.findById(childId).select("userId children");
+        tree.children.push({ _id: child._id, name: child.userId });
+      }
+      res.status(200).json(tree);
+    }
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
+});
+
 const buildUserTree = async (userId) => {
   const user = await User.findOne({ _id: userId }).select("userId children");
   const tree = { _id: user._id, name: user.userId, children: [] };
-
   for (const childId of user.children) {
     const childTree = await buildUserTree(childId);
     if (childTree) {
@@ -180,6 +200,10 @@ const buildUserTree = async (userId) => {
 const getUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.id).select("-password");
   if (user) {
+    const listDirectUser = await User.find({ refId: user._id }).select(
+      "userId email walletAddress"
+    );
+
     res.json({
       id: user._id,
       email: user.email,
@@ -196,6 +220,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
       imgFront: user.imgFront,
       imgBack: user.imgBack,
       countPay: user.countPay,
+      listDirectUser: listDirectUser,
     });
   } else {
     res.status(400);
@@ -236,4 +261,5 @@ export {
   getTree,
   getListChildOfUser,
   getTreeOfUser,
+  getChildsOfUserForTree,
 };

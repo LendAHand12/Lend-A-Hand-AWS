@@ -127,5 +127,10 @@
   "search with user name or email": "Tìm kiếm bằng username hoặc email",
   "ref code": "Mã giới thiệu",
   "username": "Tên",
-  "Invalid receiving wallet address!": "Địa chỉ ví nhận không hợp lệ!"
+  "Invalid receiving wallet address!": "Địa chỉ ví nhận không hợp lệ!",
+
+  "User not have child": "Tài khoản không có cấp dưới",
+  "Getting data": "Đang lấy dữ liệu",
+  "Getting data.Please wait": "Đang lấy dữ liệu.Vui lòng chờ",
+  "children": "Tài khoản đã giới thiệu"
 }
