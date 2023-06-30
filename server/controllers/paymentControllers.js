@@ -22,7 +22,9 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
     const parentUser = await User.findOne({ _id: user.parentId }).select(
       "-password"
     );
-    const refUser = await User.findOne({ _id: user.refId }).select("-password");
+    const refUser = await User.findOne({ _id: user.parentId }).select(
+      "-password"
+    ); // update logic cha truc tiep se nhan HHTT (refUser)
 
     if (!parentUser || !refUser) {
       res.status(404);
@@ -295,21 +297,21 @@ const onDonePayment = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({ _id: req.user.id }).select("-password");
   user.countPay = user.countPay + 1;
-  if (user.countPay % 12 === 0) {
-    const currentDay = moment(new Date());
-    const userCreatedDay = moment(user.createdAt);
-    const diffDays = currentDay.diff(userCreatedDay, "days") + 1;
-    const diffWeeks = Math.floor(diffDays / 7);
-    const tier = user.tier;
-    let increated = false;
-    if (diffWeeks >= (tier + 1) * 12) {
-      user.tier = tier + 1;
-      increated = true;
-    }
-    // if(!increated) {
+  // if (user.countPay % 12 === 0) {
+  //   const currentDay = moment(new Date());
+  //   const userCreatedDay = moment(user.createdAt);
+  //   const diffDays = currentDay.diff(userCreatedDay, "days") + 1;
+  //   const diffWeeks = Math.floor(diffDays / 7);
+  //   const tier = user.tier;
+  //   let increated = false;
+  //   if (diffWeeks >= (tier + 1) * 12) {
+  //     user.tier = tier + 1;
+  //     increated = true;
+  //   }
+  //   // if(!increated) {
 
-    // }
-  }
+  //   // }
+  // }
 
   const updatedUser = await user.save();
 

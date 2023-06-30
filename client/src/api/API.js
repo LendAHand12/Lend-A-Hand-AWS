@@ -18,26 +18,6 @@ API.interceptors.request.use(
     }
     config.headers["Accept-Language"] = i18n.language;
     config.headers["Content-Type"] = "application/json";
-
-    // if (config.method === "get" && !config.data) {
-    //   config.headers["Content-Type"] = "application/json";
-    // } else {
-    //   const formData = new FormData();
-    //   for (const key in config.data) {
-    //     formData.append(key, config.data[key]);
-    //   }
-
-    //   // Kiểm tra xem formData có chứa tệp tin hay không
-    //   const hasFile = Array.from(formData.values()).some(
-    //     (value) => value instanceof File
-    //   );
-
-    //   if (hasFile) {
-    //     config.headers["Content-Type"] = "multipart/form-data";
-    //   } else {
-    //     config.headers["Content-Type"] = "application/json";
-    //   }
-    // }
     return config;
   },
   function (error) {
