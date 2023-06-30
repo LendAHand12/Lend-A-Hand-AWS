@@ -135,9 +135,11 @@ const mailForPasswordReset = asyncHandler(async (req, res) => {
 
 const authUser = asyncHandler(async (req, res) => {
   const { code, password } = req.body;
+
   let user = await User.findOne({
     $and: [{ $or: [{ email: code }, { userId: code }] }, { isConfirmed: true }],
   });
+  console.log({ user });
   // if the passwords are matching, then check if a refresh token exists for this user
   if (user && (await user.matchPassword(password))) {
     // if no refresh token available, create one and store it in the db
