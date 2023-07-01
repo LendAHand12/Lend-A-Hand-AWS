@@ -139,7 +139,6 @@ const authUser = asyncHandler(async (req, res) => {
   let user = await User.findOne({
     $and: [{ $or: [{ email: code }, { userId: code }] }, { isConfirmed: true }],
   });
-  console.log({ user });
   // if the passwords are matching, then check if a refresh token exists for this user
   if (user && (await user.matchPassword(password))) {
     // if no refresh token available, create one and store it in the db
@@ -158,6 +157,10 @@ const authUser = asyncHandler(async (req, res) => {
       existingToken.save();
     }
 
+    const listDirectUser = await User.find({ refId: user._id }).select(
+      "userId email walletAddress"
+    );
+
     res.status(200).json({
       userInfo: {
         id: user._id,
@@ -175,6 +178,7 @@ const authUser = asyncHandler(async (req, res) => {
         imgFront: user.imgFront,
         imgBack: user.imgBack,
         countPay: user.countPay,
+        listDirectUser: listDirectUser,
       },
       accessToken,
       refreshToken,
