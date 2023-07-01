@@ -31,6 +31,9 @@ const User = {
   getTreeOfUser: (id) => {
     return API.get(`${URL_API_USER}/tree/${id}`);
   },
+  getAllUsersWithKeyword: (body) => {
+    return API.post(`${URL_API_USER}/getAllUsersWithKeyword`, body);
+  },
 };
 
 export default User;

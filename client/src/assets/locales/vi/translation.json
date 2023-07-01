@@ -132,5 +132,9 @@
   "User not have child": "Tài khoản không có cấp dưới",
   "Getting data": "Đang lấy dữ liệu",
   "Getting data.Please wait": "Đang lấy dữ liệu.Vui lòng chờ",
-  "children": "Tài khoản đã giới thiệu"
+  "children": "Tài khoản đã giới thiệu",
+
+  "movePerson": "Người chuyển đi",
+  "receivePerson": "Người nhận",
+  "Please select move and receive ID": "Vui lòng chọn người chuyển đi và người được nhận"
 }

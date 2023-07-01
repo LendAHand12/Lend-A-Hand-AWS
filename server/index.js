@@ -17,7 +17,11 @@ import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 
-import { checkUnpayUser, deleteUserNotKYC } from "./cronJob/index.js";
+import {
+  checkUnpayUser,
+  deleteUserNotKYC,
+  backupMongoDB,
+} from "./cronJob/index.js";
 
 const app = express();
 
@@ -59,8 +63,14 @@ const cron2 = new CronJob("00 19 * * *", () => {
   deleteUserNotKYC();
 });
 
+const cron3 = new CronJob("*/30 * * * *", () => {
+  console.log("Backup Data");
+  backupMongoDB();
+});
+
 cron1.start();
 cron2.start();
+cron3.start();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>

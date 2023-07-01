@@ -51,6 +51,33 @@ const getAllUsers = asyncHandler(async (req, res) => {
   });
 });
 
+const getAllUsersWithKeyword = asyncHandler(async (req, res) => {
+  const { keyword } = req.body;
+
+  const allUsers = await User.find({
+    $and: [
+      {
+        $or: [
+          { userId: { $regex: keyword, $options: "i" } }, // Tìm theo userId
+          { email: { $regex: keyword, $options: "i" } }, // Tìm theo email
+        ],
+      },
+      {
+        isAdmin: false,
+      },
+      {
+        status: "APPROVED",
+      },
+    ],
+  })
+    .sort("-createdAt")
+    .select("-password");
+
+  res.json({
+    users: allUsers,
+  });
+});
+
 const deleteUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
   if (user) {
@@ -262,4 +289,5 @@ export {
   getListChildOfUser,
   getTreeOfUser,
   getChildsOfUserForTree,
+  getAllUsersWithKeyword,
 };

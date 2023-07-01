@@ -325,6 +325,13 @@ const onDonePayment = asyncHandler(async (req, res) => {
 const getAllPayments = asyncHandler(async (req, res) => {
   const { pageNumber, keyword, status } = req.query;
   const page = Number(pageNumber) || 1;
+  let searchType = {};
+  if (status === "DIRECT" || status === "REFERRAL" || status === "REGISTER") {
+    searchType = { type: status };
+  }
+  if (status === "HOLD") {
+    searchType = { type: { $regex: status, $options: "i" } };
+  }
 
   const pageSize = 10;
 
@@ -337,9 +344,7 @@ const getAllPayments = asyncHandler(async (req, res) => {
           { address_to: { $regex: keyword, $options: "i" } }, // Tìm theo địa chỉ ví
         ],
       },
-      {
-        type: { $regex: status, $options: "i" },
-      },
+      { ...searchType },
       {
         status: "SUCCESS",
       },
@@ -355,9 +360,7 @@ const getAllPayments = asyncHandler(async (req, res) => {
           { address_to: { $regex: keyword, $options: "i" } }, // Tìm theo địa chỉ ví
         ],
       },
-      {
-        type: { $regex: status, $options: "i" },
-      },
+      { ...searchType },
       {
         status: "SUCCESS",
       },

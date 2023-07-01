@@ -1,12 +1,12 @@
 import asyncHandler from "express-async-handler";
 import moment from "moment";
-import mongoose from "mongoose";
+import { spawn } from "child_process";
+import path from "path";
+import { fileURLToPath } from "url";
 
 import User from "../models/userModel.js";
 import DeleteUser from "../models/deleteUserModel.js";
 import sendMail from "../utils/sendMail.js";
-
-const ObjectId = mongoose.Types.ObjectId;
 
 export const checkUnpayUser = asyncHandler(async () => {
   const listUser = await User.find({
@@ -60,3 +60,33 @@ export const deleteUserNotKYC = asyncHandler(async () => {
 
   console.log("Remove unveify done");
 });
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const DB_NAME = "LendAHand";
+const ARCHIVE_PATH = path.join(__dirname, "../public", `${DB_NAME}.gzip`);
+
+export const backupMongoDB = () => {
+  // mongodump --db=LendAHand --archive=./LendAHand.gzip --gzip
+  // mongorestore --db=LendAHand  --archive=./LendAHand.gzip --gzip
+  const child = spawn("mongodump", [
+    `--db=${DB_NAME}`,
+    `--archive=${ARCHIVE_PATH}`,
+    "--gzip",
+  ]);
+
+  child.stdout.on("data", (data) => {
+    console.log("stdout:\n", data);
+  });
+  child.stderr.on("data", (data) => {
+    console.log("stderr:\n", Buffer.from(data).toString());
+  });
+  child.on("error", (error) => {
+    console.log("error:\n", error);
+  });
+  child.on("exit", (code, signal) => {
+    if (code) console.log("Process exit with code:", code);
+    else if (signal) console.log("Process killed with signal:", signal);
+    else console.log("Backup is successfull ✅");
+  });
+};

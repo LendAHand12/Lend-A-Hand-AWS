@@ -8,6 +8,7 @@ const Transactions = lazy(() => import("@/pages/Admin/Transactions"));
 const Tree = lazy(() => import("@/pages/Admin/Tree"));
 const GetVerifyLink = lazy(() => import("@/pages/Admin/GetVerifyLink"));
 const TransactionDetail = lazy(() => import("@/pages/Admin/TransactionDetail"));
+const System = lazy(() => import("@/pages/Admin/System"));
 
 const routes = [
   {
@@ -36,6 +37,11 @@ const routes = [
   {
     path: "/transactions/:id",
     component: TransactionDetail,
+  },
+  {
+    path: "/system",
+    title: "tree",
+    component: System,
   },
   {
     path: "/linkVerify",

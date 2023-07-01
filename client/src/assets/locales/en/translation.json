@@ -129,5 +129,9 @@
   "User not have child": "The account has no subordinates",
   "Getting data": "Getting data",
   "Getting data.Please wait": "Getting data.Please wait",
-  "children": "Referred account"
+  "children": "Referred account",
+
+  "movePerson": "Move Person",
+  "receivePerson": "Recipient",
+  "Please select move and receive ID": "Please select sender and recipient"
 }
