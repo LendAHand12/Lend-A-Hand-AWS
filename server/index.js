@@ -8,7 +8,7 @@ import cookieSession from "cookie-session"; // for implementing cookie sessions 
 import path from "path";
 import helmet from "helmet";
 import { CronJob } from "cron";
-// import getParentWithCountPay from "./utils/getParentWithCountPay.js";
+import getParentWithCountPay from "./utils/getParentWithCountPay.js";
 
 // middleware
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
@@ -71,6 +71,12 @@ const cron2 = new CronJob("00 19 * * *", () => {
 cron1.start();
 cron2.start();
 // cron3.start();
+
+// const parentCountPay = await getParentWithCountPay(
+//   "6498056f404c2eddc8944a48",
+//   1
+// );
+// console.log({ parentCountPay });
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>

@@ -34,6 +34,9 @@ const User = {
   getAllUsersWithKeyword: (body) => {
     return API.post(`${URL_API_USER}/getAllUsersWithKeyword`, body);
   },
+  changeSystem: (body) => {
+    return API.post(`${URL_API_USER}/changeSystem`, body);
+  },
 };
 
 export default User;

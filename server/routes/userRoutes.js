@@ -11,6 +11,7 @@ import {
   getTreeOfUser,
   getChildsOfUserForTree,
   getAllUsersWithKeyword,
+  changeSystem,
 } from "../controllers/userControllers.js";
 import { protectRoute, isAdmin } from "../middleware/authMiddleware.js";
 import uploadCloud from "../middleware/uploadCloud.js";
@@ -23,6 +24,8 @@ router.route("/status").put(protectRoute, isAdmin, changeStatusUser);
 router.route("/tree").get(protectRoute, getTree);
 router.route("/tree/:id").get(protectRoute, isAdmin, getTreeOfUser);
 router.route("/treeNode").post(protectRoute, isAdmin, getChildsOfUserForTree);
+router.route("/changeSystem").post(protectRoute, isAdmin, changeSystem);
+
 router
   .route("/getAllUsersWithKeyword")
   .post(protectRoute, isAdmin, getAllUsersWithKeyword);

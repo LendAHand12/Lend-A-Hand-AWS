@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import User from "@/api/User";
 import Loading from "@/components/Loading";
@@ -19,6 +19,7 @@ const SystemPage = () => {
   const [movePerson, setMovePerson] = useState(null);
   const [receivePerson, setReceivePerson] = useState(null);
   const [refresh, setRefresh] = useState(false);
+  const [withChild, setWithChild] = useState(true);
 
   useEffect(() => {
     (async () => {
@@ -35,8 +36,8 @@ const SystemPage = () => {
           })
           .catch((error) => {
             let message =
-              error.response && error.response.data.error
-                ? error.response.data.error
+              error.response && error.response.data.message
+                ? error.response.data.message
                 : error.message;
             toast.error(t(message));
             setLoadingMove(false);
@@ -60,8 +61,8 @@ const SystemPage = () => {
           })
           .catch((error) => {
             let message =
-              error.response && error.response.data.error
-                ? error.response.data.error
+              error.response && error.response.data.message
+                ? error.response.data.message
                 : error.message;
             toast.error(t(message));
             setLoadingReceive(false);
@@ -90,10 +91,32 @@ const SystemPage = () => {
     setReceivePerson(user);
   };
 
+  const handleChangeSystem = useCallback(async () => {
+    console.log({ movePerson, receivePerson, withChild });
+    setLoading(true);
+    await User.changeSystem({
+      moveId: movePerson._id,
+      receiveId: receivePerson._id,
+      withChild,
+    })
+      .then((response) => {
+        console.log({ data: response.data });
+        setLoading(false);
+      })
+      .catch((error) => {
+        let message =
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message;
+        toast.error(t(message));
+        setLoading(false);
+      });
+  }, [movePerson, receivePerson, withChild]);
+
   return (
     <div>
       <ToastContainer />
-      <div className="w-full flex justify-center gap-10">
+      <div className="w-full flex flex-col lg:flex-row justify-center gap-10">
         <div className="shadow-md sm:rounded-lg p-10">
           <h2 className="font-bold mb-4 text-xl">{t("movePerson")}</h2>
           <div className="flex items-center justify-between pb-4 bg-white">
@@ -162,7 +185,9 @@ const SystemPage = () => {
                         onClick={() => handleChooseMove(ele)}
                         className="flex text-xs justify-center items-center hover:underline gradient text-white font-bold rounded-full py-1 px-4 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                       >
-                        {t("choose")}
+                        {movePerson && movePerson.userId === ele.userId
+                          ? t("chose")
+                          : t("choose")}
                       </button>
                     </td>
                   </tr>
@@ -244,7 +269,9 @@ const SystemPage = () => {
                         onClick={() => handleChooseReceive(ele)}
                         className="flex text-xs justify-center items-center hover:underline gradient text-white font-bold rounded-full py-1 px-4 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                       >
-                        {t("choose")}
+                        {receivePerson && receivePerson.userId === ele.userId
+                          ? t("chose")
+                          : t("choose")}
                       </button>
                     </td>
                   </tr>
@@ -260,8 +287,52 @@ const SystemPage = () => {
         </div>
       </div>
       <div className="w-full my-8 text-center">
+        <div className="w-full flex justify-center items-center mb-4">
+          <input
+            id="withChild"
+            type="checkbox"
+            className="h-4 w-4 accent-primary text-white border-primary rounded"
+            onChange={() => setWithChild(true)}
+            checked={withChild === true}
+          />
+          <label
+            htmlFor="withChild"
+            className="ml-2 block text-md text-gray-900 "
+          >
+            {t("moveIncludeChild")}
+          </label>
+        </div>
+        <div className="w-full flex justify-center items-center mb-6">
+          <input
+            id="withoutChild"
+            onChange={() => setWithChild(false)}
+            checked={withChild === false}
+            type="checkbox"
+            className="h-4 w-4 accent-primary text-white border-primary rounded"
+          />
+          <label
+            htmlFor="withoutChild"
+            className="ml-2 block text-md text-gray-900 "
+          >
+            {t("moveWithoutChild")}
+          </label>
+        </div>
         {movePerson && receivePerson ? (
-          <p>ok</p>
+          <div className="flex flex-col items-center">
+            <p>
+              {t("move account")}{" "}
+              <span className="font-semibold">{movePerson.userId}</span>{" "}
+              {t("below account")}{" "}
+              <span className="font-semibold">{receivePerson.userId}</span>
+            </p>
+            <button
+              onClick={handleChangeSystem}
+              className="max-w-xs flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+            >
+              {loading && <Loading />}
+              {t("confirm")}
+            </button>
+          </div>
         ) : (
           <p>{t("Please select move and receive ID")}</p>
         )}

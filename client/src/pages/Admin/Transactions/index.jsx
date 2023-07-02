@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import Payment from "@/api/Payment";
 import Loading from "@/components/Loading";
@@ -18,11 +18,12 @@ const Transactions = () => {
   const [searchStatus, setSearchStatus] = useState("HOLD");
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
+  const [searchKey, setSearchKey] = useState("");
 
   useEffect(() => {
     (async () => {
       setLoading(true);
-      await Payment.getAllPayments(pageNumber, keyword, searchStatus)
+      await Payment.getAllPayments(pageNumber, searchKey, searchStatus)
         .then((response) => {
           const { payments, pages } = response.data;
           setData(payments);
@@ -44,7 +45,7 @@ const Transactions = () => {
     (async () => {
       setLoading(true);
       setPageNumber(1);
-      await Payment.getAllPayments(1, keyword, searchStatus)
+      await Payment.getAllPayments(1, searchKey, searchStatus)
         .then((response) => {
           const { payments, pages } = response.data;
           setData(payments);
@@ -60,7 +61,7 @@ const Transactions = () => {
           setLoading(false);
         });
     })();
-  }, [keyword, searchStatus]);
+  }, [searchKey, searchStatus]);
 
   const onChangeStatus = (e) => setSearchStatus(e.target.value);
 
@@ -81,6 +82,10 @@ const Transactions = () => {
   const handleRowClick = (id) => {
     history.push(`/admin/transactions/${id}`);
   };
+
+  const handleSearch = useCallback(() => {
+    setSearchKey(keyword);
+  }, [keyword]);
 
   return (
     <div>
@@ -126,12 +131,21 @@ const Transactions = () => {
                 ></path>
               </svg>
             </div>
-            <input
-              type="text"
-              onChange={onSearch}
-              className="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50"
-              placeholder={t("search with user ref code")}
-            />
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                onChange={onSearch}
+                className="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50"
+                placeholder={t("search with user ref code")}
+              />
+              <button
+                onClick={handleSearch}
+                disabled={loading}
+                className="h-8 flex text-xs justify-center items-center hover:underline gradient text-white font-bold rounded-full py-1 px-4 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+              >
+                {t("search")}
+              </button>
+            </div>
           </div>
         </div>
         <table className="w-full text-sm text-left text-gray-500">

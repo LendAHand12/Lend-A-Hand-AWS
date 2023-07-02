@@ -278,6 +278,74 @@ const getDescendants = async (userId) => {
   return [{ userId: user.userId, id: user._id }, ...descendants];
 };
 
+const changeSystem = asyncHandler(async (req, res) => {
+  console.log({ req: req.body });
+  const { moveId, receiveId, withChild } = req.body;
+
+  const movePerson = await User.findById(moveId);
+  const receivePerson = await User.findById(receiveId);
+
+  // if (!movePerson || !receiveId) {
+  //   res.status(400);
+  //   throw new Error("User not found");
+  // } else if (receivePerson.children.length === 3) {
+  //   res.status(400);
+  //   throw new Error("Receive user have full children");
+  // } else {
+  //   const newMovePerson = { ...movePerson };
+  //   const newReceivePerson = { ...receivePerson };
+
+  //   const parentOfMoveChild = await User.findById(newMovePerson.parentId);
+
+  //   if (!withChild) {
+  //     if (
+  //       newMovePerson.children.length + parentOfMoveChild.children.length - 1 >
+  //       3
+  //     ) {
+  //       res.status(400);
+  //       throw new Error(
+  //         `Parent of move user have ${parentOfMoveChild.children.length} child and move user have ${newMovePerson.children.length} child > 3`
+  //       );
+  //     } else {
+  //       movePerson.parentId = newReceivePerson._id;
+  //       movePerson.children = [];
+  //       await movePerson.save();
+
+  //       receivePerson.child.push(movePerson._id);
+  //       await receivePerson.save();
+
+  //       const newParentOfMoveChild = parentOfMoveChild.children.filter(
+  //         (ele) => ele.toString() !== newMovePerson._id.toString()
+  //       );
+  //       for (let childId of newMovePerson.children) {
+  //         const child = await User.findById(childId);
+  //         child.parentId = parentOfMoveChild._id;
+  //         parentOfMoveChild.children.push(childId);
+  //       }
+  //       parentOfMoveChild.children = newParentOfMoveChild;
+  //       await parentOfMoveChild.save();
+  //     }
+  //   } else {
+  //     movePerson.parentId = newReceivePerson._id;
+  //     await movePerson.save();
+
+  //     receivePerson.child.push(movePerson._id);
+  //     await receivePerson.save();
+
+  //     const newParentOfMoveChild = parentOfMoveChild.children.filter(
+  //       (ele) => ele.toString() !== newMovePerson._id.toString()
+  //     );
+
+  //     parentOfMoveChild.children = newParentOfMoveChild;
+  //     await parentOfMoveChild.save();
+  //   }
+
+  //   res.json({
+  //     message: "Update successful",
+  //   });
+  // }
+});
+
 export {
   getUserProfile,
   getAllUsers,
@@ -290,4 +358,5 @@ export {
   getTreeOfUser,
   getChildsOfUserForTree,
   getAllUsersWithKeyword,
+  changeSystem,
 };

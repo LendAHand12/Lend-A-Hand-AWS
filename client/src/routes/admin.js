@@ -38,11 +38,11 @@ const routes = [
     path: "/transactions/:id",
     component: TransactionDetail,
   },
-  {
-    path: "/system",
-    title: "tree",
-    component: System,
-  },
+  // {
+  //   path: "/system",
+  //   title: "tree",
+  //   component: System,
+  // },
   {
     path: "/linkVerify",
     title: "linkVerify",

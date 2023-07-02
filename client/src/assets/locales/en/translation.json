@@ -133,5 +133,14 @@
 
   "movePerson": "Move Person",
   "receivePerson": "Recipient",
-  "Please select move and receive ID": "Please select sender and recipient"
+  "Please select move and receive ID": "Please select sender and recipient",
+
+  "choose": "Choose",
+  "chose": "Selected",
+  "move account": "Move account",
+  "below account": "Below account",
+  "moveIncludeChild": "Move subordinates",
+  "moveWithoutChild": "Move does not include subordinates",
+
+  "search": "Search"
 }

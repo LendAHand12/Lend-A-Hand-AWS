@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import userStatus from "@/constants/userStatus";
 import { useTranslation } from "react-i18next";
@@ -18,11 +18,12 @@ const Users = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [refresh, setRefresh] = useState(false);
+  const [searchKey, setSearchKey] = useState("");
 
   useEffect(() => {
     (async () => {
       setLoading(true);
-      await User.getAllUsers(pageNumber, keyword, searchStatus)
+      await User.getAllUsers(pageNumber, searchKey, searchStatus)
         .then((response) => {
           const { users, pages } = response.data;
           setData(users);
@@ -45,7 +46,7 @@ const Users = () => {
     (async () => {
       setLoading(true);
       setPageNumber(1);
-      await User.getAllUsers(1, keyword, searchStatus)
+      await User.getAllUsers(1, searchKey, searchStatus)
         .then((response) => {
           const { users, pages } = response.data;
           setData(users);
@@ -62,14 +63,12 @@ const Users = () => {
           setLoading(false);
         });
     })();
-  }, [searchStatus, keyword]);
+  }, [searchStatus, searchKey]);
 
   const onChangeStatus = (e) => setSearchStatus(e.target.value);
 
   const onSearch = (e) => {
-    setTimeout(() => {
-      setKeyword(e.target.value);
-    }, 1000);
+    setKeyword(e.target.value);
   };
 
   const handleApprove = async (id) => {
@@ -120,6 +119,10 @@ const Users = () => {
     setPageNumber((pageNumber) => pageNumber - 1);
   };
 
+  const handleSearch = useCallback(() => {
+    setSearchKey(keyword);
+  }, [keyword]);
+
   return (
     <div>
       <ToastContainer />
@@ -159,13 +162,21 @@ const Users = () => {
                 ></path>
               </svg>
             </div>
-            <input
-              type="text"
-              onChange={onSearch}
-              className="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50"
-              placeholder={t("search with user name or email")}
-              disabled={loading}
-            />
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                onChange={onSearch}
+                className="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50"
+                placeholder={t("search with user name or email")}
+              />
+              <button
+                onClick={handleSearch}
+                disabled={loading}
+                className="h-8 flex text-xs justify-center items-center hover:underline gradient text-white font-bold rounded-full py-1 px-4 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+              >
+                {t("search")}
+              </button>
+            </div>
           </div>
         </div>
         <table className="w-full text-sm text-left text-gray-500">

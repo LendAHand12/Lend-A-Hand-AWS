@@ -136,5 +136,14 @@
 
   "movePerson": "Người chuyển đi",
   "receivePerson": "Người nhận",
-  "Please select move and receive ID": "Vui lòng chọn người chuyển đi và người được nhận"
+  "Please select move and receive ID": "Vui lòng chọn người chuyển đi và người được nhận",
+
+  "choose": "Chọn",
+  "chose": "Đã chọn ",
+  "move account": "Chuyển tài khoản",
+  "below account": "xuống dưới tài khoản",
+  "moveIncludeChild": "Chuyển cả cấp dưới",
+  "moveWithoutChild": "Chuyển không bao gồm cấp dưới",
+
+  "search": "Tìm"
 }
