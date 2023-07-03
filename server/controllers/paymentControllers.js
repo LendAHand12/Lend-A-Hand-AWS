@@ -22,9 +22,9 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
     const parentUser = await User.findOne({ _id: user.parentId }).select(
       "-password"
     );
-    const refUser = await User.findOne({ _id: user.parentId }).select(
+    const refUser = await User.findOne({ _id: user.refId }).select(
       "-password"
-    ); // update logic cha truc tiep se nhan HHTT (refUser)
+    );
 
     if (!parentUser || !refUser) {
       res.status(404);
@@ -599,6 +599,42 @@ const updateHoldPayment = asyncHandler(async (req, res) => {
   res.send("updated");
 });
 
+const updateDirectPayment = asyncHandler(async (req, res) => {
+  const listTrans = await Transaction.find({
+    $or: [{type: "DIRECTHOLD"}, {type: "DIRECT"}],
+  });
+
+  const transIds = [];
+  for (let trans of listTrans) {
+    transIds.push(trans._id);
+    const user = await User.findById(trans.userId);
+    const refUser = await User.findById(user.refId);
+    trans.address_ref = refUser.walletAddress;
+    await trans.save();
+  }
+
+  res.json(transIds);
+});
+
+const findUserOtherParentId = asyncHandler(async (req, res) => {
+  console.log("getting....")
+  const listUsers = await User.find({$and: [{isAdmin: false}]})
+
+  const result = []
+  for (let u of listUsers) {
+    if(u.children.length > 0) {
+      for(let childId of u.children) {
+        const child = await User.findById(childId)
+        if(child.parentId.toString() !== u.parentId.toString()) {
+          result.push({child: childId, parent: u._id})
+        }
+      }
+    }
+  }
+
+  res.json(result);
+});
+
 export {
   getPaymentInfo,
   addPayment,
@@ -610,4 +646,6 @@ export {
   changeToRefunded,
   onAdminDoneRefund,
   updateHoldPayment,
+  updateDirectPayment,
+  findUserOtherParentId
 };

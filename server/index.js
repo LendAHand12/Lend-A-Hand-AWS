@@ -63,17 +63,11 @@ const cron2 = new CronJob("00 19 * * *", () => {
   deleteUserNotKYC();
 });
 
-// const cron3 = new CronJob("*/30 * * * *", () => {
-//   console.log("Backup Data");
-//   backupMongoDB();
-// });
-
 cron1.start();
 cron2.start();
-// cron3.start();
 
 // const parentCountPay = await getParentWithCountPay(
-//   "6498056f404c2eddc8944a48",
+//   "6499b0eab2e996f250ecc7a4",
 //   1
 // );
 // console.log({ parentCountPay });
