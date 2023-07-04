@@ -145,5 +145,6 @@
   "moveIncludeChild": "Chuyển cả cấp dưới",
   "moveWithoutChild": "Chuyển không bao gồm cấp dưới",
 
-  "search": "Tìm"
+  "search": "Tìm",
+  "Dupplicate wallet address": "Ví bị trùng"
 }

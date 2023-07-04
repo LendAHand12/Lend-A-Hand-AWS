@@ -138,6 +138,41 @@ const UserProfile = (match) => {
                     <div className="px-4 py-2">{data.fine}</div>
                   </div>
 
+                  {data.status === "APPROVED" && data.listDirectUser.length > 0 && (
+                    <>
+                      <div className="grid lg:grid-cols-2 grid-cols-1">
+                        <div className="px-4 py-2 font-semibold">
+                          {t("children")}
+                        </div>
+                        <div className="px-4 py-2">
+                          <ul>
+                            {data.listDirectUser.map((ele) => (
+                              <li
+                                className="bg-white border-b hover:bg-gray-50"
+                                key={ele._id}
+                              >
+                                <div className="py-2">
+                                  <div className="text-base">
+                                    <span className="font-semibold">
+                                      {ele.userId}
+                                    </span>
+                                    {/* <br></br>
+                                    {ele._id}
+                                    <br></br>
+                                    {ele.email}
+                                    <br></br>
+                                    {ele.walletAddress}
+                                    <br></br> */}
+                                  </div>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
                   <div className="grid lg:grid-cols-2 grid-cols-1">
                     <div className="px-4 py-2 font-semibold">
                       The front of identity card

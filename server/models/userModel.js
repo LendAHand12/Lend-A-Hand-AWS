@@ -9,7 +9,7 @@ const userSchema = mongoose.Schema(
     },
     walletAddress: {
       type: String,
-      // unique: true,
+      unique: true,
       required: true,
     },
     email: {

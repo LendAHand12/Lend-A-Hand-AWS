@@ -142,5 +142,6 @@
   "moveIncludeChild": "Move subordinates",
   "moveWithoutChild": "Move does not include subordinates",
 
-  "search": "Search"
+  "search": "Search",
+  "Dupplicate wallet address": "Dupplicate wallet address"
 }

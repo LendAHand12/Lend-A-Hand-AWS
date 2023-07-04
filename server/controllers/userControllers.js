@@ -93,7 +93,27 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 const getUserById = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id).select("-password");
-  if (user) res.json(user);
+  const listDirectUser = await User.find({ refId: user._id }).select(
+    "userId email walletAddress"
+  );
+  if (user) res.json({
+    id: user._id,
+      email: user.email,
+      name: user.name,
+      userId: user.userId,
+      isAdmin: user.isAdmin,
+      isConfirmed: user.isConfirmed,
+      avatar: user.avatar,
+      walletAddress: user.walletAddress,
+      tier: user.tier,
+      createdAt: user.createdAt,
+      fine: user.fine,
+      status: user.status,
+      imgFront: user.imgFront,
+      imgBack: user.imgBack,
+      countPay: user.countPay,
+      listDirectUser: listDirectUser,
+  });
   else {
     res.status(404);
     throw new Error("User does not exist");
@@ -101,8 +121,12 @@ const getUserById = asyncHandler(async (req, res) => {
 });
 
 const updateUser = asyncHandler(async (req, res) => {
-  const user = await User.findOne({ _id: req.params.id }).select("-password");
   const { walletAddress, imgFront, imgBack } = req.body;
+  const user = await User.findOne({ _id: req.params.id }).select("-password");
+  const userHaveWallet = await User.find({walletAddress })
+  if(userHaveWallet >= 2) {
+    res.status(400).json({ error: "Dupplicate wallet address" });
+  }
   if (user) {
     user.walletAddress = walletAddress || user.walletAddress;
     if (imgFront !== "" && imgBack !== "") {
