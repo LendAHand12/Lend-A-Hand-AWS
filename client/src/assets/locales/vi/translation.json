@@ -146,5 +146,9 @@
   "moveWithoutChild": "Chuyển không bao gồm cấp dưới",
 
   "search": "Tìm",
-  "Dupplicate wallet address": "Ví bị trùng"
+  "Dupplicate wallet address": "Ví bị trùng",
+  "another choose": "Chọn xem cách khác",
+
+  "fineFee": "Phí phạt",
+  "FINE": "Phạt"
 }

@@ -14,6 +14,7 @@ const PaymentPage = () => {
   const [loadingPaymentInfo, setLoadingPaymentInfo] = useState(true);
   const [paymentInfo, setPaymentInfo] = useState(null);
   const [loadingAddRegister, setLoadingAddRegister] = useState(false);
+  const [loadingAddFine, setLoadingAddFine] = useState(false);
   const [loadingAddDirectCommission, setLoadingAddDirectCommission] =
     useState(false);
   const [loadingAddReferralCommission, setLoadingAddReferralCommission] =
@@ -44,6 +45,29 @@ const PaymentPage = () => {
       } catch (error) {
         toast.error(t(error.message));
         setLoadingAddRegister(false);
+      }
+    }
+  }, [paymentInfo]);
+
+  const paymentFineFee = useCallback(async () => {
+    if (paymentInfo && paymentInfo.transactionFine !== null) {
+      setLoadingAddFine(true);
+      try {
+        const fineTransaction = await transfer(
+          import.meta.env.VITE_MAIN_WALLET_ADDRESS,
+          paymentInfo.transactionFine.amount
+        );
+        const { transactionHash } = fineTransaction;
+        await addPayment(
+          paymentInfo.transactionFine._id,
+          transactionHash,
+          "FINE"
+        );
+        setLoadingAddFine(false);
+        window.location.reload(false);
+      } catch (error) {
+        toast.error(t(error.message));
+        setLoadingAddFine(false);
       }
     }
   }, [paymentInfo]);
@@ -132,6 +156,7 @@ const PaymentPage = () => {
   const onGetPaymentInfo = async () => {
     await Payment.getPaymentInfo()
       .then((response) => {
+        console.log(response.data);
         setLoadingPaymentInfo(true);
         setPaymentInfo(response.data);
         const { step } = response.data;
@@ -223,7 +248,7 @@ const PaymentPage = () => {
           </div>
         ) : (
           <>
-            {payStep === 1 && (
+            {paymentInfo.transactionFine ? (
               <>
                 <div
                   className="flex p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 "
@@ -244,255 +269,309 @@ const PaymentPage = () => {
                   </svg>
                   <span className="sr-only">Info</span>
                   <div>
-                    <span className="font-medium">{t("registerFee")}!</span>{" "}
-                    {t("pleasePay")}. (7 USDT)
+                    <span className="font-medium">{t("fineFee")}!</span>{" "}
+                    {t("pleasePay")}. (2 USDT)
                   </div>
                 </div>
                 <div>
                   <button
                     type="submit"
-                    onClick={paymentRegisterFee}
+                    onClick={paymentFineFee}
                     className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                   >
-                    {loadingAddRegister && <Loading />}
+                    {loadingAddFine && <Loading />}
                     {t("payment")}
                   </button>
                 </div>
               </>
-            )}
-            {payStep === 2 && (
+            ) : (
               <>
-                {userInfo.countPay === 0 && (
-                  <div
-                    className="flex p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 "
-                    role="alert"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      className="flex-shrink-0 inline w-5 h-5 mr-3"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      xmlns="http://www.w3.org/2000/svg"
+                {payStep === 1 && (
+                  <>
+                    <div
+                      className="flex p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 "
+                      role="alert"
                     >
-                      <path
-                        fillRule="evenodd"
-                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                        clipRule="evenodd"
-                      ></path>
-                    </svg>
-                    <span className="sr-only">Info</span>
-                    <div>
-                      <span className="font-medium">{t("registerFee")}!</span>{" "}
-                      {t("Payment successful")}. (7 USDT)
+                      <svg
+                        aria-hidden="true"
+                        className="flex-shrink-0 inline w-5 h-5 mr-3"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clipRule="evenodd"
+                        ></path>
+                      </svg>
+                      <span className="sr-only">Info</span>
+                      <div>
+                        <span className="font-medium">{t("registerFee")}!</span>{" "}
+                        {t("pleasePay")}. (7 USDT)
+                      </div>
                     </div>
-                  </div>
+                    <div>
+                      <button
+                        type="submit"
+                        onClick={paymentRegisterFee}
+                        className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                      >
+                        {loadingAddRegister && <Loading />}
+                        {t("payment")}
+                      </button>
+                    </div>
+                  </>
                 )}
-                <div
-                  className="flex p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 "
-                  role="alert"
-                >
-                  <svg
-                    aria-hidden="true"
-                    className="flex-shrink-0 inline w-5 h-5 mr-3"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
-                  <span className="sr-only">Info</span>
-                  <div>
-                    <span className="font-medium">{t("commissionFee")}!</span>{" "}
-                    {t("pleasePay")}. ({paymentInfo.directCommissionFee} USDT)
-                  </div>
-                </div>
-                <div>
-                  <button
-                    type="submit"
-                    onClick={paymentDirectionCommission}
-                    className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-                  >
-                    {loadingAddDirectCommission && <Loading />}
-                    {t("payment")}
-                  </button>
-                </div>
-              </>
-            )}
-            {payStep === 3 && (
-              <>
-                {userInfo.countPay === 0 && (
-                  <div
-                    className="flex p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 "
-                    role="alert"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      className="flex-shrink-0 inline w-5 h-5 mr-3"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      xmlns="http://www.w3.org/2000/svg"
+                {payStep === 2 && (
+                  <>
+                    {userInfo.countPay === 0 && (
+                      <div
+                        className="flex p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 "
+                        role="alert"
+                      >
+                        <svg
+                          aria-hidden="true"
+                          className="flex-shrink-0 inline w-5 h-5 mr-3"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                            clipRule="evenodd"
+                          ></path>
+                        </svg>
+                        <span className="sr-only">Info</span>
+                        <div>
+                          <span className="font-medium">
+                            {t("registerFee")}!
+                          </span>{" "}
+                          {t("Payment successful")}. (7 USDT)
+                        </div>
+                      </div>
+                    )}
+                    <div
+                      className="flex p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 "
+                      role="alert"
                     >
-                      <path
-                        fillRule="evenodd"
-                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                        clipRule="evenodd"
-                      ></path>
-                    </svg>
-                    <span className="sr-only">Info</span>
-                    <div>
-                      <span className="font-medium">{t("registerFee")}!</span>{" "}
-                      {t("Payment successful")}. (7 USDT)
+                      <svg
+                        aria-hidden="true"
+                        className="flex-shrink-0 inline w-5 h-5 mr-3"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clipRule="evenodd"
+                        ></path>
+                      </svg>
+                      <span className="sr-only">Info</span>
+                      <div>
+                        <span className="font-medium">
+                          {t("commissionFee")}!
+                        </span>{" "}
+                        {t("pleasePay")}. ({paymentInfo.directCommissionFee}{" "}
+                        USDT)
+                      </div>
                     </div>
-                  </div>
+                    <div>
+                      <button
+                        type="submit"
+                        onClick={paymentDirectionCommission}
+                        className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                      >
+                        {loadingAddDirectCommission && <Loading />}
+                        {t("payment")}
+                      </button>
+                    </div>
+                  </>
                 )}
-                <div
-                  className="flex p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 "
-                  role="alert"
-                >
-                  <svg
-                    aria-hidden="true"
-                    className="flex-shrink-0 inline w-5 h-5 mr-3"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
-                  <span className="sr-only">Info</span>
-                  <div>
-                    <span className="font-medium">{t("commissionFee")}!</span>{" "}
-                    {t("Payment successful")}. (
-                    {paymentInfo.directCommissionFee} USDT)
-                  </div>
-                </div>
-                <div
-                  className="flex p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 "
-                  role="alert"
-                >
-                  <svg
-                    aria-hidden="true"
-                    className="flex-shrink-0 inline w-5 h-5 mr-3"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
-                  <span className="sr-only">Info</span>
-                  <div>
-                    <span className="font-medium">{t("lahFuns")}!</span>{" "}
-                    {t("pleasePay")}. ({paymentInfo.referralCommissionFee} USDT)
-                  </div>
-                </div>
-                <div>
-                  <button
-                    type="submit"
-                    onClick={paymentReferralCommission}
-                    className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-                  >
-                    {loadingAddReferralCommission && <Loading />}
-                    {t("payment")}
-                  </button>
-                </div>
-              </>
-            )}
-            {payStep === 4 && (
-              <>
-                {userInfo.countPay === 0 && (
-                  <div
-                    className="flex p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 "
-                    role="alert"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      className="flex-shrink-0 inline w-5 h-5 mr-3"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      xmlns="http://www.w3.org/2000/svg"
+                {payStep === 3 && (
+                  <>
+                    {userInfo.countPay === 0 && (
+                      <div
+                        className="flex p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 "
+                        role="alert"
+                      >
+                        <svg
+                          aria-hidden="true"
+                          className="flex-shrink-0 inline w-5 h-5 mr-3"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                            clipRule="evenodd"
+                          ></path>
+                        </svg>
+                        <span className="sr-only">Info</span>
+                        <div>
+                          <span className="font-medium">
+                            {t("registerFee")}!
+                          </span>{" "}
+                          {t("Payment successful")}. (7 USDT)
+                        </div>
+                      </div>
+                    )}
+                    <div
+                      className="flex p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 "
+                      role="alert"
                     >
-                      <path
-                        fillRule="evenodd"
-                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                        clipRule="evenodd"
-                      ></path>
-                    </svg>
-                    <span className="sr-only">Info</span>
-                    <div>
-                      <span className="font-medium">{t("registerFee")}!</span>{" "}
-                      {t("Payment successful")}. (7 USDT)
+                      <svg
+                        aria-hidden="true"
+                        className="flex-shrink-0 inline w-5 h-5 mr-3"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clipRule="evenodd"
+                        ></path>
+                      </svg>
+                      <span className="sr-only">Info</span>
+                      <div>
+                        <span className="font-medium">
+                          {t("commissionFee")}!
+                        </span>{" "}
+                        {t("Payment successful")}. (
+                        {paymentInfo.directCommissionFee} USDT)
+                      </div>
                     </div>
-                  </div>
+                    <div
+                      className="flex p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 "
+                      role="alert"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        className="flex-shrink-0 inline w-5 h-5 mr-3"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clipRule="evenodd"
+                        ></path>
+                      </svg>
+                      <span className="sr-only">Info</span>
+                      <div>
+                        <span className="font-medium">{t("lahFuns")}!</span>{" "}
+                        {t("pleasePay")}. ({paymentInfo.referralCommissionFee}{" "}
+                        USDT)
+                      </div>
+                    </div>
+                    <div>
+                      <button
+                        type="submit"
+                        onClick={paymentReferralCommission}
+                        className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                      >
+                        {loadingAddReferralCommission && <Loading />}
+                        {t("payment")}
+                      </button>
+                    </div>
+                  </>
                 )}
+                {payStep === 4 && (
+                  <>
+                    {userInfo.countPay === 0 && (
+                      <div
+                        className="flex p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 "
+                        role="alert"
+                      >
+                        <svg
+                          aria-hidden="true"
+                          className="flex-shrink-0 inline w-5 h-5 mr-3"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                            clipRule="evenodd"
+                          ></path>
+                        </svg>
+                        <span className="sr-only">Info</span>
+                        <div>
+                          <span className="font-medium">
+                            {t("registerFee")}!
+                          </span>{" "}
+                          {t("Payment successful")}. (7 USDT)
+                        </div>
+                      </div>
+                    )}
 
-                <div
-                  className="flex p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 "
-                  role="alert"
-                >
-                  <svg
-                    aria-hidden="true"
-                    className="flex-shrink-0 inline w-5 h-5 mr-3"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
-                  <span className="sr-only">Info</span>
-                  <div>
-                    <span className="font-medium">{t("commissionFee")}!</span>{" "}
-                    {t("Payment successful")}. (
-                    {paymentInfo.directCommissionFee} USDT)
-                  </div>
-                </div>
-                <div
-                  className="flex p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 "
-                  role="alert"
-                >
-                  <svg
-                    aria-hidden="true"
-                    className="flex-shrink-0 inline w-5 h-5 mr-3"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
-                  <span className="sr-only">Info</span>
-                  <div>
-                    <span className="font-medium">{t("lahFuns")}!</span>{" "}
-                    {t("Payment successful")}. (
-                    {paymentInfo.referralCommissionFee} USDT)
-                  </div>
-                </div>
-                <div>
-                  <button
-                    type="submit"
-                    onClick={onDonePay}
-                    className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-                  >
-                    {t("donePayment")}
-                  </button>
-                </div>
+                    <div
+                      className="flex p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 "
+                      role="alert"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        className="flex-shrink-0 inline w-5 h-5 mr-3"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clipRule="evenodd"
+                        ></path>
+                      </svg>
+                      <span className="sr-only">Info</span>
+                      <div>
+                        <span className="font-medium">
+                          {t("commissionFee")}!
+                        </span>{" "}
+                        {t("Payment successful")}. (
+                        {paymentInfo.directCommissionFee} USDT)
+                      </div>
+                    </div>
+                    <div
+                      className="flex p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 "
+                      role="alert"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        className="flex-shrink-0 inline w-5 h-5 mr-3"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clipRule="evenodd"
+                        ></path>
+                      </svg>
+                      <span className="sr-only">Info</span>
+                      <div>
+                        <span className="font-medium">{t("lahFuns")}!</span>{" "}
+                        {t("Payment successful")}. (
+                        {paymentInfo.referralCommissionFee} USDT)
+                      </div>
+                    </div>
+                    <div>
+                      <button
+                        type="submit"
+                        onClick={onDonePay}
+                        className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                      >
+                        {t("donePayment")}
+                      </button>
+                    </div>
+                  </>
+                )}
               </>
             )}
           </>

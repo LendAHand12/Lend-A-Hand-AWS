@@ -22,9 +22,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
     const parentUser = await User.findOne({ _id: user.parentId }).select(
       "-password"
     );
-    const refUser = await User.findOne({ _id: user.refId }).select(
-      "-password"
-    );
+    const refUser = await User.findOne({ _id: user.refId }).select("-password");
 
     if (!parentUser || !refUser) {
       res.status(404);
@@ -80,6 +78,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
     let transactionRegister = null;
     let transactionDirect = null;
     let transactionReferral = null;
+    let transactionFine = null;
 
     const transIds = {};
 
@@ -88,6 +87,9 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         { userId: user.id },
         { userCountPay: user.countPay },
         { status: "SUCCESS" },
+        {
+          type: { $ne: "FINE" },
+        },
       ],
     });
 
@@ -251,6 +253,20 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       transIds.register = referral._id;
     }
 
+    if (user.fine < 0) {
+      transactionFine = await Transaction.create({
+        userId: user.id,
+        amount: user.find,
+        userCountPay: user.countPay,
+        address_ref: process.env.MAIN_WALLET_ADDRESS,
+        address_from: user.walletAddress,
+        address_to: process.env.MAIN_WALLET_ADDRESS,
+        hash: "",
+        type: "FINE",
+        status: "PENDING",
+      });
+    }
+
     res.json({
       step,
       registerFee,
@@ -259,6 +275,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       referralCommissionWallet,
       referralCommissionFee,
       transIds,
+      transactionFine,
     });
   } else {
     res.status(404);
@@ -326,7 +343,12 @@ const getAllPayments = asyncHandler(async (req, res) => {
   const { pageNumber, keyword, status } = req.query;
   const page = Number(pageNumber) || 1;
   let searchType = {};
-  if (status === "DIRECT" || status === "REFERRAL" || status === "REGISTER") {
+  if (
+    status === "DIRECT" ||
+    status === "REFERRAL" ||
+    status === "REGISTER" ||
+    status === "FINE"
+  ) {
     searchType = { type: status };
   }
   if (status === "HOLD") {
@@ -374,7 +396,7 @@ const getAllPayments = asyncHandler(async (req, res) => {
   const result = [];
   for (let pay of allPayments) {
     let user = await User.findById(pay.userId);
-    if (status === "REGISTER") {
+    if (status === "REGISTER" || status === "FINE") {
       result.push({
         _id: pay._id,
         address_from: pay.address_from,
@@ -601,7 +623,7 @@ const updateHoldPayment = asyncHandler(async (req, res) => {
 
 const updateDirectPayment = asyncHandler(async (req, res) => {
   const listTrans = await Transaction.find({
-    $or: [{type: "DIRECTHOLD"}, {type: "DIRECT"}],
+    $or: [{ type: "DIRECTHOLD" }, { type: "DIRECT" }],
   });
 
   const transIds = [];
@@ -617,16 +639,16 @@ const updateDirectPayment = asyncHandler(async (req, res) => {
 });
 
 const findUserOtherParentId = asyncHandler(async (req, res) => {
-  console.log("getting....")
-  const listUsers = await User.find({$and: [{isAdmin: false}]})
+  console.log("getting....");
+  const listUsers = await User.find({ $and: [{ isAdmin: false }] });
 
-  const result = []
+  const result = [];
   for (let u of listUsers) {
-    if(u.children.length > 0) {
-      for(let childId of u.children) {
-        const child = await User.findById(childId)
-        if(child.parentId.toString() !== u.parentId.toString()) {
-          result.push({child: childId, parent: u._id})
+    if (u.children.length > 0) {
+      for (let childId of u.children) {
+        const child = await User.findById(childId);
+        if (child.parentId.toString() !== u.parentId.toString()) {
+          result.push({ child: childId, parent: u._id });
         }
       }
     }
@@ -647,5 +669,5 @@ export {
   onAdminDoneRefund,
   updateHoldPayment,
   updateDirectPayment,
-  findUserOtherParentId
+  findUserOtherParentId,
 };

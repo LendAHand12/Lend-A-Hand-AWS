@@ -107,6 +107,9 @@ const Transactions = () => {
               <option value="REFERRAL" key="REFERRAL">
                 {t("REFERRAL")}{" "}
               </option>
+              <option value="FINE" key="FINE">
+                {t("FINE")}{" "}
+              </option>
               <option value="HOLD" key="HOLD">
                 {t("HOLD")}{" "}
               </option>
@@ -154,17 +157,20 @@ const Transactions = () => {
               <th scope="col" className="px-6 py-3">
                 {t("send")}
               </th>
-              {searchStatus !== "REGISTER" && (
-                <th scope="col" className="px-6 py-3">
-                  {t("receive")}
-                </th>
+              {searchStatus !== "REGISTER" && searchStatus !== "FINE" && (
+                <>
+                  <th scope="col" className="px-6 py-3">
+                    {t("receive")}
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    {t("count pay")}
+                  </th>
+                </>
               )}
               {/* <th scope="col" className="px-6 py-3">
                 Hash
               </th> */}
-              <th scope="col" className="px-6 py-3">
-                {t("count pay")}
-              </th>
+
               <th scope="col" className="px-6 py-3">
                 {t("amount")}
               </th>
@@ -203,17 +209,22 @@ const Transactions = () => {
                       </div>
                     </div>
                   </th>
-                  {searchStatus !== "REGISTER" && (
-                    <td className="px-6 py-4">
-                      <div className="">
-                        <div className="text-base font-semibold">
-                          {ele.userReceiveId}
+                  {searchStatus !== "REGISTER" && searchStatus !== "FINE" && (
+                    <>
+                      <td className="px-6 py-4">
+                        <div className="">
+                          <div className="text-base font-semibold">
+                            {ele.userReceiveId}
+                          </div>
+                          <div className="font-normal text-gray-500">
+                            {ele.userReceiveEmail}
+                          </div>
                         </div>
-                        <div className="font-normal text-gray-500">
-                          {ele.userReceiveEmail}
-                        </div>
-                      </div>
-                    </td>
+                      </td>
+                      <td className="px-6 py-4">
+                        {ele.userCountPay} {t("times")}
+                      </td>
+                    </>
                   )}
                   {/* <td className="px-6 py-4 text-blue-600">
                     <a
@@ -224,9 +235,7 @@ const Transactions = () => {
                       {shortenWalletAddress(ele.hash)}
                     </a>
                   </td> */}
-                  <td className="px-6 py-4">
-                    {ele.userCountPay} {t("times")}
-                  </td>
+
                   <td className="px-6 py-4">{ele.amount} USDT</td>
                   <td className="px-6 py-4">
                     <div

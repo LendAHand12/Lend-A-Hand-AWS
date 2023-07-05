@@ -143,5 +143,8 @@
   "moveWithoutChild": "Move does not include subordinates",
 
   "search": "Search",
-  "Dupplicate wallet address": "Dupplicate wallet address"
+  "Dupplicate wallet address": "Dupplicate wallet address",
+
+  "fineFee": "penalty fee",
+  "FINE": "Penalty"
 }

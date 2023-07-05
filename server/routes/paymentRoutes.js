@@ -17,7 +17,7 @@ import { protectRoute, isAdmin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// router.route("/updateHoldPayment").get(updateHoldPayment);
+router.route("/updateHoldPayment").get(updateHoldPayment);
 // router.route("/updateDirectPayment").get(updateDirectPayment);
 // router.route("/findUserOtherParentId").get(findUserOtherParentId);
 

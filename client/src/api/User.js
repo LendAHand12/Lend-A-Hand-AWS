@@ -37,6 +37,9 @@ const User = {
   changeSystem: (body) => {
     return API.post(`${URL_API_USER}/changeSystem`, body);
   },
+  getChildrenList: () => {
+    return API.get(`${URL_API_USER}/getChildrenList`);
+  },
 };
 
 export default User;

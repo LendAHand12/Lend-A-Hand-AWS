@@ -1,12 +1,10 @@
 import asyncHandler from "express-async-handler";
 import moment from "moment";
-import { spawn } from "child_process";
-import path from "path";
-import { fileURLToPath } from "url";
 
-import User from "../models/userModel.js";
 import DeleteUser from "../models/deleteUserModel.js";
+import User from "../models/userModel.js";
 import sendMail from "../utils/sendMail.js";
+import { getCountAllChildren } from "../controllers/userControllers.js";
 
 export const checkUnpayUser = asyncHandler(async () => {
   const listUser = await User.find({
@@ -19,15 +17,51 @@ export const checkUnpayUser = asyncHandler(async () => {
     const { countPay } = u;
     const countPayWithDays = 7 * (countPay + 1); // số ngày thanh toán theo lần thanh toán
     if (countPayWithDays - diffDays < -7) {
-      u.fine = u.fine + 2;
-      u.status = "LOCKED";
+      if (u.fine === 2) {
+        u.fine = 4;
+      } else if (u.fine === 4) {
+        u.fine = 6;
+        u.status = "LOCKED";
+      }
       await u.save();
     } else if (countPayWithDays - diffDays < 0) {
-      u.fine = u.fine + 2;
+      if (u.fine === 0) {
+        u.fine = 2;
+      }
       await u.save();
     } else if (countPayWithDays - diffDays === 0) {
       // send mail payment
       sendMail(u._id, u.email, "Payment to not fine");
+    }
+  }
+});
+
+export const checkIncreaseTier = asyncHandler(async () => {
+  const listUser = await User.find({
+    $and: [{ isAdmin: false }, { status: "APPROVED" }],
+  }).select("createdAt countPay fine status email");
+  for (let u of listUser) {
+    let nextTier = Math.floor(u.countPay / 12);
+
+    if (nextTier > 0 && u.tier !== nextTier) {
+      const currentDay = moment(new Date());
+      const userCreatedDay = moment(u.createdAt);
+      const diffDays = currentDay.diff(userCreatedDay, "days") + 1;
+      if (diffDays > nextTier * 84) {
+        const countTotalChild = await getCountAllChildren(u._id);
+        if (countTotalChild > 30000 * nextTier) {
+          u.tier = nextTier;
+          // await u.save();
+          console.log({ u });
+        }
+      } else {
+        const countTotalChild = await getCountAllChildren(u._id);
+        if (countTotalChild > 797161 * nextTier) {
+          u.tier = nextTier;
+          console.log({ u });
+          // await u.save();
+        }
+      }
     }
   }
 });
@@ -60,33 +94,3 @@ export const deleteUserNotKYC = asyncHandler(async () => {
 
   console.log("Remove unveify done");
 });
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const DB_NAME = "LendAHand";
-const ARCHIVE_PATH = path.join(__dirname, "../public", `${DB_NAME}.gzip`);
-
-export const backupMongoDB = () => {
-  // mongodump --db=LendAHand --archive=./LendAHand.gzip --gzip
-  // mongorestore --db=LendAHand  --archive=./LendAHand.gzip --gzip
-  const child = spawn("mongodump", [
-    `--db=${DB_NAME}`,
-    `--archive=${ARCHIVE_PATH}`,
-    "--gzip",
-  ]);
-
-  child.stdout.on("data", (data) => {
-    console.log("stdout:\n", data);
-  });
-  child.stderr.on("data", (data) => {
-    console.log("stderr:\n", Buffer.from(data).toString());
-  });
-  child.on("error", (error) => {
-    console.log("error:\n", error);
-  });
-  child.on("exit", (code, signal) => {
-    if (code) console.log("Process exit with code:", code);
-    else if (signal) console.log("Process killed with signal:", signal);
-    else console.log("Backup is successfull ✅");
-  });
-};

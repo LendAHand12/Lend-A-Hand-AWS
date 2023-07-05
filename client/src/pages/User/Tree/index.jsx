@@ -1,13 +1,21 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Tree, TreeNode } from "react-organizational-chart";
-import User from "../../../api/User";
+import { useSelector } from "react-redux";
+import User from "@/api/User";
 import { toast, ToastContainer } from "react-toastify";
 import Loading from "@/components/Loading";
+import { useTranslation } from "react-i18next";
+import TreeMenu from "react-simple-tree-menu";
+import TreeBG from "@/assets/img/tree.jpg";
+import AppleBG from "@/assets/img/apple.png";
 import "./index.less";
 
-const StyledNode = ({ children }) => {
+const StyledNode = ({ children, onClick }) => {
   return (
-    <div className="p-3 rotate-180 text-white text-sm rounded-md inline-block bg-green-600">
+    <div
+      onClick={onClick}
+      className="cursor-pointer p-3 rotate-180 text-white text-sm rounded-md inline-block bg-green-600"
+    >
       <div className="flex flex-col items-center">
         <span>{children}</span>
         <svg
@@ -43,26 +51,63 @@ const StyledNode = ({ children }) => {
   );
 };
 
-const TreeNodeItem = ({ node }) => {
+const TreeNodeItem = ({ node, onClick }) => {
   return (
-    <TreeNode label={<StyledNode>{node.name}</StyledNode>}>
-      {node.children &&
-        node.children.length > 0 &&
-        node.children.map((ele) => <TreeNodeItem key={ele._id} node={ele} />)}
+    <TreeNode
+      label={
+        <StyledNode onClick={() => onClick(node.key)}>{node.label}</StyledNode>
+      }
+    >
+      {node.nodes &&
+        node.nodes.length > 0 &&
+        node.nodes.map((ele) => (
+          <TreeNodeItem key={ele.key} node={ele} onClick={onClick} />
+        ))}
     </TreeNode>
   );
 };
 
 const TreePage = () => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [treeData, setTreeData] = useState({});
+  const [treeArr, setTreeArr] = useState([]);
+  const [showType, setShowType] = useState(false);
+  const [appleWidth, setAppleWidth] = useState(20);
+  const [treeDataView, setTreeDataView] = useState([]);
+  const [clickedKeys, setClickedKeys] = useState([]);
+  const [loadingItem, setLoadingItem] = useState("");
+  const { userInfo } = useSelector((state) => state.auth);
+
+  // useEffect(() => {
+  //   const width = window.innerWidth;
+  //   const height = window.innerHeight;
+  //   setAppleWidth(width / 50);
+  // }, []);
 
   useEffect(() => {
     (async () => {
+      // if (!showType) {
+      // setLoading(true);
+      // await User.getChildrenList()
+      //   .then((response) => {
+      //     setLoading(false);
+      //     setTreeArr(response.data);
+      //   })
+      //   .catch((error) => {
+      //     let message =
+      //       error.response && error.response.data.error
+      //         ? error.response.data.error
+      //         : error.message;
+      //     toast.error(message);
+      //     setLoading(false);
+      //   });
+      // } else {
       setLoading(true);
-      await User.getTree()
+      await User.getChildsOfUserForTree({ id: userInfo.id })
         .then((response) => {
           setLoading(false);
+          setClickedKeys([response.data.key]);
           setTreeData(response.data);
         })
         .catch((error) => {
@@ -73,8 +118,67 @@ const TreePage = () => {
           toast.error(message);
           setLoading(false);
         });
+      // }
     })();
   }, []);
+
+  // const getRandomPosition = () => {
+  //   const windowWidth = window.innerWidth;
+  //   const windowHeight = window.innerHeight;
+  //   const xPosition =
+  //     Math.random() * (windowWidth / 2); /* 40 là kích thước của hình ảnh táo */
+  //   const yPosition =
+  //     Math.random() *
+  //     (windowHeight / 2); /* 40 là kích thước của hình ảnh táo */
+  //   return { x: xPosition, y: yPosition };
+  // };
+
+  const handleNodeItemClick = useCallback(
+    async (id) => {
+      if (loadingItem) {
+        toast.error(t("Getting data.Please wait"));
+      } else {
+        setLoadingItem(true);
+        await User.getChildsOfUserForTree({ id })
+          .then((response) => {
+            setLoadingItem(false);
+            const cloneTreeData = { ...treeData };
+            const newTreeData = handleFindAndPushChild(
+              id,
+              response.data.nodes,
+              cloneTreeData
+            );
+            setTreeData(newTreeData);
+            setClickedKeys(id);
+          })
+          .catch((error) => {
+            let message =
+              error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message;
+            toast.error(t(message));
+            setLoadingItem(false);
+          });
+      }
+    },
+    [treeData]
+  );
+
+  const handleFindAndPushChild = (id, newChildren, cloneTreeData) => {
+    if (cloneTreeData.key === id) {
+      return { ...cloneTreeData, nodes: newChildren };
+    } else if (cloneTreeData.nodes && cloneTreeData.nodes.length > 0) {
+      const updatedChildren = cloneTreeData.nodes.map((child) =>
+        handleFindAndPushChild(id, newChildren, child)
+      );
+      return { ...cloneTreeData, nodes: updatedChildren };
+    }
+    return cloneTreeData;
+  };
+
+  useEffect(() => {
+    setTreeDataView([treeData]);
+  }, [treeData]);
 
   return (
     <>
@@ -84,20 +188,82 @@ const TreePage = () => {
           <Loading />
         </div>
       ) : (
-        <div className="w-full overflow-auto rotate-180">
-          <Tree
-            lineWidth={"10px"}
-            lineColor={"brown"}
-            lineBorderRadius={"10px"}
-            label={<StyledNode>{treeData.name}</StyledNode>}
+        <>
+          <button
+            onClick={() => setShowType(!showType)}
+            className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
           >
-            {treeData.children &&
-              treeData.children.length > 0 &&
-              treeData.children.map((child) => (
-                <TreeNodeItem key={child._id} node={child} />
-              ))}
-          </Tree>
-        </div>
+            {t("another choose")}
+          </button>
+          {loadingItem && (
+            <div
+              className="flex items-center gradient text-white text-sm px-4 py-3 mb-4"
+              role="alert"
+            >
+              <svg
+                className="fill-current w-4 h-4 mr-2"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+              >
+                <path d="M12.432 0c1.34 0 2.01.912 2.01 1.957 0 1.305-1.164 2.512-2.679 2.512-1.269 0-2.009-.75-1.974-1.99C9.789 1.436 10.67 0 12.432 0zM8.309 20c-1.058 0-1.833-.652-1.093-3.524l1.214-5.092c.211-.814.246-1.141 0-1.141-.317 0-1.689.562-2.502 1.117l-.528-.88c2.572-2.186 5.531-3.467 6.801-3.467 1.057 0 1.233 1.273.705 3.23l-1.391 5.352c-.246.945-.141 1.271.106 1.271.317 0 1.357-.392 2.379-1.207l.6.814C12.098 19.02 9.365 20 8.309 20z" />
+              </svg>
+              <p>{t("Getting data")}...</p>
+            </div>
+          )}
+          {showType ? (
+            <div className="w-full overflow-auto rotate-180">
+              <Tree
+                lineWidth={"10px"}
+                lineColor={"brown"}
+                lineBorderRadius={"10px"}
+                label={<StyledNode>{treeData.label}</StyledNode>}
+              >
+                {treeData.nodes &&
+                  treeData.nodes.length > 0 &&
+                  treeData.nodes.map((child) => (
+                    <TreeNodeItem
+                      key={child.key}
+                      node={child}
+                      onClick={handleNodeItemClick}
+                    />
+                  ))}
+              </Tree>
+            </div>
+          ) : (
+            // <div className="relative w-full h-full">
+            //   <img src={TreeBG} className="w-full h-auto object-contain" />
+            //   <div className="absolute top-0 w-full h-2/3">
+            //     <div className="relative w-full h-full">
+            //       {treeArr &&
+            //         treeArr.map((item, index) => {
+            //           const { x, y } = getRandomPosition();
+            //           console.log({ x, y });
+            //           return (
+            //             <img
+            //               key={index}
+            //               src={AppleBG}
+            //               style={{
+            //                 position: "absolute",
+            //                 width: appleWidth,
+            //                 top: `${y}px`,
+            //                 left: `${x}px`,
+            //               }}
+            //             />
+            //           );
+            //         })}
+            //     </div>
+            //   </div>
+            // </div>
+            <TreeMenu
+              hasSearch={false}
+              data={treeDataView}
+              onClickItem={(item) => {
+                const key = item.key.split("/")[item.key.split("/").length - 1];
+                !clickedKeys.includes(key) && handleNodeItemClick(key);
+              }}
+            ></TreeMenu>
+          )}
+        </>
       )}
     </>
   );

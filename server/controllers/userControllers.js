@@ -96,8 +96,9 @@ const getUserById = asyncHandler(async (req, res) => {
   const listDirectUser = await User.find({ refId: user._id }).select(
     "userId email walletAddress"
   );
-  if (user) res.json({
-    id: user._id,
+  if (user)
+    res.json({
+      id: user._id,
       email: user.email,
       name: user.name,
       userId: user.userId,
@@ -113,7 +114,7 @@ const getUserById = asyncHandler(async (req, res) => {
       imgBack: user.imgBack,
       countPay: user.countPay,
       listDirectUser: listDirectUser,
-  });
+    });
   else {
     res.status(404);
     throw new Error("User does not exist");
@@ -123,8 +124,8 @@ const getUserById = asyncHandler(async (req, res) => {
 const updateUser = asyncHandler(async (req, res) => {
   const { walletAddress, imgFront, imgBack } = req.body;
   const user = await User.findOne({ _id: req.params.id }).select("-password");
-  const userHaveWallet = await User.find({walletAddress })
-  if(userHaveWallet >= 2) {
+  const userHaveWallet = await User.find({ walletAddress });
+  if (userHaveWallet >= 2) {
     res.status(400).json({ error: "Dupplicate wallet address" });
   }
   if (user) {
@@ -140,6 +141,9 @@ const updateUser = asyncHandler(async (req, res) => {
     }
     const updatedUser = await user.save();
     if (updatedUser) {
+      const listDirectUser = await User.find({ refId: user._id }).select(
+        "userId email walletAddress"
+      );
       res.status(200).json({
         message: "Update successful",
         data: {
@@ -158,6 +162,7 @@ const updateUser = asyncHandler(async (req, res) => {
           imgFront: updatedUser.imgFront,
           imgBack: updatedUser.imgBack,
           countPay: updatedUser.countPay,
+          listDirectUser,
         },
       });
     }
@@ -180,6 +185,14 @@ const changeStatusUser = asyncHandler(async (req, res) => {
   } else {
     res.status(400).json({ error: "User not found" });
   }
+});
+
+const getChildrenList = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+
+  let result = await getAllChildren(id);
+
+  res.status(200).json(result);
 });
 
 const getTree = asyncHandler(async (req, res) => {
@@ -222,10 +235,14 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
       res.status(404);
       throw new Error("User not have child");
     } else {
-      const tree = { _id: user._id, name: user.userId, children: [] };
+      const tree = { key: user._id, label: user.userId, nodes: [] };
       for (const childId of user.children) {
         const child = await User.findById(childId).select("userId children");
-        tree.children.push({ _id: child._id, name: child.userId });
+        const countChild = await getCountAllChildren(childId);
+        tree.nodes.push({
+          key: child._id,
+          label: `${child.userId} (${countChild})`,
+        });
       }
       res.status(200).json(tree);
     }
@@ -246,6 +263,38 @@ const buildUserTree = async (userId) => {
   }
 
   return tree;
+};
+
+const getAllChildren = async (userId) => {
+  const user = await User.findById(userId).select("userId children");
+
+  if (!user) {
+    return [];
+  }
+
+  let children = [];
+  for (const childId of user.children) {
+    const child = await getAllChildren(childId);
+    children = children.concat(child);
+  }
+
+  return [user.userId, ...children];
+};
+
+const getCountAllChildren = async (userId) => {
+  const user = await User.findById(userId).select("userId children");
+
+  if (!user) {
+    return 0;
+  }
+
+  let result = user.children.length;
+  for (const childId of user.children) {
+    const count = await getCountAllChildren(childId);
+    result += count;
+  }
+
+  return result;
 };
 
 const getUserProfile = asyncHandler(async (req, res) => {
@@ -383,4 +432,6 @@ export {
   getChildsOfUserForTree,
   getAllUsersWithKeyword,
   changeSystem,
+  getChildrenList,
+  getCountAllChildren,
 };

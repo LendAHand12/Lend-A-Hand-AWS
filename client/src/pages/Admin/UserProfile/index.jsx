@@ -45,7 +45,6 @@ const UserProfile = (match) => {
   }, [id]);
 
   const onSubmit = async (data) => {
-    console.log({ data });
     const { walletAddress, imgFront, imgBack } = data;
 
     await User.update(id, {
@@ -77,7 +76,7 @@ const UserProfile = (match) => {
             <div className="bg-white shadow-md p-3 border-t-4 border-primary">
               <ul className=" text-gray-600 py-2 px-3 mt-3 divide-y rounded">
                 <li className="flex items-center py-3">
-                  <span>Status</span>
+                  <span>{t("status")}</span>
                   <span className="ml-auto">
                     <span
                       className={`${
@@ -99,7 +98,7 @@ const UserProfile = (match) => {
                   </span>
                 </li>
                 <li className="flex items-center py-3">
-                  <span>Member since</span>
+                  <span>{t("memberSince")}</span>
                   <span className="ml-auto">
                     {new Date(data.createdAt).toLocaleDateString("vi")}
                   </span>
@@ -125,7 +124,7 @@ const UserProfile = (match) => {
                   </div>
                   <div className="grid lg:grid-cols-2 grid-cols-1">
                     <div className="px-4 py-2 font-semibold">
-                      Wallet address
+                      {t("walletAddress")}
                     </div>
                     <div className="px-4 py-2">{data.walletAddress}</div>
                   </div>
@@ -134,48 +133,49 @@ const UserProfile = (match) => {
                     <div className="px-4 py-2">{data.tier}</div>
                   </div>
                   <div className="grid lg:grid-cols-2 grid-cols-1">
-                    <div className="px-4 py-2 font-semibold">Fine</div>
+                    <div className="px-4 py-2 font-semibold">{t("fine")}</div>
                     <div className="px-4 py-2">{data.fine}</div>
                   </div>
 
-                  {data.status === "APPROVED" && data.listDirectUser.length > 0 && (
-                    <>
-                      <div className="grid lg:grid-cols-2 grid-cols-1">
-                        <div className="px-4 py-2 font-semibold">
-                          {t("children")}
-                        </div>
-                        <div className="px-4 py-2">
-                          <ul>
-                            {data.listDirectUser.map((ele) => (
-                              <li
-                                className="bg-white border-b hover:bg-gray-50"
-                                key={ele._id}
-                              >
-                                <div className="py-2">
-                                  <div className="text-base">
-                                    <span className="font-semibold">
-                                      {ele.userId}
-                                    </span>
-                                    {/* <br></br>
+                  {data.status === "APPROVED" &&
+                    data.listDirectUser.length > 0 && (
+                      <>
+                        <div className="grid lg:grid-cols-2 grid-cols-1">
+                          <div className="px-4 py-2 font-semibold">
+                            {t("children")}
+                          </div>
+                          <div className="px-4 py-2">
+                            <ul>
+                              {data.listDirectUser.map((ele) => (
+                                <li
+                                  className="bg-white border-b hover:bg-gray-50"
+                                  key={ele._id}
+                                >
+                                  <div className="py-2">
+                                    <div className="text-base">
+                                      <span className="font-semibold">
+                                        {ele.userId}
+                                      </span>
+                                      {/* <br></br>
                                     {ele._id}
                                     <br></br>
                                     {ele.email}
                                     <br></br>
                                     {ele.walletAddress}
                                     <br></br> */}
+                                    </div>
                                   </div>
-                                </div>
-                              </li>
-                            ))}
-                          </ul>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
                         </div>
-                      </div>
-                    </>
-                  )}
+                      </>
+                    )}
 
                   <div className="grid lg:grid-cols-2 grid-cols-1">
                     <div className="px-4 py-2 font-semibold">
-                      The front of identity card
+                      {t("idCardFront")}
                     </div>
                     <img
                       onClick={handleToggler}
@@ -189,7 +189,7 @@ const UserProfile = (match) => {
                   />
                   <div className="grid lg:grid-cols-2 grid-cols-1">
                     <div className="px-4 py-2 font-semibold">
-                      The back of identity card
+                      {t("idCardBack")}
                     </div>
 
                     <img

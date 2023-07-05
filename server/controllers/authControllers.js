@@ -137,7 +137,11 @@ const authUser = asyncHandler(async (req, res) => {
   const { code, password } = req.body;
 
   let user = await User.findOne({
-    $and: [{ $or: [{ email: code }, { userId: code }] }, { isConfirmed: true }],
+    $and: [
+      { $or: [{ email: code }, { userId: code }] },
+      { isConfirmed: true },
+      { status: { $ne: "LOCKED" } },
+    ],
   });
   // if the passwords are matching, then check if a refresh token exists for this user
   if (user && (await user.matchPassword(password))) {

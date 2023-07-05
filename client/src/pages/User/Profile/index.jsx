@@ -193,7 +193,7 @@ const Profile = () => {
                       {t("walletAddress")}
                     </div>
                     <div className="">
-                      <input
+                      {/* <input
                         className="w-full px-4 py-1 rounded-md border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                         {...register("walletAddress", {
                           required: "Wallet address is required",
@@ -207,7 +207,8 @@ const Profile = () => {
                       />
                       <p className="error-message-text">
                         {errors.walletAddress?.message}
-                      </p>
+                      </p> */}
+                      <div className="px-4 py-2">{walletAddress}</div>
                     </div>
                   </div>
                   <div className="grid lg:grid-cols-2 grid-cols-1">

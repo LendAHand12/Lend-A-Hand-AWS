@@ -37,6 +37,7 @@
 
 **[MIT](./LICENSE)**
 
-chuyển parentId = refId
-sửa status HOLD thành REFERRALHOLD
-sửa status REFERRAL thành REFERRAL
+Mail gửi đổi ví bằng code 3tr
+Thêm option view hệ thống 2tr
+Trang xem user đã bị xoá 1.5tr
+Tăng 2 tuần xoá sang 3 tuần xoá 500

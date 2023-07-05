@@ -20,7 +20,7 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import {
   checkUnpayUser,
   deleteUserNotKYC,
-  backupMongoDB,
+  checkIncreaseTier,
 } from "./cronJob/index.js";
 
 const app = express();
@@ -63,11 +63,17 @@ const cron2 = new CronJob("00 19 * * *", () => {
   deleteUserNotKYC();
 });
 
+const cron3 = new CronJob("00 20 * * *", () => {
+  console.log("Check increase tier");
+  checkIncreaseTier();
+});
+
 cron1.start();
 cron2.start();
+cron3.start();
 
 // const parentCountPay = await getParentWithCountPay(
-//   "6499b0eab2e996f250ecc7a4",
+//   "6496ea79e996e723f375e578",
 //   1
 // );
 // console.log({ parentCountPay });

@@ -1,8 +1,9 @@
 import Loading from "@/components/Loading";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Tree, TreeNode } from "react-organizational-chart";
 import { ToastContainer, toast } from "react-toastify";
+import TreeMenu from "react-simple-tree-menu";
 import User from "@/api/User";
 import "./index.less";
 
@@ -51,13 +52,13 @@ const TreeNodeItem = ({ node, onClick }) => {
   return (
     <TreeNode
       label={
-        <StyledNode onClick={() => onClick(node._id)}>{node.name}</StyledNode>
+        <StyledNode onClick={() => onClick(node.key)}>{node.label}</StyledNode>
       }
     >
-      {node.children &&
-        node.children.length > 0 &&
-        node.children.map((ele) => (
-          <TreeNodeItem key={ele._id} node={ele} onClick={onClick} />
+      {node.nodes &&
+        node.nodes.length > 0 &&
+        node.nodes.map((ele) => (
+          <TreeNodeItem key={ele.key} node={ele} onClick={onClick} />
         ))}
     </TreeNode>
   );
@@ -66,46 +67,53 @@ const TreeNodeItem = ({ node, onClick }) => {
 const TreePage = ({ match }) => {
   const { id } = match.params;
   const { t } = useTranslation();
+  const [showType, setShowType] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [loadingItem, setLoadingItem] = useState("");
   const [treeData, setTreeData] = useState({});
+  const [treeDataView, setTreeDataView] = useState([]);
+  const [clickedKeys, setClickedKeys] = useState([]);
 
-  const handleNodeItemClick = async (id) => {
-    if (loadingItem) {
-      toast.error(t("Getting data.Please wait"));
-    } else {
-      setLoadingItem(true);
-      await User.getChildsOfUserForTree({ id })
-        .then((response) => {
-          setLoadingItem(false);
-          const cloneTreeData = { ...treeData };
-          const newTreeData = handleFindAndPushChild(
-            id,
-            response.data.children,
-            cloneTreeData
-          );
-          setTreeData(newTreeData);
-        })
-        .catch((error) => {
-          let message =
-            error.response && error.response.data.message
-              ? error.response.data.message
-              : error.message;
-          toast.error(t(message));
-          setLoadingItem(false);
-        });
-    }
-  };
+  const handleNodeItemClick = useCallback(
+    async (id) => {
+      if (loadingItem) {
+        toast.error(t("Getting data.Please wait"));
+      } else {
+        setLoadingItem(true);
+        await User.getChildsOfUserForTree({ id })
+          .then((response) => {
+            setLoadingItem(false);
+            const cloneTreeData = { ...treeData };
+            const newTreeData = handleFindAndPushChild(
+              id,
+              response.data.nodes,
+              cloneTreeData
+            );
+            setTreeData(newTreeData);
+            setClickedKeys(id);
+          })
+          .catch((error) => {
+            let message =
+              error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message;
+            toast.error(t(message));
+            setLoadingItem(false);
+          });
+      }
+    },
+    [treeData]
+  );
 
   const handleFindAndPushChild = (id, newChildren, cloneTreeData) => {
-    if (cloneTreeData._id === id) {
-      return { ...cloneTreeData, children: newChildren };
-    } else if (cloneTreeData.children && cloneTreeData.children.length > 0) {
-      const updatedChildren = cloneTreeData.children.map((child) =>
+    if (cloneTreeData.key === id) {
+      return { ...cloneTreeData, nodes: newChildren };
+    } else if (cloneTreeData.nodes && cloneTreeData.nodes.length > 0) {
+      const updatedChildren = cloneTreeData.nodes.map((child) =>
         handleFindAndPushChild(id, newChildren, child)
       );
-      return { ...cloneTreeData, children: updatedChildren };
+      return { ...cloneTreeData, nodes: updatedChildren };
     }
     return cloneTreeData;
   };
@@ -135,6 +143,7 @@ const TreePage = ({ match }) => {
       await User.getChildsOfUserForTree({ id })
         .then((response) => {
           setLoading(false);
+          setClickedKeys([response.data.key]);
           setTreeData(response.data);
         })
         .catch((error) => {
@@ -148,6 +157,10 @@ const TreePage = ({ match }) => {
     })();
   }, []);
 
+  useEffect(() => {
+    setTreeDataView([treeData]);
+  }, [treeData]);
+
   return (
     <>
       <ToastContainer />
@@ -157,6 +170,12 @@ const TreePage = ({ match }) => {
         </div>
       ) : (
         <>
+          <button
+            onClick={() => setShowType(!showType)}
+            className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+          >
+            {t("another choose")}
+          </button>
           {loadingItem && (
             <div
               className="flex items-center gradient text-white text-sm px-4 py-3 mb-4"
@@ -172,24 +191,35 @@ const TreePage = ({ match }) => {
               <p>{t("Getting data")}...</p>
             </div>
           )}
-          <div className="w-full overflow-auto rotate-180">
-            <Tree
-              lineWidth={"10px"}
-              lineColor={"brown"}
-              lineBorderRadius={"10px"}
-              label={<StyledNode>{treeData.name}</StyledNode>}
-            >
-              {treeData.children &&
-                treeData.children.length > 0 &&
-                treeData.children.map((child) => (
-                  <TreeNodeItem
-                    key={child._id}
-                    node={child}
-                    onClick={handleNodeItemClick}
-                  />
-                ))}
-            </Tree>
-          </div>
+          {showType ? (
+            <div className="w-full overflow-auto rotate-180">
+              <Tree
+                lineWidth={"10px"}
+                lineColor={"brown"}
+                lineBorderRadius={"10px"}
+                label={<StyledNode>{treeData.label}</StyledNode>}
+              >
+                {treeData.nodes &&
+                  treeData.nodes.length > 0 &&
+                  treeData.nodes.map((child) => (
+                    <TreeNodeItem
+                      key={child.key}
+                      node={child}
+                      onClick={handleNodeItemClick}
+                    />
+                  ))}
+              </Tree>
+            </div>
+          ) : (
+            <TreeMenu
+              hasSearch={false}
+              data={treeDataView}
+              onClickItem={(item) => {
+                const key = item.key.split("/")[item.key.split("/").length - 1];
+                !clickedKeys.includes(key) && handleNodeItemClick(key);
+              }}
+            ></TreeMenu>
+          )}
         </>
       )}
     </>
