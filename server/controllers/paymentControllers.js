@@ -253,7 +253,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       transIds.register = referral._id;
     }
 
-    if (user.fine < 0) {
+    if (user.fine > 0) {
       transactionFine = await Transaction.create({
         userId: user.id,
         amount: user.find,
