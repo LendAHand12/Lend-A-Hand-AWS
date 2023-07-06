@@ -68,9 +68,9 @@ const cron3 = new CronJob("00 20 * * *", () => {
   checkIncreaseTier();
 });
 
-// cron1.start();
-// cron2.start();
-// cron3.start();
+cron1.start();
+cron2.start();
+cron3.start();
 
 // const parentCountPay = await getParentWithCountPay(
 //   "6499a38ab2e996f250ecc696",
