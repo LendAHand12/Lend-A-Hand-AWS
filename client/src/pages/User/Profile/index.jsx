@@ -208,7 +208,9 @@ const Profile = () => {
                       <p className="error-message-text">
                         {errors.walletAddress?.message}
                       </p> */}
-                      <div className="px-4 py-2">{walletAddress}</div>
+                      <div className="px-4 py-2 break-words">
+                        {walletAddress}
+                      </div>
                     </div>
                   </div>
                   <div className="grid lg:grid-cols-2 grid-cols-1">

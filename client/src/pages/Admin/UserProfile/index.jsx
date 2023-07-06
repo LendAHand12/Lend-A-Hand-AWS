@@ -126,7 +126,17 @@ const UserProfile = (match) => {
                     <div className="px-4 py-2 font-semibold">
                       {t("walletAddress")}
                     </div>
-                    <div className="px-4 py-2">{data.walletAddress}</div>
+                    <div className="px-4 py-2 break-words">
+                      {data.walletAddress}
+                    </div>
+                  </div>
+                  <div className="grid lg:grid-cols-2 grid-cols-1">
+                    <div className="px-4 py-2 font-semibold">
+                      {t("count pay")}
+                    </div>
+                    <div className="px-4 py-2">
+                      {data.countPay} {t("times")}
+                    </div>
                   </div>
                   <div className="grid lg:grid-cols-2 grid-cols-1">
                     <div className="px-4 py-2 font-semibold">Tier</div>

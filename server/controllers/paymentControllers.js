@@ -286,6 +286,11 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
 const addPayment = asyncHandler(async (req, res) => {
   const { id, hash } = req.body;
   const transaction = await Transaction.findById(id);
+  if (transaction.type === "FINE") {
+    const user = await User.findById(transaction.userId);
+    user.fine = 0;
+    await user.save();
+  }
   transaction.hash = hash || transaction.hash;
   transaction.status = "SUCCESS";
   const transactionUpdate = await transaction.save();
