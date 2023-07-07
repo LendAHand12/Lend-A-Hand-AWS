@@ -665,6 +665,14 @@ const findUserOtherParentId = asyncHandler(async (req, res) => {
   res.json(result);
 });
 
+const getParentWithCount = asyncHandler(async (req, res) => {
+  const { id, countPay } = req.body;
+
+  const parent = await getParentWithCountPay(id, countPay);
+
+  res.json(parent);
+});
+
 export {
   getPaymentInfo,
   addPayment,
@@ -678,4 +686,5 @@ export {
   updateHoldPayment,
   updateDirectPayment,
   findUserOtherParentId,
+  getParentWithCount,
 };

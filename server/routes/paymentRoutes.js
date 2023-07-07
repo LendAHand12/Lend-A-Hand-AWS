@@ -11,13 +11,15 @@ import {
   onAdminDoneRefund,
   updateHoldPayment,
   updateDirectPayment,
-  findUserOtherParentId
+  findUserOtherParentId,
+  getParentWithCount,
 } from "../controllers/paymentControllers.js";
 import { protectRoute, isAdmin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.route("/updateHoldPayment").get(updateHoldPayment);
+router.route("/getParentWithCount").post(getParentWithCount);
+// router.route("/updateHoldPayment").get(updateHoldPayment);
 // router.route("/updateDirectPayment").get(updateDirectPayment);
 // router.route("/findUserOtherParentId").get(findUserOtherParentId);
 

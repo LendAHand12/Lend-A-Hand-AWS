@@ -13,6 +13,7 @@ import {
   getAllUsersWithKeyword,
   changeSystem,
   getChildrenList,
+  getAllDeletedUsers,
 } from "../controllers/userControllers.js";
 import { protectRoute, isAdmin } from "../middleware/authMiddleware.js";
 import uploadCloud from "../middleware/uploadCloud.js";
@@ -20,6 +21,9 @@ import uploadCloud from "../middleware/uploadCloud.js";
 const router = express.Router();
 
 router.route("/").get(protectRoute, isAdmin, getAllUsers);
+router
+  .route("/getAllDeletedUsers")
+  .get(protectRoute, isAdmin, getAllDeletedUsers);
 router.route("/profile").get(protectRoute, getUserProfile);
 router.route("/status").put(protectRoute, isAdmin, changeStatusUser);
 router.route("/tree").get(protectRoute, getTree);

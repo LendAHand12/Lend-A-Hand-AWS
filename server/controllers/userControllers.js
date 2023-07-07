@@ -1,5 +1,6 @@
 import asyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
+import DeleteUser from "../models/deleteUserModel.js";
 
 const getAllUsers = asyncHandler(async (req, res) => {
   const { pageNumber, keyword, status } = req.query;
@@ -422,6 +423,36 @@ const changeSystem = asyncHandler(async (req, res) => {
   // }
 });
 
+const getAllDeletedUsers = asyncHandler(async (req, res) => {
+  const { pageNumber, keyword } = req.query;
+  console.log({ pageNumber, keyword });
+  const page = Number(pageNumber) || 1;
+
+  const pageSize = 10;
+
+  const count = await DeleteUser.countDocuments({
+    $or: [
+      { userId: { $regex: keyword, $options: "i" } }, // Tìm theo userId
+      { email: { $regex: keyword, $options: "i" } }, // Tìm theo email
+    ],
+  });
+  const allUsers = await DeleteUser.find({
+    $or: [
+      { userId: { $regex: keyword, $options: "i" } }, // Tìm theo userId
+      { email: { $regex: keyword, $options: "i" } }, // Tìm theo email
+    ],
+  })
+    .limit(pageSize)
+    .skip(pageSize * (page - 1))
+    .sort("-createdAt")
+    .select("-password");
+
+  res.json({
+    users: allUsers,
+    pages: Math.ceil(count / pageSize),
+  });
+});
+
 export {
   getUserProfile,
   getAllUsers,
@@ -437,4 +468,5 @@ export {
   changeSystem,
   getChildrenList,
   getCountAllChildren,
+  getAllDeletedUsers,
 };
