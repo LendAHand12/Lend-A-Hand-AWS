@@ -21,6 +21,7 @@ import {
   checkUnpayUser,
   deleteUserNotKYC,
   checkIncreaseTier,
+  countChildToData,
 } from "./cronJob/index.js";
 
 const app = express();
@@ -68,15 +69,24 @@ const cron3 = new CronJob("00 20 * * *", () => {
   checkIncreaseTier();
 });
 
+const cron4 = new CronJob("00 21 * * *", () => {
+  console.log("Count child");
+  countChildToData();
+});
+
 cron1.start();
 cron2.start();
 cron3.start();
+cron4.start();
 
 // const parentCountPay = await getParentWithCountPay(
-//   "6499a38ab2e996f250ecc696",
-//   1
+//   "6495433186db385fedb31fc6",
+//   13
 // );
 // console.log({ parentCountPay });
+// console.time("start count");
+// countChildToData();
+// console.timeEnd("start count");
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>

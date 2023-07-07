@@ -68,6 +68,10 @@ const userSchema = mongoose.Schema(
       type: Number,
       default: 0,
     },
+    countChild: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

@@ -94,3 +94,17 @@ export const deleteUserNotKYC = asyncHandler(async () => {
 
   console.log("Remove unveify done");
 });
+
+export const countChildToData = asyncHandler(async () => {
+  const listUser = await User.find({
+    $and: [{ isAdmin: false }, { status: "APPROVED" }],
+  }).select("children");
+
+  for (let u of listUser) {
+    const countChild = await getCountAllChildren(u._id);
+    u.countChild = countChild;
+    await u.save();
+  }
+
+  console.log("updated count Child");
+});

@@ -238,10 +238,11 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
       const tree = { key: user._id, label: user.userId, nodes: [] };
       for (const childId of user.children) {
         const child = await User.findById(childId).select("userId children");
-        const countChild = await getCountAllChildren(childId);
+        // const countChild = await getCountAllChildren(childId);
         tree.nodes.push({
           key: child._id,
-          label: `${child.userId} (${countChild})`,
+          // label: `${child.userId} (${countChild})`,
+          label: `${child.userId}`,
         });
       }
       res.status(200).json(tree);
