@@ -256,7 +256,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
     if (user.fine > 0) {
       transactionFine = await Transaction.create({
         userId: user.id,
-        amount: user.find,
+        amount: user.fine,
         userCountPay: user.countPay,
         address_ref: process.env.MAIN_WALLET_ADDRESS,
         address_from: user.walletAddress,
