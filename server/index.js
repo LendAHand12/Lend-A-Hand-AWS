@@ -80,8 +80,8 @@ cron3.start();
 cron4.start();
 
 // const parentCountPay = await getParentWithCountPay(
-//   "6495433186db385fedb31fc6",
-//   13
+//   "649693f102670355bddc3c70",
+//   2
 // );
 // console.log({ parentCountPay });
 

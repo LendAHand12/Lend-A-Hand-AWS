@@ -75,6 +75,9 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       referralCommissionFee = 10 * Math.pow(2, user.tier);
     }
 
+    haveParentNotPayEnough = true; // termp
+    referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS; // termp
+
     let transactionRegister = null;
     let transactionDirect = null;
     let transactionReferral = null;
