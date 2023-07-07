@@ -229,7 +229,9 @@ const getTreeOfUser = asyncHandler(async (req, res) => {
 
 const getChildsOfUserForTree = asyncHandler(async (req, res) => {
   const { id } = req.body;
-  const user = await User.findOne({ _id: id }).select("userId children");
+  const user = await User.findOne({ _id: id }).select(
+    "userId children countChild"
+  );
   if (user) {
     if (user.children.length === 0) {
       res.status(404);
@@ -237,12 +239,12 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
     } else {
       const tree = { key: user._id, label: user.userId, nodes: [] };
       for (const childId of user.children) {
-        const child = await User.findById(childId).select("userId children");
-        // const countChild = await getCountAllChildren(childId);
+        const child = await User.findById(childId).select(
+          "userId children countChild"
+        );
         tree.nodes.push({
           key: child._id,
-          // label: `${child.userId} (${countChild})`,
-          label: `${child.userId}`,
+          label: `${child.userId} (${child.countChild})`,
         });
       }
       res.status(200).json(tree);
