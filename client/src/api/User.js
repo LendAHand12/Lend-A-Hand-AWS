@@ -40,6 +40,11 @@ const User = {
   getChildrenList: () => {
     return API.get(`${URL_API_USER}/getChildrenList`);
   },
+  getAllDeletedUsers: (pageNumber, keyword) => {
+    return API.get(
+      `${URL_API_USER}/getAllDeletedUsers/?pageNumber=${pageNumber}&keyword=${keyword}`
+    );
+  },
 };
 
 export default User;

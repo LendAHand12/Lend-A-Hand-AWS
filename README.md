@@ -38,8 +38,9 @@
 **[MIT](./LICENSE)**
 
 Mail gửi đổi ví bằng code 2.5tr
-Thêm option view hệ thống 1tr
+Thêm option view hệ thống 1tr => Done
 Trang xem user đã bị xoá 1.5tr
-Tăng 2 tuần xoá sang 3 tuần xoá 500
-Xoá user không thanh toán trong 24h 1tr
-Hệ thống tự đếm số con 1.5tr
+Tăng 2 tuần xoá sang 3 tuần xoá 500 => Done
+Xoá user không thanh toán trong 48h 1tr
+Hệ thống tự đếm số con 1.5tr => Done
+Xuất excel => 2tr
