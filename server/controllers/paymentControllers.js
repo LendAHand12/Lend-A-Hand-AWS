@@ -17,6 +17,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
   });
   let haveParentNotPayEnough = false;
   let haveRefNotPayEnough = false;
+  let parentWithCountPay;
 
   if (user) {
     const parentUser = await User.findOne({ _id: user.parentId }).select(
@@ -59,10 +60,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         directCommissionWallet = refUser.walletAddress;
       }
       directCommissionFee = 5 * Math.pow(2, user.tier);
-      const parentWithCountPay = await getParentWithCountPay(
-        user.id,
-        user.countPay
-      );
+      parentWithCountPay = await getParentWithCountPay(user.id, user.countPay);
 
       if (!parentWithCountPay) {
         referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
@@ -70,13 +68,14 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
         haveParentNotPayEnough = true;
       } else {
+        console.log("inhere :", parentWithCountPay.walletAddress);
         referralCommissionWallet = parentWithCountPay.walletAddress;
       }
       referralCommissionFee = 10 * Math.pow(2, user.tier);
     }
 
-    haveParentNotPayEnough = true; // termp
-    referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS; // termp
+    // haveParentNotPayEnough = true; // termp
+    // referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS; // termp
 
     let transactionRegister = null;
     let transactionDirect = null;
@@ -133,9 +132,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         userId: user.id,
         amount: referralCommissionFee,
         userCountPay: user.countPay,
-        address_ref: haveParentNotPayEnough
-          ? parentUser.walletAddress
-          : referralCommissionWallet,
+        address_ref: parentWithCountPay.walletAddress,
         address_from: user.walletAddress,
         address_to: referralCommissionWallet,
         hash: "",
@@ -165,9 +162,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           userId: user.id,
           amount: referralCommissionFee,
           userCountPay: user.countPay,
-          address_ref: haveParentNotPayEnough
-            ? parentUser.walletAddress
-            : referralCommissionWallet,
+          address_ref: parentWithCountPay.walletAddress,
           address_from: user.walletAddress,
           address_to: referralCommissionWallet,
           hash: "",
@@ -186,9 +181,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           userId: user.id,
           amount: referralCommissionFee,
           userCountPay: user.countPay,
-          address_ref: haveParentNotPayEnough
-            ? parentUser.walletAddress
-            : referralCommissionWallet,
+          address_ref: parentWithCountPay.walletAddress,
           address_from: user.walletAddress,
           address_to: referralCommissionWallet,
           hash: "",
@@ -215,9 +208,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           userId: user.id,
           amount: referralCommissionFee,
           userCountPay: user.countPay,
-          address_ref: haveParentNotPayEnough
-            ? parentUser.walletAddress
-            : referralCommissionWallet,
+          address_ref: parentWithCountPay.walletAddress,
           address_from: user.walletAddress,
           address_to: referralCommissionWallet,
           hash: "",
