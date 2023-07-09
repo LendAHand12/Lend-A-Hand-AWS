@@ -38,7 +38,7 @@ const Profile = () => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      walletAddress: walletAddress,
+      // walletAddress: walletAddress,
       imgBackData: "",
       imgFrontData: "",
     },
@@ -92,10 +92,10 @@ const Profile = () => {
 
   const onSubmit = useCallback(
     async (data) => {
-      const { walletAddress } = data;
+      // const { walletAddress } = data;
       setLoading(true);
       await User.update(id, {
-        walletAddress: walletAddress.trim(),
+        // walletAddress: walletAddress.trim(),
         imgFront,
         imgBack,
       })

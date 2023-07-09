@@ -45,6 +45,9 @@ const User = {
       `${URL_API_USER}/getAllDeletedUsers/?pageNumber=${pageNumber}&keyword=${keyword}`
     );
   },
+  getAllUsersForExport: () => {
+    return API.get(`${URL_API_USER}/getAllUsersForExport`);
+  },
 };
 
 export default User;

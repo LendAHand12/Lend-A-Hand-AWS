@@ -8,8 +8,8 @@ const userSchema = mongoose.Schema(
       required: true,
     },
     walletAddress: {
-      type: String,
-      unique: true,
+      type: Array,
+      // unique: true,
       required: true,
     },
     email: {
@@ -27,12 +27,10 @@ const userSchema = mongoose.Schema(
     },
     children: [{ type: mongoose.Schema.Types.ObjectId, ref: "children" }],
     parentId: {
-      type: String,
-      // required: true,
+      type: mongoose.Schema.Types.ObjectId,
     },
     refId: {
-      type: String,
-      // required: true,
+      type: mongoose.Schema.Types.ObjectId,
     },
     isAdmin: {
       type: Boolean,

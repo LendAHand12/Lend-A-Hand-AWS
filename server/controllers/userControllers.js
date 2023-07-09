@@ -1,6 +1,7 @@
 import asyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
 import DeleteUser from "../models/deleteUserModel.js";
+import mongoose from "mongoose";
 
 const getAllUsers = asyncHandler(async (req, res) => {
   const { pageNumber, keyword, status } = req.query;
@@ -106,7 +107,7 @@ const getUserById = asyncHandler(async (req, res) => {
       isAdmin: user.isAdmin,
       isConfirmed: user.isConfirmed,
       avatar: user.avatar,
-      walletAddress: user.walletAddress,
+      walletAddress: user.walletAddress[0],
       tier: user.tier,
       createdAt: user.createdAt,
       fine: user.fine,
@@ -125,12 +126,12 @@ const getUserById = asyncHandler(async (req, res) => {
 const updateUser = asyncHandler(async (req, res) => {
   const { walletAddress, imgFront, imgBack } = req.body;
   const user = await User.findOne({ _id: req.params.id }).select("-password");
-  const userHaveWallet = await User.find({ walletAddress });
-  if (userHaveWallet >= 2) {
-    res.status(400).json({ error: "Dupplicate wallet address" });
-  }
+  // const userHaveWallet = await User.find({ walletAddress });
+  // if (userHaveWallet >= 2) {
+  //   res.status(400).json({ error: "Dupplicate wallet address" });
+  // }
   if (user) {
-    user.walletAddress = walletAddress || user.walletAddress;
+    // user.walletAddress = walletAddress || user.walletAddress;
     if (imgFront !== "" && imgBack !== "") {
       if (
         imgFront.includes("https://res.cloudinary.com/dhqggkmto") &&
@@ -155,7 +156,7 @@ const updateUser = asyncHandler(async (req, res) => {
           isAdmin: updatedUser.isAdmin,
           isConfirmed: updatedUser.isConfirmed,
           avatar: updatedUser.avatar,
-          walletAddress: updatedUser.walletAddress,
+          walletAddress: updatedUser.walletAddress[0],
           tier: updatedUser.tier,
           createdAt: updatedUser.createdAt,
           fine: updatedUser.fine,
@@ -316,7 +317,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
       isAdmin: user.isAdmin,
       isConfirmed: user.isConfirmed,
       avatar: user.avatar,
-      walletAddress: user.walletAddress,
+      walletAddress: user.walletAddress[0],
       tier: user.tier,
       createdAt: user.createdAt,
       fine: user.fine,
@@ -453,6 +454,55 @@ const getAllDeletedUsers = asyncHandler(async (req, res) => {
   });
 });
 
+const getAllUsersForExport = asyncHandler(async (req, res) => {
+  const users = await User.aggregate([
+    {
+      $match: {
+        $and: [{ isAdmin: false }, { refId: { $ne: "" } }],
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "refId",
+        foreignField: "_id",
+        as: "parent",
+      },
+    },
+    { $unwind: "$parent" },
+    {
+      $project: {
+        _id: 1,
+        userId: 1,
+        walletAddress: 1,
+        email: 1,
+        fine: 1,
+        countPay: 1,
+        status: 1,
+        createdAt: 1,
+        parent: "$parent",
+      },
+    },
+  ]);
+  console.log({ users });
+
+  const result = [];
+  for (let u of users) {
+    result.push({
+      name: u.userId,
+      email: u.email,
+      walletAddress: u.walletAddress[0],
+      memberSince: u.createdAt,
+      refUserName: u.parent ? u.parent.userId : "",
+      "count pay": u.countPay,
+      fine: u.fine,
+      status: u.status,
+    });
+  }
+
+  res.json(result);
+});
+
 export {
   getUserProfile,
   getAllUsers,
@@ -469,4 +519,5 @@ export {
   getChildrenList,
   getCountAllChildren,
   getAllDeletedUsers,
+  getAllUsersForExport,
 };

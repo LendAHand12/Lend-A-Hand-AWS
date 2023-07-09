@@ -46,7 +46,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const { userId, walletAddress, email, password, ref, receiveId } = req.body;
 
   const userExists = await User.findOne({
-    $or: [{ email }, { userId }, { walletAddress }],
+    $or: [{ email }, { userId }, { walletAddress: { $in: [walletAddress] } }],
   });
 
   if (userExists) {
@@ -61,7 +61,7 @@ const registerUser = asyncHandler(async (req, res) => {
       email,
       password,
       avatar,
-      walletAddress,
+      walletAddress: [walletAddress],
       parentId: receiveId,
       refId: ref,
     });
@@ -174,7 +174,7 @@ const authUser = asyncHandler(async (req, res) => {
         isAdmin: user.isAdmin,
         isConfirmed: user.isConfirmed,
         avatar: user.avatar,
-        walletAddress: user.walletAddress,
+        walletAddress: user.walletAddress[0],
         tier: user.tier,
         createdAt: user.createdAt,
         fine: user.fine,

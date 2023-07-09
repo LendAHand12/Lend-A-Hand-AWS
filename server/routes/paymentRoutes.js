@@ -9,22 +9,20 @@ import {
   checkCanRefundPayment,
   changeToRefunded,
   onAdminDoneRefund,
-  updateHoldPayment,
-  updateDirectPayment,
-  findUserOtherParentId,
   getParentWithCount,
+  getAllTransForExport,
 } from "../controllers/paymentControllers.js";
 import { protectRoute, isAdmin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 router.route("/getParentWithCount").post(getParentWithCount);
-// router.route("/updateHoldPayment").get(updateHoldPayment);
-// router.route("/updateDirectPayment").get(updateDirectPayment);
-// router.route("/findUserOtherParentId").get(findUserOtherParentId);
 
 router.route("/info").get(protectRoute, getPaymentInfo);
 router.route("/user").get(protectRoute, isAdmin, getAllPayments);
+router
+  .route("/getAllTransForExport")
+  .get(protectRoute, isAdmin, getAllTransForExport);
 router
   .route("/")
   .get(protectRoute, getPaymentsOfUser)

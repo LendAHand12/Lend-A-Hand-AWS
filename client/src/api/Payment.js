@@ -31,6 +31,9 @@ const Payment = {
   onAdminDoneRefund: (body) => {
     return API.post(`${URL_API_PAYMENT}/onAdminDoneRefund`, body);
   },
+  getAllTransForExport: () => {
+    return API.get(`${URL_API_PAYMENT}/getAllTransForExport`);
+  },
 };
 
 export default Payment;

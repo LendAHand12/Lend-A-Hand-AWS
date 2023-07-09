@@ -132,7 +132,7 @@
   "User not have child": "Tài khoản không có cấp dưới",
   "Getting data": "Đang lấy dữ liệu",
   "Getting data.Please wait": "Đang lấy dữ liệu.Vui lòng chờ",
-  "children": "Tài khoản đã giới thiệu",
+  "children": "THÀNH VIÊN TRỰC TIẾP",
 
   "movePerson": "Người chuyển đi",
   "receivePerson": "Người nhận",
@@ -154,5 +154,23 @@
 
   "trash": "Thùng rác",
 
-  "You are not eligible for next step payment": "Bạn chưa đủ điều kiện để đến thanh toán tiếp theo"
+  "You are not eligible for next step payment": "Bạn chưa đủ điều kiện để đến thanh toán tiếp theo",
+
+  "export": "Trích xuất",
+  "export users list": "Trích xuất danh sách người dùng",
+  "export trans list": "Trích xuất danh sách giao dịch",
+  "refUserName": "Người giới thiệu",
+  "name": "Tên",
+  "order": "STT",
+  "usersListFileName": "Danh_sach_nguoi_dung",
+  "transListFileName": "Danh_sach_giao_dich",
+  "senderName": "Người gửi",
+  "receiverName": "Người nhận",
+  "address_from": "Ví gửi",
+  "address_ref": "Ví nhận",
+  "isHoldRefund": "Hoàn trả",
+  "createdAt": "Thời gian",
+  "export successful": "Xuất file thành công",
+  "false": "Chưa",
+  "true": "Rồi"
 }

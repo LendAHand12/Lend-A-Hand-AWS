@@ -52,14 +52,14 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
         haveRefNotPayEnough = true;
       } else {
-        directCommissionWallet = refUser.walletAddress;
+        directCommissionWallet = refUser.walletAddress[0];
       }
       directCommissionFee = 5;
       if (parentUser.countPay < user.countPay + 1) {
         referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
         haveParentNotPayEnough = true;
       } else {
-        referralCommissionWallet = parentUser.walletAddress;
+        referralCommissionWallet = parentUser.walletAddress[0];
       }
       referralCommissionFee = 10;
     } else {
@@ -67,7 +67,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
         haveRefNotPayEnough = true;
       } else {
-        directCommissionWallet = refUser.walletAddress;
+        directCommissionWallet = refUser.walletAddress[0];
       }
       directCommissionFee = 5 * Math.pow(2, user.tier);
 
@@ -77,7 +77,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
         haveParentNotPayEnough = true;
       } else {
-        referralCommissionWallet = parentWithCountPay.walletAddress;
+        referralCommissionWallet = parentWithCountPay.walletAddress[0];
       }
       referralCommissionFee = 10 * Math.pow(2, user.tier);
     }
@@ -112,7 +112,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           amount: registerFee,
           userCountPay: user.countPay,
           address_ref: process.env.MAIN_WALLET_ADDRESS,
-          address_from: user.walletAddress,
+          address_from: user.walletAddress[0],
           address_to: process.env.MAIN_WALLET_ADDRESS,
           hash: "",
           type: "REGISTER",
@@ -127,8 +127,8 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         userId: user.id,
         amount: directCommissionFee,
         userCountPay: user.countPay,
-        address_ref: refUser.walletAddress,
-        address_from: user.walletAddress,
+        address_ref: refUser.walletAddress[0],
+        address_from: user.walletAddress[0],
         address_to: directCommissionWallet,
         hash: "",
         type: haveRefNotPayEnough ? "DIRECTHOLD" : "DIRECT",
@@ -140,8 +140,8 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         userId: user.id,
         amount: referralCommissionFee,
         userCountPay: user.countPay,
-        address_ref: parentWithCountPay.walletAddress,
-        address_from: user.walletAddress,
+        address_ref: parentWithCountPay.walletAddress[0],
+        address_from: user.walletAddress[0],
         address_to: referralCommissionWallet,
         hash: "",
         type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
@@ -157,8 +157,8 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           userId: user.id,
           amount: directCommissionFee,
           userCountPay: user.countPay,
-          address_ref: refUser.walletAddress,
-          address_from: user.walletAddress,
+          address_ref: refUser.walletAddress[0],
+          address_from: user.walletAddress[0],
           address_to: directCommissionWallet,
           hash: "",
           type: haveRefNotPayEnough ? "DIRECTHOLD" : "DIRECT",
@@ -170,8 +170,8 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           userId: user.id,
           amount: referralCommissionFee,
           userCountPay: user.countPay,
-          address_ref: parentWithCountPay.walletAddress,
-          address_from: user.walletAddress,
+          address_ref: parentWithCountPay.walletAddress[0],
+          address_from: user.walletAddress[0],
           address_to: referralCommissionWallet,
           hash: "",
           type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
@@ -189,8 +189,8 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           userId: user.id,
           amount: referralCommissionFee,
           userCountPay: user.countPay,
-          address_ref: parentWithCountPay.walletAddress,
-          address_from: user.walletAddress,
+          address_ref: parentWithCountPay.walletAddress[0],
+          address_from: user.walletAddress[0],
           address_to: referralCommissionWallet,
           hash: "",
           type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
@@ -216,8 +216,8 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           userId: user.id,
           amount: referralCommissionFee,
           userCountPay: user.countPay,
-          address_ref: parentWithCountPay.walletAddress,
-          address_from: user.walletAddress,
+          address_ref: parentWithCountPay.walletAddress[0],
+          address_from: user.walletAddress[0],
           address_to: referralCommissionWallet,
           hash: "",
           type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
@@ -261,7 +261,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         amount: user.fine,
         userCountPay: user.countPay,
         address_ref: process.env.MAIN_WALLET_ADDRESS,
-        address_from: user.walletAddress,
+        address_from: user.walletAddress[0],
         address_to: process.env.MAIN_WALLET_ADDRESS,
         hash: "",
         type: "FINE",
@@ -321,21 +321,6 @@ const onDonePayment = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({ _id: req.user.id }).select("-password");
   user.countPay = user.countPay + 1;
-  // if (user.countPay % 12 === 0) {
-  //   const currentDay = moment(new Date());
-  //   const userCreatedDay = moment(user.createdAt);
-  //   const diffDays = currentDay.diff(userCreatedDay, "days") + 1;
-  //   const diffWeeks = Math.floor(diffDays / 7);
-  //   const tier = user.tier;
-  //   let increated = false;
-  //   if (diffWeeks >= (tier + 1) * 12) {
-  //     user.tier = tier + 1;
-  //     increated = true;
-  //   }
-  //   // if(!increated) {
-
-  //   // }
-  // }
 
   const updatedUser = await user.save();
 
@@ -415,7 +400,9 @@ const getAllPayments = asyncHandler(async (req, res) => {
         createdAt: pay.createdAt,
       });
     } else if (status === "DIRECT" || status === "REFERRAL") {
-      const userRef = await User.findOne({ walletAddress: pay.address_ref });
+      const userRef = await User.findOne({
+        walletAddress: { $in: [pay.address_ref] },
+      });
       result.push({
         _id: pay._id,
         address_from: pay.address_from,
@@ -430,7 +417,9 @@ const getAllPayments = asyncHandler(async (req, res) => {
         createdAt: pay.createdAt,
       });
     } else if (status === "HOLD") {
-      const userRef = await User.findOne({ walletAddress: pay.address_ref });
+      const userRef = await User.findOne({
+        walletAddress: { $in: [pay.address_ref] },
+      });
       result.push({
         _id: pay._id,
         address_from: pay.address_from,
@@ -496,7 +485,9 @@ const getPaymentDetail = asyncHandler(async (req, res) => {
         createdAt: trans.createdAt,
       });
     } else if (trans.type === "DIRECT" || trans.type === "REFERRAL") {
-      const userRef = await User.findOne({ walletAddress: trans.address_ref });
+      const userRef = await User.findOne({
+        walletAddress: { $in: [trans.address_ref] },
+      });
       res.json({
         _id: trans._id,
         address_from: trans.address_from,
@@ -513,7 +504,9 @@ const getPaymentDetail = asyncHandler(async (req, res) => {
         createdAt: trans.createdAt,
       });
     } else if (trans.type === "DIRECTHOLD" || trans.type === "REFERRALHOLD") {
-      const userRef = await User.findOne({ walletAddress: trans.address_ref });
+      const userRef = await User.findOne({
+        walletAddress: { $in: [trans.address_ref] },
+      });
       res.json({
         _id: trans._id,
         address_from: trans.address_from,
@@ -542,7 +535,9 @@ const checkCanRefundPayment = asyncHandler(async (req, res) => {
   const trans = await Transaction.findById(id);
   if (trans) {
     const { userCountPay, address_ref } = trans;
-    const userReceive = await User.findOne({ walletAddress: address_ref });
+    const userReceive = await User.findOne({
+      walletAddress: { $in: [address_ref] },
+    });
     if (userReceive) {
       if (userReceive.status === "LOCKED") {
         res.status(404);
@@ -583,7 +578,6 @@ const changeToRefunded = asyncHandler(async (req, res) => {
 });
 
 const onAdminDoneRefund = asyncHandler(async (req, res) => {
-  console.log({ body: req.body });
   const { transId, transHash, transType, fromWallet, receiveWallet } = req.body;
   const trans = await Transaction.findById(transId);
   if (trans) {
@@ -598,8 +592,6 @@ const onAdminDoneRefund = asyncHandler(async (req, res) => {
       type: transType,
     });
 
-    console.log({ refund });
-
     res.json({
       message: "Refund successful",
     });
@@ -607,42 +599,6 @@ const onAdminDoneRefund = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("Transaction does not exist");
   }
-});
-
-const updateHoldPayment = asyncHandler(async (req, res) => {
-  const listTrans = await Transaction.find({
-    type: "REFERRALHOLD",
-  });
-
-  const transIds = [];
-  for (let trans of listTrans) {
-    transIds.push(trans._id);
-    const parentWithLevelOfUser = await getParentWithCountPay(
-      trans.userId,
-      trans.userCountPay
-    );
-    trans.address_ref = parentWithLevelOfUser.walletAddress;
-    await trans.save();
-  }
-
-  res.send("updated");
-});
-
-const updateDirectPayment = asyncHandler(async (req, res) => {
-  const listTrans = await Transaction.find({
-    $or: [{ type: "DIRECTHOLD" }, { type: "DIRECT" }],
-  });
-
-  const transIds = [];
-  for (let trans of listTrans) {
-    transIds.push(trans._id);
-    const user = await User.findById(trans.userId);
-    const refUser = await User.findById(user.refId);
-    trans.address_ref = refUser.walletAddress;
-    await trans.save();
-  }
-
-  res.json(transIds);
 });
 
 const findUserOtherParentId = asyncHandler(async (req, res) => {
@@ -672,6 +628,50 @@ const getParentWithCount = asyncHandler(async (req, res) => {
   res.json(parent);
 });
 
+const getAllTransForExport = asyncHandler(async (req, res) => {
+  const trans = await Transaction.aggregate([
+    {
+      $match: {
+        status: "SUCCESS",
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "address_from",
+        foreignField: "walletAddress",
+        as: "sender",
+      },
+    },
+    { $unwind: "$sender" },
+    {
+      $lookup: {
+        from: "users",
+        localField: "address_ref",
+        foreignField: "walletAddress",
+        as: "receiver",
+      },
+    },
+    { $unwind: "$receiver" },
+    {
+      $project: {
+        _id: 0,
+        type: 1,
+        amount: 1,
+        isHoldRefund: 1,
+        status: 1,
+        createdAt: 1,
+        address_from: 1,
+        address_ref: 1,
+        senderName: "$sender.userId",
+        receiverName: "$receiver.userId",
+      },
+    },
+  ]);
+
+  res.json(trans);
+});
+
 export {
   getPaymentInfo,
   addPayment,
@@ -682,8 +682,7 @@ export {
   checkCanRefundPayment,
   changeToRefunded,
   onAdminDoneRefund,
-  updateHoldPayment,
-  updateDirectPayment,
   findUserOtherParentId,
   getParentWithCount,
+  getAllTransForExport,
 };

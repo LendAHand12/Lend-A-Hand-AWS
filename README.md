@@ -45,3 +45,46 @@ Xoá user không thanh toán trong 48h 1tr
 Hệ thống tự đếm số con 1.5tr => Done
 Xuất excel => 2tr
 Nút xoá user chưa KYC => 1tr
+
+// update parent
+db.users.update({
+$and: [
+    {isAdmin: false},
+    {refId: {$ne: ""}},
+{parentId: {$ne: ""}},
+]
+
+},
+[
+{
+$set: {
+"parentId": {
+$toObjectId: "$parentId"
+},
+"refId": {
+$toObjectId: "$refId"
+}
+}
+}
+],
+{
+"multi": true
+})
+
+// update wallet
+db.users.update({
+$and: [
+{isAdmin: false}
+]
+
+},
+[
+{
+$set: {
+"walletAddress": ["$walletAddress"],
+}
+}
+],
+{
+"multi": true
+})

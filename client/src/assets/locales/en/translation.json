@@ -129,7 +129,7 @@
   "User not have child": "The account has no subordinates",
   "Getting data": "Getting data",
   "Getting data.Please wait": "Getting data.Please wait",
-  "children": "Referred account",
+  "children": "DIRECT REFERRAL MEMBERS",
 
   "movePerson": "Move Person",
   "receivePerson": "Recipient",
@@ -150,5 +150,23 @@
 
   "trash": "Trash",
 
-  "You are not eligible for next step payment": "You are not eligible for next step payment"
+  "You are not eligible for next step payment": "You are not eligible for next step payment",
+
+  "export": "Export",
+  "export users list": "Export user list",
+  "export trans list": "Export transaction list",
+  "refUserName": "Referer",
+  "name": "Name",
+  "order": "Order",
+  "usersListFileName": "List_users",
+  "transListFileName": "List_transactions",
+  "senderName": "Sender",
+  "receiverName": "Recipient",
+  "address_from": "Sender wallet",
+  "address_ref": "Receiver wallet",
+  "isHoldRefund": "Refund",
+  "createdAt": "Time",
+  "export successful": "Export successful",
+  "false": "Not yet",
+  "true": "Yes"
 }

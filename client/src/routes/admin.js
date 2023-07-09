@@ -10,6 +10,7 @@ const GetVerifyLink = lazy(() => import("@/pages/Admin/GetVerifyLink"));
 const TransactionDetail = lazy(() => import("@/pages/Admin/TransactionDetail"));
 const System = lazy(() => import("@/pages/Admin/System"));
 const Trash = lazy(() => import("@/pages/Admin/Trash"));
+const Export = lazy(() => import("@/pages/Admin/Export"));
 
 const routes = [
   {
@@ -49,10 +50,15 @@ const routes = [
     title: "trash",
     component: Trash,
   },
+  // {
+  //   path: "/linkVerify",
+  //   title: "linkVerify",
+  //   component: GetVerifyLink,
+  // },
   {
-    path: "/linkVerify",
-    title: "linkVerify",
-    component: GetVerifyLink,
+    path: "/export",
+    title: "export",
+    component: Export,
   },
 ];
 
