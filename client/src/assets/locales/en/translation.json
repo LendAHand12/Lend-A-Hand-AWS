@@ -148,5 +148,7 @@
   "fineFee": "penalty fee",
   "FINE": "Penalty",
 
-  "trash": "Trash"
+  "trash": "Trash",
+
+  "You are not eligible for next step payment": "You are not eligible for next step payment"
 }

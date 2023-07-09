@@ -5,10 +5,8 @@ import connectDB from "./config/db.js";
 import morgan from "morgan"; // show the API endpoints
 import cors from "cors"; // allow cross origin requests
 import cookieSession from "cookie-session"; // for implementing cookie sessions for passport
-import path from "path";
 import helmet from "helmet";
 import { CronJob } from "cron";
-import getParentWithCountPay from "./utils/getParentWithCountPay.js";
 
 // middleware
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
@@ -22,6 +20,7 @@ import {
   deleteUserNotKYC,
   checkIncreaseTier,
   countChildToData,
+  deleteUserNotPay,
 } from "./cronJob/index.js";
 
 const app = express();
@@ -74,20 +73,16 @@ const cron4 = new CronJob("00 21 * * *", () => {
   countChildToData();
 });
 
-cron1.start();
-cron2.start();
-cron3.start();
-cron4.start();
+const cron5 = new CronJob("00 23 * * *", () => {
+  console.log("Delete user not pay");
+  deleteUserNotPay();
+});
 
-// const parentCountPay = await getParentWithCountPay(
-//   "64a3e8f84bb0d5c48b052306",
-//   1
-// );
-// console.log({ parentCountPay });
-
-// console.time("start count");
-// countChildToData();
-// console.timeEnd("start count");
+// cron1.start();
+// cron2.start();
+// cron3.start();
+// cron4.start();
+// cron5.start();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>

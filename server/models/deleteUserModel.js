@@ -3,6 +3,9 @@ import bcrypt from "bcryptjs";
 
 const deleteUserSchema = mongoose.Schema(
   {
+    userId: {
+      type: String,
+    },
     oldId: {
       type: String,
     },

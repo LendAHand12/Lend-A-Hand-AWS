@@ -3,6 +3,7 @@ import User from "../models/userModel.js";
 import Transaction from "../models/transactionModel.js";
 import getParentWithCountPay from "../utils/getParentWithCountPay.js";
 import Refund from "../models/refundModel.js";
+import { checkCanIncreaseNextTier } from "../cronJob/index.js";
 
 const getPaymentInfo = asyncHandler(async (req, res) => {
   const { user } = req;
@@ -20,6 +21,13 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
   let parentWithCountPay;
 
   if (user) {
+    if (user.countPay > 0 && user.countPay % 13 === 0) {
+      const canIncreaseTier = await checkCanIncreaseNextTier(user);
+      if (!canIncreaseTier) {
+        res.status(404);
+        throw new Error("You are not eligible for next step payment");
+      }
+    }
     const parentUser = await User.findOne({ _id: user.parentId }).select(
       "-password"
     );
@@ -35,6 +43,8 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
     let directCommissionFee = 0;
     let referralCommissionWallet = "";
     let referralCommissionFee = 0;
+
+    parentWithCountPay = await getParentWithCountPay(user.id, user.countPay);
 
     if (user.countPay === 0) {
       registerFee = 7;
@@ -60,7 +70,6 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         directCommissionWallet = refUser.walletAddress;
       }
       directCommissionFee = 5 * Math.pow(2, user.tier);
-      parentWithCountPay = await getParentWithCountPay(user.id, user.countPay);
 
       if (!parentWithCountPay) {
         referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
@@ -68,7 +77,6 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
         haveParentNotPayEnough = true;
       } else {
-        console.log("inhere :", parentWithCountPay.walletAddress);
         referralCommissionWallet = parentWithCountPay.walletAddress;
       }
       referralCommissionFee = 10 * Math.pow(2, user.tier);

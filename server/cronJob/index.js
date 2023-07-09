@@ -44,27 +44,37 @@ export const checkIncreaseTier = asyncHandler(async () => {
     let nextTier = Math.floor(u.countPay / 12);
 
     if (nextTier > 0 && u.tier !== nextTier) {
-      const currentDay = moment(new Date());
-      const userCreatedDay = moment(u.createdAt);
-      const diffDays = currentDay.diff(userCreatedDay, "days") + 1;
-      if (diffDays > nextTier * 84) {
-        const countTotalChild = await getCountAllChildren(u._id);
-        if (countTotalChild > 30000 * nextTier) {
-          u.tier = nextTier;
-          // await u.save();
-          console.log({ u });
-        }
-      } else {
-        const countTotalChild = await getCountAllChildren(u._id);
-        if (countTotalChild > 797161 * nextTier) {
-          u.tier = nextTier;
-          console.log({ u });
-          // await u.save();
-        }
+      const canIncreaseTier = await checkCanIncreaseNextTier(u);
+      if (canIncreaseTier) {
+        u.tier = nextTier;
+        await u.save();
       }
     }
   }
 });
+
+export const checkCanIncreaseNextTier = async (u) => {
+  let nextTier = Math.floor(u.countPay / 12);
+
+  if (nextTier > 0 && u.tier !== nextTier) {
+    const currentDay = moment(new Date());
+    const userCreatedDay = moment(u.createdAt);
+    const diffDays = currentDay.diff(userCreatedDay, "days") + 1;
+    if (diffDays > nextTier * 84) {
+      const countTotalChild = await getCountAllChildren(u._id);
+      if (countTotalChild > 30000 * nextTier) {
+        return true;
+      }
+    } else {
+      const countTotalChild = await getCountAllChildren(u._id);
+      if (countTotalChild > 797161 * nextTier) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+};
 
 export const deleteUserNotKYC = asyncHandler(async () => {
   const listUser = await User.find({ status: "UNVERIFY" });
@@ -80,6 +90,46 @@ export const deleteUserNotKYC = asyncHandler(async () => {
       await parent.save();
 
       const userDelete = await DeleteUser.create({
+        userId: u.userId,
+        oldId: u._id,
+        email: u.email,
+        password: u.password,
+        walletAddress: u.walletAddress,
+        parentId: u.parentId,
+        refId: u.refId,
+      });
+
+      await User.deleteOne({ _id: u._id });
+    }
+  }
+
+  console.log("Remove unveify done");
+});
+
+export const deleteUserNotPay = asyncHandler(async () => {
+  const currentDay = new Date(Date.now() - 48 * 3600 * 1000);
+  console.log({ currentDay });
+  const listUser = await User.find({
+    $and: [
+      { status: "APPROVED" },
+      { createdAt: { $lt: currentDay } },
+      { countPay: 0 },
+      { countChild: 0 },
+    ],
+  });
+
+  for (let u of listUser) {
+    let parent = await User.findById(u.parentId);
+    if (parent) {
+      let childs = parent.children;
+      let newChilds = childs.filter((item) => {
+        if (item.toString() !== u._id.toString()) return item;
+      });
+      parent.children = [...newChilds];
+      await parent.save();
+
+      const userDelete = await DeleteUser.create({
+        userId: u.userId,
         oldId: u._id,
         email: u.email,
         password: u.password,
