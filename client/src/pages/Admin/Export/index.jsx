@@ -27,11 +27,10 @@ const ExportPage = () => {
           [t("fine")]: null,
           [t("status")]: null,
         });
-        console.log({ excelData });
-        // exportToExcel(
-        //   excelData,
-        //   `${t("usersListFileName")}_${moment().format("DD/MM/YYYY_HH:mm:ss")}`
-        // );
+        exportToExcel(
+          excelData,
+          `${t("usersListFileName")}_${moment().format("DD/MM/YYYY_HH:mm:ss")}`
+        );
         setLoading(false);
         toast.success(t("export successful"));
       })
