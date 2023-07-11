@@ -10,7 +10,7 @@ const deleteUserSchema = mongoose.Schema(
       type: String,
     },
     walletAddress: {
-      type: String,
+      type: Array,
     },
     email: {
       type: String,

@@ -172,5 +172,16 @@
   "createdAt": "Thời gian",
   "export successful": "Xuất file thành công",
   "false": "Chưa",
-  "true": "Rồi"
+  "true": "Rồi",
+
+  "Are you sure to do this.": "Vui lòng xác nhận xoá người dùng này!",
+  "Delete user successfull": "Xoá người dùng thành công",
+  "change wallet": "Đổi địa chỉ ví",
+  "please check your mail to change wallet": "Vui lòng kiểm tra mail để lấy mã code",
+  "Code is required": "Mã code là bắt buộc",
+  "Change wallet mail sended.Please check your mail": "Đã gửi mail thay đổi ví. Vui lòng kiểm tra mail của bạn",
+  "Could not send the mail. Please retry.": "Không thể gửi mail. Vui lòng thử lại",
+  "Your wallet address updated": "Địa chỉ ví của bạn được cập nhật.",
+  "receiverEmail": "Email người nhận",
+  "senderEmail": "Email người gửi"
 }

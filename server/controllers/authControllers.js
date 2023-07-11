@@ -46,7 +46,11 @@ const registerUser = asyncHandler(async (req, res) => {
   const { userId, walletAddress, email, password, ref, receiveId } = req.body;
 
   const userExists = await User.findOne({
-    $or: [{ email }, { userId }, { walletAddress: { $in: [walletAddress] } }],
+    $or: [
+      { email },
+      { userId: { $regex: userId, $options: "i" } },
+      { walletAddress: { $in: [walletAddress] } },
+    ],
   });
 
   if (userExists) {

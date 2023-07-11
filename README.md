@@ -37,15 +37,16 @@
 
 **[MIT](./LICENSE)**
 
-Mail gửi đổi ví bằng code 2.5tr
+Mail gửi đổi ví bằng code 2.5tr => Done
 Thêm option view hệ thống 1tr => Done
 Trang xem user đã bị xoá 1.5tr => done
 Tăng 2 tuần xoá sang 3 tuần xoá 500 => Done
 Xoá user không thanh toán trong 48h 1tr
 Hệ thống tự đếm số con 1.5tr => Done
+
 Xuất excel => 2tr => Done
-Nút xoá user chưa KYC => 1tr
-Ràng buộc không trùng username => 1tr
+Nút xoá user chưa KYC 1tr => Done
+Ràng buộc không trùng username 1tr => done
 
 // update parent
 db.users.update({

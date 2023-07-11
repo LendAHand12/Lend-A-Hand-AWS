@@ -19,6 +19,10 @@ const generateToken = (id, option) => {
     return jwt.sign({ id }, process.env.JWT_FORGOT_PASSWORD_TOKEN_SECRET, {
       expiresIn: 60 * 10, // 10 minutes
     });
+  } else if (option === "change wallet") {
+    return jwt.sign({ id }, process.env.JWT_FORGOT_PASSWORD_TOKEN_SECRET, {
+      expiresIn: 60 * 10, // 10 minutes
+    });
   }
 };
 

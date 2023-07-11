@@ -168,5 +168,16 @@
   "createdAt": "Time",
   "export successful": "Export successful",
   "false": "Not yet",
-  "true": "Yes"
+  "true": "Yes",
+
+  "Are you sure to do this.": "Please confirm delete this user!",
+  "Delete user Successfull": "Delete user successfully",
+  "change wallet": "Change wallet address",
+  "Please check your email to exchange your wallet": "Please check your email for the link",
+  "Code is started": "Code is required",
+  "Wallet change mail sent. Please check your mail": "Change wallet mail sent. Please check your mail",
+  "Could not send the mail. Please retry.": "Unable to send the mail. Please try again",
+  "Your wallet address updated": "Your wallet address has been updated.",
+  "receiverEmail": "Receiver Email",
+  "senderEmail": "Sender Email"
 }

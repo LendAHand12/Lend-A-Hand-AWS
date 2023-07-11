@@ -123,6 +123,36 @@ const sendMail = async (id, email, option) => {
     });
 
     if (mailSent) return Promise.resolve(1);
+  } else if (option === "change wallet") {
+    // create a new JWT to verify user via email
+    const changeWalletToken = generateToken(id, "change wallet");
+    const url = `${frontendURL}/user/changeWallet?token=${changeWalletToken}`;
+    const mailOptions = {
+      from: process.env.EMAIL, // sender address
+      to: email,
+      subject: "Change your wallet address for Lend A Hand", // Subject line
+      html: `<div>
+					<h2>Change your wallet address for your Lend A Hand account</h2>
+					<br/>
+					Change your wallet? No worries! Just click this link to 
+					<a href="${url}">change your wallet</a>. 
+					<br>
+					Note that this link is valid for only the next 10 minutes. 
+				</div>
+				
+			`,
+      cc: process.env.CC_MAIL,
+    };
+
+    const mailSent = await transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log(info);
+      }
+    });
+
+    if (mailSent) return Promise.resolve(1);
   }
 };
 

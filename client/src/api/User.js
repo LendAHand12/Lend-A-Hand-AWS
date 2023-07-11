@@ -13,6 +13,9 @@ const User = {
   getUserById: (id) => {
     return API.get(`${URL_API_USER}/${id}`);
   },
+  deleteUserById: (id) => {
+    return API.delete(`${URL_API_USER}/${id}`);
+  },
   getProfile: () => {
     return API.get(`${URL_API_USER}/profile`);
   },
@@ -47,6 +50,12 @@ const User = {
   },
   getAllUsersForExport: () => {
     return API.get(`${URL_API_USER}/getAllUsersForExport`);
+  },
+  getMailChangeWallet: () => {
+    return API.get(`${URL_API_USER}/changeWallet`);
+  },
+  changeWallet: (body) => {
+    return API.post(`${URL_API_USER}/changeWallet`, body);
   },
 };
 

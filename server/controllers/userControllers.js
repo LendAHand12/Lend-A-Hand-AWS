@@ -2,6 +2,11 @@ import asyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
 import DeleteUser from "../models/deleteUserModel.js";
 import mongoose from "mongoose";
+import sendMail from "../utils/sendMail.js";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const getAllUsers = asyncHandler(async (req, res) => {
   const { pageNumber, keyword, status } = req.query;
@@ -83,10 +88,30 @@ const getAllUsersWithKeyword = asyncHandler(async (req, res) => {
 const deleteUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
   if (user) {
-    await user.remove();
-    res.json({
-      message: "User removed from DB",
-    });
+    let parent = await User.findById(user.parentId);
+    if (parent) {
+      let childs = parent.children;
+      let newChilds = childs.filter((item) => {
+        if (item.toString() !== user._id.toString()) return item;
+      });
+      parent.children = [...newChilds];
+      await parent.save();
+
+      await DeleteUser.create({
+        userId: user.userId,
+        oldId: user._id,
+        email: user.email,
+        password: user.password,
+        walletAddress: user.walletAddress,
+        parentId: user.parentId,
+        refId: user.refId,
+      });
+
+      await User.deleteOne({ _id: user._id });
+      res.json({
+        message: "Delete user successfull",
+      });
+    }
   } else {
     res.status(404);
     throw new Error("User not found");
@@ -503,6 +528,57 @@ const getAllUsersForExport = asyncHandler(async (req, res) => {
   res.json(result);
 });
 
+const mailForChangeWallet = asyncHandler(async (req, res) => {
+  try {
+    const { id } = req.user;
+    const user = await User.findById(id);
+
+    if (user && user.isConfirmed) {
+      await sendMail(user._id, user.email, "change wallet");
+
+      res.status(200).json({
+        message: "Change wallet mail sended.Please check your mail",
+      });
+    } else {
+      res.status(404);
+      throw new Error("Not found user");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(401);
+    throw new Error("Could not send the mail. Please retry.");
+  }
+});
+
+const changeWallet = asyncHandler(async (req, res) => {
+  try {
+    const { token, newWallet } = req.body;
+    const decodedToken = jwt.verify(
+      token,
+      process.env.JWT_FORGOT_PASSWORD_TOKEN_SECRET
+    );
+    const user = await User.findById(decodedToken.id);
+
+    if (user && newWallet) {
+      const newWalletAddress = [newWallet, ...user.walletAddress];
+      user.walletAddress = [...newWalletAddress];
+      const updatedUser = await user.save();
+
+      if (updatedUser) {
+        res.status(200).json({
+          message: "Your wallet address updated",
+        });
+      } else {
+        res.status(401);
+        throw new Error("Unable to update wallet");
+      }
+    }
+  } catch (error) {
+    res.status(401);
+    throw new Error("User not found");
+  }
+});
+
 export {
   getUserProfile,
   getAllUsers,
@@ -520,4 +596,6 @@ export {
   getCountAllChildren,
   getAllDeletedUsers,
   getAllUsersForExport,
+  mailForChangeWallet,
+  changeWallet,
 };

@@ -108,13 +108,12 @@ export const deleteUserNotKYC = asyncHandler(async () => {
 
 export const deleteUserNotPay = asyncHandler(async () => {
   const currentDay = new Date(Date.now() - 48 * 3600 * 1000);
-  console.log({ currentDay });
   const listUser = await User.find({
     $and: [
       { status: "APPROVED" },
       { createdAt: { $lt: currentDay } },
       { countPay: 0 },
-      { countChild: 0 },
+      { children: { $size: 0 } },
     ],
   });
 

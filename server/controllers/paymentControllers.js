@@ -664,7 +664,9 @@ const getAllTransForExport = asyncHandler(async (req, res) => {
         address_from: 1,
         address_ref: 1,
         senderName: "$sender.userId",
+        senderEmail: "$sender.email",
         receiverName: "$receiver.userId",
+        receiverEmail: "$receiver.email",
       },
     },
   ]);

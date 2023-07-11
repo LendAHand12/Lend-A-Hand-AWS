@@ -6,6 +6,7 @@ const Transactions = lazy(() => import("@/pages/User/Transactions"));
 const Tree = lazy(() => import("@/pages/User/Tree"));
 const Payment = lazy(() => import("@/pages/User/Payment"));
 const Referral = lazy(() => import("@/pages/User/Referral"));
+const ChangeWallet = lazy(() => import("@/pages/User/ChangeWallet"));
 
 const routes = [
   {
@@ -43,6 +44,12 @@ const routes = [
     title: "referral",
     permissionWithStatus: ["APPROVED"],
     component: Referral,
+  },
+  {
+    path: "/changeWallet",
+    title: "",
+    permissionWithStatus: ["APPROVED"],
+    component: ChangeWallet,
   },
 ];
 

@@ -7,6 +7,8 @@ import { ToastContainer, toast } from "react-toastify";
 import NoContent from "@/components/NoContent";
 import Loading from "@/components/Loading";
 import { useHistory } from "react-router-dom";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 
 const Users = () => {
   const { t } = useTranslation();
@@ -95,20 +97,34 @@ const Users = () => {
     history.push(`/admin/tree/${id}`);
   };
 
-  const handleBlock = async (id) => {
-    await User.changeStatus({ id, status: "LOCKED" })
-      .then((response) => {
-        const { message } = response.data;
-        setRefresh(!refresh);
-        toast.success(message);
-      })
-      .catch((error) => {
-        let message =
-          error.response && error.response.data.error
-            ? error.response.data.error
-            : error.message;
-        toast.error(t(message));
-      });
+  const handleDelete = async (id) => {
+    confirmAlert({
+      title: t("Are you sure to do this."),
+      message: "",
+      buttons: [
+        {
+          label: "Yes",
+          onClick: async () => {
+            await User.deleteUserById(id)
+              .then((response) => {
+                const { message } = response.data;
+                setRefresh(!refresh);
+                toast.success(t(message));
+              })
+              .catch((error) => {
+                let message =
+                  error.response && error.response.data.error
+                    ? error.response.data.error
+                    : error.message;
+                toast.error(t(message));
+              });
+          },
+        },
+        {
+          label: "No",
+        },
+      ],
+    });
   };
 
   const handleNextPage = () => {
@@ -320,19 +336,22 @@ const Users = () => {
                         </button>
                       )}
 
-                      <button
-                        onClick={() => handleBlock(ele._id)}
-                        className="font-medium text-gray-500 hover:text-primary"
-                      >
-                        <svg
-                          fill="currentColor"
-                          viewBox="-3.5 0 19 19"
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="w-6 h-auto"
+                      {ele.countPay === 0 && ele.children.length === 0 && (
+                        <button
+                          onClick={() => handleDelete(ele._id)}
+                          className="font-medium text-gray-500 hover:text-primary"
                         >
-                          <path d="M11.383 13.644A1.03 1.03 0 0 1 9.928 15.1L6 11.172 2.072 15.1a1.03 1.03 0 1 1-1.455-1.456l3.928-3.928L.617 5.79a1.03 1.03 0 1 1 1.455-1.456L6 8.261l3.928-3.928a1.03 1.03 0 0 1 1.455 1.456L7.455 9.716z" />
-                        </svg>
-                      </button>
+                          <svg
+                            fill="currentColor"
+                            className="w-6 h-auto"
+                            viewBox="-3 -2 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                            preserveAspectRatio="xMinYMin"
+                          >
+                            <path d="M6 2V1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1h4a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2h-.133l-.68 10.2a3 3 0 0 1-2.993 2.8H5.826a3 3 0 0 1-2.993-2.796L2.137 7H2a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h4zm10 2H2v1h14V4zM4.141 7l.687 10.068a1 1 0 0 0 .998.932h6.368a1 1 0 0 0 .998-.934L13.862 7h-9.72zM7 8a1 1 0 0 1 1 1v7a1 1 0 0 1-2 0V9a1 1 0 0 1 1-1zm4 0a1 1 0 0 1 1 1v7a1 1 0 0 1-2 0V9a1 1 0 0 1 1-1z" />
+                          </svg>
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

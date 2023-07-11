@@ -50,11 +50,11 @@ const routes = [
     title: "trash",
     component: Trash,
   },
-  // {
-  //   path: "/linkVerify",
-  //   title: "linkVerify",
-  //   component: GetVerifyLink,
-  // },
+  {
+    path: "/linkVerify",
+    // title: "linkVerify",
+    component: GetVerifyLink,
+  },
   {
     path: "/export",
     title: "export",

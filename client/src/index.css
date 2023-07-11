@@ -18,3 +18,37 @@ body {
   font-size: 12px;
   margin: 4px 0;
 }
+
+.react-confirm-alert-body {
+  text-align: center;
+  width: 500px;
+  padding: 40px;
+  background: azure;
+  box-shadow: 0 20px 75px rgba(0, 0, 0, 0.23);
+  border-radius: 20px;
+}
+
+.react-confirm-alert-body > h1 {
+  margin-bottom: 30px;
+  font-size: 25px;
+  font-weight: 500;
+}
+.react-confirm-alert-body > p {
+  text-align: left;
+}
+.react-confirm-alert-body > button {
+  width: 160px;
+  padding: 10px;
+  border: 2px solid gray;
+  margin: 10px;
+  cursor: pointer;
+  background: none;
+  border-radius: 20px;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+.react-confirm-alert-body > button:hover {
+  background-color: #28bae6;
+  border-color: #28bae6;
+  color: #fff;
+}

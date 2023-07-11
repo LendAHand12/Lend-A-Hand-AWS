@@ -14,6 +14,7 @@ const Profile = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState();
+  const [loadingChangeWallet, setLoadingChangeWallet] = useState(false);
   const [loadingUploadFileFront, setLoadingUploadFileFront] = useState(false);
   const [loadingUploadFileBack, setLoadingUploadFileBack] = useState(false);
   const { userInfo } = useSelector((state) => state.auth);
@@ -115,6 +116,25 @@ const Profile = () => {
     },
     [imgFront, imgBack]
   );
+
+  const handleChangeWallet = async () => {
+    // const { walletAddress } = data;
+    setLoadingChangeWallet(true);
+    await User.getMailChangeWallet()
+      .then((response) => {
+        console.log(response.data);
+        setLoadingChangeWallet(false);
+        toast.success(t(response.data.message));
+      })
+      .catch((error) => {
+        let message =
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message;
+        toast.error(t(message));
+        setLoadingChangeWallet(false);
+      });
+  };
 
   return (
     <div>
@@ -421,6 +441,14 @@ const Profile = () => {
               >
                 {loading && <Loading />}
                 {t("update")}
+              </button>
+              <button
+                onClick={handleChangeWallet}
+                disabled={loadingChangeWallet}
+                className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+              >
+                {loadingChangeWallet && <Loading />}
+                {t("change wallet")}
               </button>
               <button
                 onClick={handleLogout}

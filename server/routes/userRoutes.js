@@ -15,6 +15,8 @@ import {
   getChildrenList,
   getAllDeletedUsers,
   getAllUsersForExport,
+  mailForChangeWallet,
+  changeWallet,
 } from "../controllers/userControllers.js";
 import { protectRoute, isAdmin } from "../middleware/authMiddleware.js";
 import uploadCloud from "../middleware/uploadCloud.js";
@@ -26,6 +28,10 @@ router
   .route("/getAllDeletedUsers")
   .get(protectRoute, isAdmin, getAllDeletedUsers);
 router.route("/profile").get(protectRoute, getUserProfile);
+router
+  .route("/changeWallet")
+  .get(protectRoute, mailForChangeWallet)
+  .post(protectRoute, changeWallet);
 router.route("/status").put(protectRoute, isAdmin, changeStatusUser);
 router.route("/tree").get(protectRoute, getTree);
 router.route("/tree/:id").get(protectRoute, isAdmin, getTreeOfUser);

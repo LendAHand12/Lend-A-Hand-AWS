@@ -51,8 +51,10 @@ const ExportPage = () => {
         const excelData = convertResponseDataToExportData(response.data, {
           [t("order")]: null,
           [t("senderName")]: null,
+          [t("senderEmail")]: null,
           [t("address_from")]: null,
           [t("receiverName")]: null,
+          [t("receiverEmail")]: null,
           [t("address_ref")]: null,
           [t("type")]: null,
           [t("amount")]: null,
