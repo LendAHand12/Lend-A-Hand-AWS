@@ -180,5 +180,6 @@
   "Your wallet address updated": "Your wallet address has been updated.",
   "receiverEmail": "Receiver Email",
   "senderEmail": "Sender Email",
-  "the next pay count": "The next distribution"
+  "the next pay count": "The next distribution",
+  "isRegistered": "Completed registration"
 }

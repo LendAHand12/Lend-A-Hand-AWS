@@ -184,5 +184,8 @@
   "Your wallet address updated": "Địa chỉ ví của bạn được cập nhật.",
   "receiverEmail": "Email người nhận",
   "senderEmail": "Email người gửi",
-  "the next pay count": "Lần đóng góp tiếp theo"
+  "the next pay count": "Lần đóng góp tiếp theo",
+  "isRegistered": "Đã hoàn thành đăng ký",
+  "finished": "Đã hoàn thành",
+  "unfinished": "Chưa hoàn thành"
 }
