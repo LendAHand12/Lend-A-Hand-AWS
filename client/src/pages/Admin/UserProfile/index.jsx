@@ -135,7 +135,7 @@ const UserProfile = (match) => {
                       {t("count pay")}
                     </div>
                     <div className="px-4 py-2">
-                      {data.countPay} {t("times")}
+                      {data.countPay === 0 ? 0 : data.countPay - 1} {t("times")}
                     </div>
                   </div>
                   <div className="grid lg:grid-cols-2 grid-cols-1">

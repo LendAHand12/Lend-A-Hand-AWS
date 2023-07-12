@@ -118,7 +118,7 @@
   "Receive User Email": "Email người nhận",
   "Receive User Wallet": "Ví người nhận",
   "amount": "Số tiền",
-  "count pay": "Đóng góp lần tiếp theo",
+  "count pay": "Số lần đóng góp",
   "send": "Người gửi",
   "receive": "Người nhận",
   "type": "Loại",
@@ -183,5 +183,6 @@
   "Could not send the mail. Please retry.": "Không thể gửi mail. Vui lòng thử lại",
   "Your wallet address updated": "Địa chỉ ví của bạn được cập nhật.",
   "receiverEmail": "Email người nhận",
-  "senderEmail": "Email người gửi"
+  "senderEmail": "Email người gửi",
+  "the next pay count": "Lần đóng góp tiếp theo"
 }

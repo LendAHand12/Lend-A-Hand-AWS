@@ -115,7 +115,7 @@
   "Receive User Email": "Receiver Email",
   "Receive User Wallet": "Receiver Wallet",
   "amount": "Amount",
-  "count pay": "Next contribution count",
+  "count pay": "Number of contribution",
   "send": "Sender",
   "receive": "Recipient",
   "type": "Type",
@@ -179,5 +179,6 @@
   "Could not send the mail. Please retry.": "Unable to send the mail. Please try again",
   "Your wallet address updated": "Your wallet address has been updated.",
   "receiverEmail": "Receiver Email",
-  "senderEmail": "Sender Email"
+  "senderEmail": "Sender Email",
+  "the next pay count": "The next distribution"
 }

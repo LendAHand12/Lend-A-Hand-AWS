@@ -238,7 +238,7 @@ const Profile = () => {
                       {t("count pay")}
                     </div>
                     <div className="px-4 py-2">
-                      {countPay} {t("times")}
+                      {countPay === 0 ? 0 : countPay - 1} {t("times")}
                     </div>
                   </div>
                   <div className="grid lg:grid-cols-2 grid-cols-1">

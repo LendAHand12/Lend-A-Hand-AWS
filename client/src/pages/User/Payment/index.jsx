@@ -207,7 +207,7 @@ const PaymentPage = () => {
           </>
         )}
 
-        <div className="mb-3">
+        {/* <div className="mb-3">
           <label className="font-bold text-sm mb-2 ml-1">{t("weeks")}</label>
           <div>
             <select
@@ -230,7 +230,15 @@ const PaymentPage = () => {
               <option value="12">12</option>
             </select>
           </div>
-        </div>
+        </div> */}
+        {!loadingPaymentInfo && userInfo.countPay !== 0 && (
+          <div className="mb-3">
+            <p className="text-lg mb-2 ml-1">
+              <span className="font-bold">{t("the next pay count")}</span> :{" "}
+              {userInfo.countPay}
+            </p>
+          </div>
+        )}
         <div className="mb-3">
           <p className="text-lg mb-2 ml-1">
             <span className="font-bold">Total</span> : {total} USDT
