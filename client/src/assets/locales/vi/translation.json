@@ -198,5 +198,8 @@
   "Please enter the correct phone format": "Vui lòng điền đúng định dạng số điện thoại",
   "Dupplicate phone": "Số điện thoại bị trùng",
   "This account have child": "Tài khoản này đã có cấp dưới",
-  "countChild": "Số lượng cấp dưới"
+  "countChild": "Số lượng cấp dưới",
+
+  "Please connect your wallet": "Vui lòng kết nối ví của Bạn",
+  "Please connect your true wallet": "Vui lòng kết nối đúng ví Bạn đã đăng ký"
 }

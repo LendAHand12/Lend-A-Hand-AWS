@@ -35,11 +35,11 @@ const AppNav = () => {
     connector,
   });
 
-  // useEffect(() => {
-  //   connect();
-  // }, []);
-
   const onClickOutside = () => setShowMenu(false);
+
+  useEffect(() => {
+    connect();
+  }, []);
 
   useLayoutEffect(() => {
     const handleScroll = () => {
