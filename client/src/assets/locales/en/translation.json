@@ -181,5 +181,7 @@
   "receiverEmail": "Receiver Email",
   "senderEmail": "Sender Email",
   "the next pay count": "The next distribution",
-  "isRegistered": "Completed registration"
+  "isRegistered": "Completed registration",
+
+  "full3child": "Account has enough 3 branches"
 }

@@ -115,12 +115,18 @@ const UserProfile = (match) => {
               <div className="text-gray-700">
                 <div className="grid grid-cols-1 text-sm">
                   <div className="grid lg:grid-cols-2 grid-cols-1">
-                    <div className="px-4 py-2 font-semibold">User ID</div>
+                    <div className="px-4 py-2 font-semibold">
+                      {t("user name")}
+                    </div>
                     <div className="px-4 py-2">{data.userId}</div>
                   </div>
                   <div className="grid lg:grid-cols-2 grid-cols-1">
                     <div className="px-4 py-2 font-semibold">Email</div>
                     <div className="px-4 py-2">{data.email}</div>
+                  </div>
+                  <div className="grid lg:grid-cols-2 grid-cols-1">
+                    <div className="px-4 py-2 font-semibold">{t("phone")}</div>
+                    <div className="px-4 py-2">{data.phone}</div>
                   </div>
                   <div className="grid lg:grid-cols-2 grid-cols-1">
                     <div className="px-4 py-2 font-semibold">

@@ -27,7 +27,7 @@ const checkLinkRef = asyncHandler(async (req, res) => {
         });
       } else {
         res.status(400).json({
-          error: message,
+          error: "full3child",
         });
       }
     } else {
@@ -43,13 +43,15 @@ const checkLinkRef = asyncHandler(async (req, res) => {
 });
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { userId, walletAddress, email, password, ref, receiveId } = req.body;
+  const { userId, walletAddress, email, password, ref, receiveId, phone } =
+    req.body;
 
   const userExists = await User.findOne({
     $or: [
       { email },
       { userId: { $regex: userId, $options: "i" } },
       { walletAddress: { $in: [walletAddress] } },
+      { $and: [{ phone: { $ne: "" } }, { phone }] },
     ],
   });
 
@@ -186,6 +188,7 @@ const authUser = asyncHandler(async (req, res) => {
         imgFront: user.imgFront,
         imgBack: user.imgBack,
         countPay: user.countPay,
+        phone: user.phone,
         listDirectUser: listDirectUser,
       },
       accessToken,
@@ -313,7 +316,7 @@ const updateData = asyncHandler(async (req, res) => {
 });
 
 const getNewPass = asyncHandler(async (req, res) => {
-  res.json(bcrypt.hashSync("Temppassword1", 12));
+  res.json(bcrypt.hashSync("abcd1234", 12));
 });
 
 export {

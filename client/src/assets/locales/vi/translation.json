@@ -187,5 +187,16 @@
   "the next pay count": "Lần đóng góp tiếp theo",
   "isRegistered": "Đã hoàn thành đăng ký",
   "finished": "Đã hoàn thành",
-  "unfinished": "Chưa hoàn thành"
+  "unfinished": "Chưa hoàn thành",
+
+  "full3child": "Tài khoản đã đủ 3 nhánh",
+  "confirm password": "Xác nhận lại mật khẩu",
+  "wallet address": "Địa chỉ ví",
+  "user name": "Tên tài khoản",
+  "phone": "Số điện thoại",
+  "Phone is required": "Số điện thoại là bắt buộc",
+  "Please enter the correct phone format": "Vui lòng điền đúng định dạng số điện thoại",
+  "Dupplicate phone": "Số điện thoại bị trùng",
+  "This account have child": "Tài khoản này đã có cấp dưới",
+  "countChild": "Số lượng cấp dưới"
 }

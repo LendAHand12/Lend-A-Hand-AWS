@@ -88,6 +88,10 @@ const getAllUsersWithKeyword = asyncHandler(async (req, res) => {
 const deleteUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
   if (user) {
+    if (user.children.length > 0) {
+      res.status(404);
+      throw new Error("This account have child");
+    }
     let parent = await User.findById(user.parentId);
     if (parent) {
       let childs = parent.children;
@@ -100,6 +104,7 @@ const deleteUser = asyncHandler(async (req, res) => {
       await DeleteUser.create({
         userId: user.userId,
         oldId: user._id,
+        phone: user.phone,
         email: user.email,
         password: user.password,
         walletAddress: user.walletAddress,
@@ -140,6 +145,7 @@ const getUserById = asyncHandler(async (req, res) => {
       imgFront: user.imgFront,
       imgBack: user.imgBack,
       countPay: user.countPay,
+      phone: user.phone,
       listDirectUser: listDirectUser,
     });
   else {
@@ -149,14 +155,17 @@ const getUserById = asyncHandler(async (req, res) => {
 });
 
 const updateUser = asyncHandler(async (req, res) => {
-  const { walletAddress, imgFront, imgBack } = req.body;
+  const { phone, imgFront, imgBack } = req.body;
   const user = await User.findOne({ _id: req.params.id }).select("-password");
-  // const userHaveWallet = await User.find({ walletAddress });
-  // if (userHaveWallet >= 2) {
-  //   res.status(400).json({ error: "Dupplicate wallet address" });
-  // }
+  const userHavePhone = await User.find({
+    $and: [{ phone }, { email: { $ne: user.email } }],
+  });
+
+  if (userHavePhone.length >= 1) {
+    res.status(400).json({ error: "Dupplicate phone" });
+  }
   if (user) {
-    // user.walletAddress = walletAddress || user.walletAddress;
+    user.phone = phone || user.phone;
     if (imgFront !== "" && imgBack !== "") {
       if (
         imgFront.includes("https://res.cloudinary.com/dhqggkmto") &&
@@ -189,6 +198,7 @@ const updateUser = asyncHandler(async (req, res) => {
           imgFront: updatedUser.imgFront,
           imgBack: updatedUser.imgBack,
           countPay: updatedUser.countPay,
+          phone: updatedUser.phone,
           listDirectUser,
         },
       });
@@ -350,6 +360,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
       imgFront: user.imgFront,
       imgBack: user.imgBack,
       countPay: user.countPay,
+      phone: user.phone,
       listDirectUser: listDirectUser,
     });
   } else {
@@ -504,20 +515,23 @@ const getAllUsersForExport = asyncHandler(async (req, res) => {
         fine: 1,
         countPay: 1,
         status: 1,
+        countChild: 1,
+        phone: 1,
         createdAt: 1,
         parent: "$parent",
       },
     },
   ]);
-  console.log({ users });
 
   const result = [];
   for (let u of users) {
     result.push({
       name: u.userId,
       email: u.email,
+      phone: u.phone,
       walletAddress: u.walletAddress[0],
       memberSince: u.createdAt,
+      countChild: u.countChild,
       refUserName: u.parent ? u.parent.userId : "",
       "count pay": u.countPay,
       fine: u.fine,

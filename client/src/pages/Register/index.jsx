@@ -35,7 +35,8 @@ const Register = () => {
 
   const onSubmit = async (data) => {
     setLoading(true);
-    const { userId, email, password, ref, receiveId, walletAddress } = data;
+    const { userId, email, password, ref, receiveId, walletAddress, phone } =
+      data;
     await Auth.register({
       userId: userId.trim(),
       email: email.trim(),
@@ -43,6 +44,7 @@ const Register = () => {
       ref,
       receiveId,
       walletAddress: walletAddress.trim(),
+      phone: phone.trim(),
     })
       .then((response) => {
         setLoading(false);
@@ -97,7 +99,7 @@ const Register = () => {
                       <input
                         className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                         type="text"
-                        placeholder="User Name"
+                        placeholder={t("user name")}
                         {...register("userId", {
                           required: t("User ID is required"),
                         })}
@@ -119,11 +121,28 @@ const Register = () => {
                       <p className="error-message-text">
                         {errors.email?.message}
                       </p>
+                      {/* Phone */}
+                      <input
+                        className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                        type="text"
+                        placeholder={t("phone")}
+                        {...register("phone", {
+                          required: t("Phone is required"),
+                          pattern: {
+                            value: /(0[3|5|7|8|9])+([0-9]{8})\b/g,
+                            message: t("Please enter the correct phone format"),
+                          },
+                        })}
+                        disabled={loading}
+                      />
+                      <p className="error-message-text">
+                        {errors.phone?.message}
+                      </p>
                       {/* Wallet address */}
                       <input
                         className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
                         type="text"
-                        placeholder="Wallet address : Oxbx7..."
+                        placeholder={`${t("wallet address")} : Oxbx7...`}
                         {...register("walletAddress", {
                           required: t("Wallet address is required"),
                           pattern: {
@@ -142,7 +161,7 @@ const Register = () => {
                       <input
                         className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
                         type="password"
-                        placeholder="Password"
+                        placeholder={t("password")}
                         {...register("password", {
                           required: t("Password is required"),
                           pattern: {
@@ -161,7 +180,7 @@ const Register = () => {
                       <input
                         className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
                         type="password"
-                        placeholder="Confirm Password"
+                        placeholder={t("confirm password")}
                         {...register("confirmPassword", {
                           required: t("Confirm password is required"),
                           validate: (val) => {

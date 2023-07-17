@@ -41,12 +41,22 @@ Mail gửi đổi ví bằng code 2.5tr => Done
 Thêm option view hệ thống 1tr => Done
 Trang xem user đã bị xoá 1.5tr => done
 Tăng 2 tuần xoá sang 3 tuần xoá 500 => Done
-Xoá user không thanh toán trong 48h 1tr
+Xoá user không thanh toán trong 48h 1tr => Done
 Hệ thống tự đếm số con 1.5tr => Done
 
 Xuất excel => 2tr => Done
 Nút xoá user chưa KYC 1tr => Done
 Ràng buộc không trùng username 1tr => done
+
+Chi phí cũ 4tr
+
+- Chuyển alert full con 500
+- Lưu thêm số điện thoại 1tr
+- thêm cột số lượng con trong xuất excel 500
+- thêm số trang danh sách 1tr
+- nhận diện, mới tần màu khác nhau. Hoàn thành la phải trả $22 dk. 1tr
+- thêm chức năng hệ thống báo tài khoản đầy tầng 1, 2, 3,... 1tr
+- trên cây hệ thống của user phải có 2 con số. Danh số và đã trả bao nhiêu lần.
 
 // update parent
 db.users.update({
