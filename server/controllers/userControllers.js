@@ -281,7 +281,7 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
         );
         tree.nodes.push({
           key: child._id,
-          label: `${child.userId} (${child.countChild})`,
+          label: `${child.userId} (${child.countChild} - ${child.countPay})`,
         });
       }
       res.status(200).json(tree);
