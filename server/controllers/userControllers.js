@@ -281,7 +281,13 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
         );
         tree.nodes.push({
           key: child._id,
-          label: `${child.userId} (${child.countChild} - ${child.countPay})`,
+          label: `${child.userId} (${child.countChild} - ${
+            child.countPay === 0
+              ? "Chưa hoàn thành"
+              : child.countPay === 1
+              ? "Hoàn thành"
+              : child.countPay - 1
+          })`,
         });
       }
       res.status(200).json(tree);
