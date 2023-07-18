@@ -58,7 +58,7 @@ Chi phí cũ 4tr
 - thêm chức năng hệ thống báo tài khoản đầy tầng 1, 2, 3,... 1tr
 - trên cây hệ thống của user phải có 2 con số. Danh số và đã trả bao nhiêu lần.
 
-- ràng buộc dùng 1 ví đăng ký để thanh toán => 1tr
+- ràng buộc dùng 1 ví đăng ký để thanh toán 1tr => done
 - xuống cấp cũng gửi mail => 2tr
 
 // update parent

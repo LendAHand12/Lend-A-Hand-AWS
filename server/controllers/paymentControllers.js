@@ -105,6 +105,8 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       ],
     });
 
+    console.log({ pay: user.countPay, listTransSuccess });
+
     let step = 0;
     if (listTransSuccess.length === 0) {
       if (user.countPay === 0) {
@@ -310,26 +312,36 @@ const onDonePayment = asyncHandler(async (req, res) => {
   const { transIds } = req.body;
 
   const transIdsList = Object.values(transIds);
-  for (let transId of transIdsList) {
-    try {
-      await Transaction.findOne({
-        $and: [{ _id: transId }, { status: "SUCCESS" }],
-      });
-    } catch (err) {
-      res.status(400);
-      throw new Error("No transaction found");
+  if (transIdsList.length > 0) {
+    for (let transId of transIdsList) {
+      try {
+        await Transaction.findOne({
+          $and: [
+            { userId: req.user.id },
+            { userCountPay: req.user.countPay },
+            { _id: transId },
+            { status: "SUCCESS" },
+          ],
+        });
+      } catch (err) {
+        res.status(400);
+        throw new Error("No transaction found");
+      }
     }
-  }
 
-  const user = await User.findOne({ _id: req.user.id }).select("-password");
-  user.countPay = user.countPay + 1;
+    const user = await User.findOne({ _id: req.user.id }).select("-password");
+    user.countPay = user.countPay + 1;
 
-  const updatedUser = await user.save();
+    const updatedUser = await user.save();
 
-  if (updatedUser) {
-    res.status(201).json({
-      message: "Payment successful",
-    });
+    if (updatedUser) {
+      res.status(201).json({
+        message: "Payment successful",
+      });
+    }
+  } else {
+    res.status(400);
+    throw new Error("No transaction found");
   }
 });
 

@@ -52,3 +52,21 @@ body {
   border-color: #28bae6;
   color: #fff;
 }
+
+.pagination {
+  display: flex;
+  gap: 10px;
+}
+
+.visually-hidden {
+  display: none;
+}
+
+.pagination .page-item .page-link {
+  padding: 4px;
+  color: rgb(107 114 128 / 1);
+}
+
+.pagination .page-item.active .page-link {
+  color: #000;
+}

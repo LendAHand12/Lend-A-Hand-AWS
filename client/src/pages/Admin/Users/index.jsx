@@ -6,21 +6,27 @@ import User from "@/api/User";
 import { ToastContainer, toast } from "react-toastify";
 import NoContent from "@/components/NoContent";
 import Loading from "@/components/Loading";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import { PaginationControl } from "react-bootstrap-pagination-control";
 
 const Users = () => {
   const { t } = useTranslation();
   const history = useHistory();
-  const [pageNumber, setPageNumber] = useState(1);
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const key = searchParams.get("keyword");
+  const page = searchParams.get("page");
+  const status = searchParams.get("status");
+  const [pageNumber, setPageNumber] = useState(page ? page : 1);
   const [totalPage, setTotalPage] = useState(0);
-  const [keyword, setKeyword] = useState("");
-  const [searchStatus, setSearchStatus] = useState("all");
+  const [keyword, setKeyword] = useState(key ? key : "");
+  const [searchStatus, setSearchStatus] = useState(status ? status : "all");
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [refresh, setRefresh] = useState(false);
-  const [searchKey, setSearchKey] = useState("");
+  const [searchKey, setSearchKey] = useState(key ? key : "");
 
   useEffect(() => {
     (async () => {
@@ -48,7 +54,7 @@ const Users = () => {
     (async () => {
       setLoading(true);
       setPageNumber(1);
-      await User.getAllUsers(1, searchKey, searchStatus)
+      await User.getAllUsers(pageNumber, searchKey, searchStatus)
         .then((response) => {
           const { users, pages } = response.data;
           setData(users);
@@ -127,12 +133,16 @@ const Users = () => {
     });
   };
 
-  const handleNextPage = () => {
-    setPageNumber((pageNumber) => pageNumber + 1);
-  };
+  // const handleNextPage = () => {
+  //   setPageNumber((pageNumber) => pageNumber + 1);
+  // };
 
-  const handlePrevPage = () => {
-    setPageNumber((pageNumber) => pageNumber - 1);
+  // const handlePrevPage = () => {
+  //   setPageNumber((pageNumber) => pageNumber - 1);
+  // };
+
+  const handleChangePage = (page) => {
+    setPageNumber(page);
   };
 
   const handleSearch = useCallback(() => {
@@ -148,7 +158,7 @@ const Users = () => {
             <select
               className="block p-2 pr-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none active:outline-none"
               onChange={onChangeStatus}
-              defaultValue={"all"}
+              defaultValue={searchStatus}
               disabled={loading}
             >
               <option value="all">All</option>
@@ -184,6 +194,7 @@ const Users = () => {
                 onChange={onSearch}
                 className="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50"
                 placeholder={t("search with user name or email")}
+                defaultValue={searchKey}
               />
               <button
                 onClick={handleSearch}
@@ -376,7 +387,7 @@ const Users = () => {
               <span className="font-semibold text-gray-900">{totalPage}</span>{" "}
               page
             </span>
-            <ul className="inline-flex items-center -space-x-px">
+            {/* <ul className="inline-flex items-center -space-x-px">
               <li>
                 <button
                   disabled={pageNumber === 1}
@@ -425,7 +436,17 @@ const Users = () => {
                   </svg>
                 </button>
               </li>
-            </ul>
+            </ul> */}
+            <div>
+              <PaginationControl
+                page={pageNumber}
+                between={5}
+                total={20 * totalPage}
+                limit={20}
+                changePage={handleChangePage}
+                ellipsis={1}
+              />
+            </div>
           </nav>
         )}
       </div>

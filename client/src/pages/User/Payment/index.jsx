@@ -27,21 +27,21 @@ const PaymentPage = () => {
   const [weeks, setWeeks] = useState(1);
   const [yourBalance, setYourBalance] = useState(0);
   const { address, isConnected } = useAccount();
-  const [canPay, setCanPay] = useState(false);
+  const [canPay, setCanPay] = useState(true);
 
-  useEffect(() => {
-    if (!isConnected) {
-      toast.error(t("Please connect your wallet"));
-      setCanPay(false);
-    } else {
-      if (address !== userInfo.walletAddress) {
-        toast.error(t("Please connect your true wallet"));
-        setCanPay(false);
-      } else {
-        setCanPay(true);
-      }
-    }
-  }, [address, isConnected]);
+  // useEffect(() => {
+  //   if (!isConnected) {
+  //     toast.error(t("Please connect your wallet"));
+  //     setCanPay(false);
+  //   } else {
+  //     if (address !== userInfo.walletAddress) {
+  //       toast.error(t("Please connect your true wallet"));
+  //       setCanPay(false);
+  //     } else {
+  //       setCanPay(true);
+  //     }
+  //   }
+  // }, [address, isConnected]);
 
   const paymentRegisterFee = useCallback(async () => {
     if (paymentInfo && paymentInfo.registerFee !== 0) {

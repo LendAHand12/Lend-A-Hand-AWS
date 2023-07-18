@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { ToastContainer, toast } from "react-toastify";
 import { useHistory } from "react-router-dom";
 // import { shortenWalletAddress } from "@/utils";
+import { PaginationControl } from "react-bootstrap-pagination-control";
 
 const Transactions = () => {
   const { t } = useTranslation();
@@ -71,12 +72,16 @@ const Transactions = () => {
     }, 1000);
   };
 
-  const handleNextPage = () => {
-    setPageNumber((pageNumber) => pageNumber + 1);
-  };
+  // const handleNextPage = () => {
+  //   setPageNumber((pageNumber) => pageNumber + 1);
+  // };
 
-  const handlePrevPage = () => {
-    setPageNumber((pageNumber) => pageNumber - 1);
+  // const handlePrevPage = () => {
+  //   setPageNumber((pageNumber) => pageNumber - 1);
+  // };
+
+  const handleChangePage = (page) => {
+    setPageNumber(page);
   };
 
   const handleRowClick = (id) => {
@@ -281,7 +286,7 @@ const Transactions = () => {
               <span className="font-semibold text-gray-900">{totalPage}</span>{" "}
               page
             </span>
-            <ul className="inline-flex items-center -space-x-px">
+            {/* <ul className="inline-flex items-center -space-x-px">
               <li>
                 <button
                   disabled={pageNumber === 1}
@@ -330,7 +335,19 @@ const Transactions = () => {
                   </svg>
                 </button>
               </li>
-            </ul>
+            </ul> */}
+            <div>
+              <div>
+                <PaginationControl
+                  page={pageNumber}
+                  between={5}
+                  total={20 * totalPage}
+                  limit={20}
+                  changePage={handleChangePage}
+                  ellipsis={1}
+                />
+              </div>
+            </div>
           </nav>
         )}
       </div>
