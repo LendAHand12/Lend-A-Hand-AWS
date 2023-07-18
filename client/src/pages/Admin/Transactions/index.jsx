@@ -341,8 +341,8 @@ const Transactions = () => {
                 <PaginationControl
                   page={pageNumber}
                   between={5}
-                  total={20 * totalPage}
-                  limit={20}
+                  total={10 * totalPage}
+                  limit={10}
                   changePage={handleChangePage}
                   ellipsis={1}
                 />
