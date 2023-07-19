@@ -559,12 +559,11 @@ const checkCanRefundPayment = asyncHandler(async (req, res) => {
       } else if (userReceive.countPay - 1 < userCountPay) {
         res.status(404);
         throw new Error(
-          `User parent pay = ${userReceive.countPay} time but user pay = ${userCountPay} time 
-          (
-            0.NO FINISHED REGISTER 
-            1.FINISHED REGISTER 
-            other X - 1 => LAH)
-          `
+          userReceive.countPay === 0
+            ? `User parent NOT FINISHED REGISTER`
+            : `User parent pay = ${
+                userReceive.countPay - 1
+              } time but user pay = ${userCountPay} time`
         );
       } else {
         res.json({
