@@ -53,7 +53,7 @@ Chi phí cũ 4tr
 - Chuyển alert full con 500 => done
 - Lưu thêm số điện thoại 1tr => done
 - thêm cột số lượng con trong xuất excel 500 => done
-- thêm số trang danh sách 1tr
+- thêm số trang danh sách 1tr => done
 - nhận diện, mới tần màu khác nhau. Hoàn thành la phải trả $22 dk. 1tr
 - thêm chức năng hệ thống báo tài khoản đầy tầng 1, 2, 3,... 1tr
 - trên cây hệ thống của user phải có 2 con số. Danh số và đã trả bao nhiêu lần.

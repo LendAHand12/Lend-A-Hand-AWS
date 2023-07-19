@@ -556,10 +556,15 @@ const checkCanRefundPayment = asyncHandler(async (req, res) => {
       if (userReceive.status === "LOCKED") {
         res.status(404);
         throw new Error(`User parent locked`);
-      } else if (userReceive.countPay < userCountPay) {
+      } else if (userReceive.countPay - 1 < userCountPay) {
         res.status(404);
         throw new Error(
-          `User parent pay = ${userReceive.countPay} time but user pay = ${userCountPay} time`
+          `User parent pay = ${userReceive.countPay} time but user pay = ${userCountPay} time 
+          (
+            0.NO FINISHED REGISTER 
+            1.FINISHED REGISTER 
+            other X - 1 => LAH)
+          `
         );
       } else {
         res.json({
