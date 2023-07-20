@@ -146,6 +146,8 @@ const getUserById = asyncHandler(async (req, res) => {
       imgBack: user.imgBack,
       countPay: user.countPay,
       phone: user.phone,
+      oldLayer: user.oldLayer,
+      currentLayer: user.currentLayer,
       listDirectUser: listDirectUser,
     });
   else {
@@ -199,6 +201,8 @@ const updateUser = asyncHandler(async (req, res) => {
           imgBack: updatedUser.imgBack,
           countPay: updatedUser.countPay,
           phone: updatedUser.phone,
+          oldLayer: updatedUser.oldLayer,
+          currentLayer: updatedUser.currentLayer,
           listDirectUser,
         },
       });
@@ -367,6 +371,8 @@ const getUserProfile = asyncHandler(async (req, res) => {
       imgBack: user.imgBack,
       countPay: user.countPay,
       phone: user.phone,
+      oldLayer: user.oldLayer,
+      currentLayer: user.currentLayer,
       listDirectUser: listDirectUser,
     });
   } else {

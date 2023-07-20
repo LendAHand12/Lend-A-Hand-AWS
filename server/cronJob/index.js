@@ -4,6 +4,7 @@ import moment from "moment";
 import DeleteUser from "../models/deleteUserModel.js";
 import User from "../models/userModel.js";
 import sendMail from "../utils/sendMail.js";
+import { sendMailUpdateLayerForAdmin } from "../utils/sendMailCustom.js";
 import { getCountAllChildren } from "../controllers/userControllers.js";
 
 export const checkUnpayUser = asyncHandler(async () => {
@@ -158,4 +159,75 @@ export const countChildToData = asyncHandler(async () => {
   }
 
   console.log("updated count Child");
+});
+
+async function countDescendants(userId, layer) {
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return 0;
+  }
+
+  if (layer === 0) {
+    return 1; // Nếu đã đủ 3 cấp dưới thì tính là một node hoàn chỉnh
+  }
+
+  let count = 0;
+
+  for (const childId of user.children) {
+    const child = await User.findById(childId);
+    if (child.countPay !== 0) {
+      count += await countDescendants(childId, layer - 1);
+    }
+  }
+
+  return count;
+}
+
+export const findRootLayer = asyncHandler(async (id) => {
+  // Tìm người dùng root đầu tiên (có parentId null)
+  const root = await User.findById(id);
+  if (!root) {
+    return 0; // Nếu không tìm thấy root, trả về 0
+  }
+
+  let layer = 1;
+  let currentLayerCount = 1; // Số lượng node hoàn chỉnh ở tầng hiện tại (ban đầu là 1)
+
+  while (true) {
+    const nextLayerCount = currentLayerCount * 3; // Số lượng node hoàn chỉnh trong tầng tiếp theo
+    const totalDescendants = await countDescendants(root._id, layer); // Tính tổng số con (bao gồm cả node hoàn chỉnh và node chưa đủ 3 cấp dưới)
+
+    if (totalDescendants < nextLayerCount) {
+      break;
+    }
+
+    layer++;
+    currentLayerCount = nextLayerCount;
+  }
+
+  return layer - 1; // Trừ 1 vì layer hiện tại là layer chưa hoàn chỉnh
+});
+
+export const countLayerToData = asyncHandler(async () => {
+  const listUser = await User.find({
+    $and: [{ isAdmin: false }, { status: "APPROVED" }],
+  }).select("children userId email oldLayer currentLayer");
+
+  const result = [];
+
+  for (let u of listUser) {
+    const layer = await findRootLayer(u._id);
+    if (layer !== u.currentLayer) {
+      u.oldLayer = u.currentLayer;
+      u.currentLayer = layer;
+      let updatedUser = await u.save();
+      result.push(updatedUser);
+    } else {
+      u.oldLayer = u.currentLayer;
+      await u.save();
+    }
+  }
+  await sendMailUpdateLayerForAdmin(result);
+  console.log("updated layer");
 });

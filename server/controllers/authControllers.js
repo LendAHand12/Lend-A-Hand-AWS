@@ -189,6 +189,8 @@ const authUser = asyncHandler(async (req, res) => {
         imgBack: user.imgBack,
         countPay: user.countPay,
         phone: user.phone,
+        oldLayer: user.oldLayer,
+        currentLayer: user.currentLayer,
         listDirectUser: listDirectUser,
       },
       accessToken,

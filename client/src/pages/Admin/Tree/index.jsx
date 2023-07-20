@@ -118,25 +118,6 @@ const TreePage = ({ match }) => {
     return cloneTreeData;
   };
 
-  // useEffect(() => {
-  //   (async () => {
-  //     setLoading(true);
-  //     await User.getTreeOfUser(id)
-  //       .then((response) => {
-  //         setLoading(false);
-  //         setTreeData(response.data);
-  //       })
-  //       .catch((error) => {
-  //         let message =
-  //           error.response && error.response.data.message
-  //             ? error.response.data.message
-  //             : error.message;
-  //         toast.error(message);
-  //         setLoading(false);
-  //       });
-  //   })();
-  // }, []);
-
   useEffect(() => {
     (async () => {
       setLoading(true);
@@ -168,7 +149,7 @@ const TreePage = ({ match }) => {
         <div className="flex justify-center">
           <Loading />
         </div>
-      ) : (
+      ) : treeData.key ? (
         <>
           <button
             onClick={() => setShowType(!showType)}
@@ -221,6 +202,8 @@ const TreePage = ({ match }) => {
             ></TreeMenu>
           )}
         </>
+      ) : (
+        ""
       )}
     </>
   );

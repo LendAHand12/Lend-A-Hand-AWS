@@ -79,30 +79,8 @@ const TreePage = () => {
   const [loadingItem, setLoadingItem] = useState("");
   const { userInfo } = useSelector((state) => state.auth);
 
-  // useEffect(() => {
-  //   const width = window.innerWidth;
-  //   const height = window.innerHeight;
-  //   setAppleWidth(width / 50);
-  // }, []);
-
   useEffect(() => {
     (async () => {
-      // if (!showType) {
-      // setLoading(true);
-      // await User.getChildrenList()
-      //   .then((response) => {
-      //     setLoading(false);
-      //     setTreeArr(response.data);
-      //   })
-      //   .catch((error) => {
-      //     let message =
-      //       error.response && error.response.data.error
-      //         ? error.response.data.error
-      //         : error.message;
-      //     toast.error(message);
-      //     setLoading(false);
-      //   });
-      // } else {
       setLoading(true);
       await User.getChildsOfUserForTree({ id: userInfo.id })
         .then((response) => {
@@ -112,26 +90,15 @@ const TreePage = () => {
         })
         .catch((error) => {
           let message =
-            error.response && error.response.data.error
-              ? error.response.data.error
+            error.response && error.response.data.message
+              ? error.response.data.message
               : error.message;
-          toast.error(message);
+          toast.error(t(message));
           setLoading(false);
         });
       // }
     })();
   }, []);
-
-  // const getRandomPosition = () => {
-  //   const windowWidth = window.innerWidth;
-  //   const windowHeight = window.innerHeight;
-  //   const xPosition =
-  //     Math.random() * (windowWidth / 2); /* 40 là kích thước của hình ảnh táo */
-  //   const yPosition =
-  //     Math.random() *
-  //     (windowHeight / 2); /* 40 là kích thước của hình ảnh táo */
-  //   return { x: xPosition, y: yPosition };
-  // };
 
   const handleNodeItemClick = useCallback(
     async (id) => {
@@ -187,7 +154,7 @@ const TreePage = () => {
         <div className="flex justify-center">
           <Loading />
         </div>
-      ) : (
+      ) : treeData.key ? (
         <>
           <button
             onClick={() => setShowType(!showType)}
@@ -264,6 +231,8 @@ const TreePage = () => {
             ></TreeMenu>
           )}
         </>
+      ) : (
+        ""
       )}
     </>
   );

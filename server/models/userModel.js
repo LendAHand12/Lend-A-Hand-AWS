@@ -74,6 +74,14 @@ const userSchema = mongoose.Schema(
       type: String,
       default: "",
     },
+    currentLayer: {
+      type: Number,
+      default: 0,
+    },
+    oldLayer: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

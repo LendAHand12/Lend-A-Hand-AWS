@@ -30,6 +30,8 @@ const Profile = () => {
     countPay,
     listDirectUser,
     phone,
+    oldLayer,
+    currentLayer,
   } = userInfo;
   const [imgFront, setImgFront] = useState("");
   const [imgBack, setImgBack] = useState("");
@@ -148,6 +150,17 @@ const Profile = () => {
             role="alert"
           >
             <span className="block sm:inline">{t("verifyAccountAlert")}</span>
+          </div>
+        )}
+
+        {oldLayer < currentLayer && (
+          <div
+            className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-5"
+            role="alert"
+          >
+            <span className="block sm:inline">
+              {t("congrateLayer")} {currentLayer}
+            </span>
           </div>
         )}
 
