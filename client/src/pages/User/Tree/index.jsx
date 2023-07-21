@@ -5,95 +5,28 @@ import User from "@/api/User";
 import { toast, ToastContainer } from "react-toastify";
 import Loading from "@/components/Loading";
 import { useTranslation } from "react-i18next";
-import TreeMenu from "react-simple-tree-menu";
+import TreeMenu, { ItemComponent } from "react-simple-tree-menu";
 import TreeBG from "@/assets/img/tree.jpg";
 import AppleBG from "@/assets/img/apple.png";
 import "./index.less";
 
 const colors = [
-  "#16a34a",
   "#ea580c",
   "#d97706",
-  "#ca8a04",
   "#65a30d",
+  "#c026d3",
+  "#be185d",
+  "#e11d48",
   "#059669",
+  "#0284c7",
+  "#ca8a04",
   "#0d9488",
   "#0891b2",
-  "#0284c7",
   "#2563eb",
   "#4f46e5",
   "#7c3aed",
   "#9333ea",
-  "#c026d3",
-  "#be185d",
-  "#e11d48",
 ];
-
-const StyledNode = ({ children, onClick, layer }) => {
-  if (!layer) {
-    layer = 0;
-  }
-  return (
-    <div
-      onClick={onClick}
-      className={`cursor-pointer p-3 rotate-180 text-white text-sm rounded-md inline-block`}
-      style={{ backgroundColor: colors[layer] }}
-    >
-      <div className="flex flex-col items-center">
-        <span>{children}</span>
-        <svg
-          className="w-10 h-auto text-red-500"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M18.6675 8.40949C15.9295 5.55221 13.2894 7.72919 12.3116 8.91972C11.3167 7.73083 8.14152 5.60094 5.3558 8.45428C1.87366 12.0209 5.85325 19.1543 8.83795 20.6829C10.3303 21.4472 12.3116 20.6543 12.3116 20.1448C12.3116 20.655 13.7783 21.4203 15.245 20.655C18.1785 19.1243 22.0899 11.9811 18.6675 8.40949Z"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M18.6675 8.40949C15.9295 5.55221 13.2894 7.72919 12.3116 8.91972C11.3167 7.73083 8.14152 5.60094 5.3558 8.45428C1.87366 12.0209 5.85325 19.1543 8.83795 20.6829C10.3303 21.4472 12.3116 20.6543 12.3116 20.1448C12.3116 20.655 13.7783 21.4203 15.245 20.655C18.1785 19.1243 22.0899 11.9811 18.6675 8.40949Z"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M12.7395 5.27826L14.5178 3.50002"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </div>
-    </div>
-  );
-};
-
-const TreeNodeItem = ({ node, onClick }) => {
-  return (
-    <TreeNode
-      label={
-        <StyledNode
-          layer={node.layer}
-          onClick={() => onClick(node.key, node.layer)}
-        >
-          {node.label}
-        </StyledNode>
-      }
-    >
-      {node.nodes &&
-        node.nodes.length > 0 &&
-        node.nodes.map((ele) => (
-          <TreeNodeItem key={ele.key} node={ele} onClick={onClick} />
-        ))}
-    </TreeNode>
-  );
-};
 
 const TreePage = () => {
   const { t } = useTranslation();
@@ -106,6 +39,75 @@ const TreePage = () => {
   const [clickedKeys, setClickedKeys] = useState([]);
   const [loadingItem, setLoadingItem] = useState("");
   const { userInfo } = useSelector((state) => state.auth);
+
+  const StyledNode = useCallback(
+    ({ children, onClick, layer }) => {
+      return (
+        <div
+          onClick={onClick}
+          className={`cursor-pointer p-3 rotate-180 text-white text-sm rounded-md inline-block`}
+          style={{
+            backgroundColor:
+              layer <= userInfo.currentLayer ? colors[layer] : "#16a34a",
+          }}
+        >
+          <div className="flex flex-col items-center">
+            <span>{children}</span>
+            <svg
+              className="w-10 h-auto text-red-500"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M18.6675 8.40949C15.9295 5.55221 13.2894 7.72919 12.3116 8.91972C11.3167 7.73083 8.14152 5.60094 5.3558 8.45428C1.87366 12.0209 5.85325 19.1543 8.83795 20.6829C10.3303 21.4472 12.3116 20.6543 12.3116 20.1448C12.3116 20.655 13.7783 21.4203 15.245 20.655C18.1785 19.1243 22.0899 11.9811 18.6675 8.40949Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M18.6675 8.40949C15.9295 5.55221 13.2894 7.72919 12.3116 8.91972C11.3167 7.73083 8.14152 5.60094 5.3558 8.45428C1.87366 12.0209 5.85325 19.1543 8.83795 20.6829C10.3303 21.4472 12.3116 20.6543 12.3116 20.1448C12.3116 20.655 13.7783 21.4203 15.245 20.655C18.1785 19.1243 22.0899 11.9811 18.6675 8.40949Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M12.7395 5.27826L14.5178 3.50002"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+        </div>
+      );
+    },
+    [userInfo]
+  );
+
+  const TreeNodeItem = ({ node, onClick }) => {
+    return (
+      <TreeNode
+        label={
+          <StyledNode
+            layer={node.layer}
+            onClick={() => onClick(node.key, node.layer)}
+          >
+            {node.label}
+          </StyledNode>
+        }
+      >
+        {node.nodes &&
+          node.nodes.length > 0 &&
+          node.nodes.map((ele) => (
+            <TreeNodeItem key={ele.key} node={ele} onClick={onClick} />
+          ))}
+      </TreeNode>
+    );
+  };
 
   useEffect(() => {
     (async () => {
@@ -214,7 +216,11 @@ const TreePage = () => {
                 lineWidth={"10px"}
                 lineColor={"brown"}
                 lineBorderRadius={"10px"}
-                label={<StyledNode>{treeData.label}</StyledNode>}
+                label={
+                  <StyledNode layer={userInfo.currentLayer}>
+                    {treeData.label}
+                  </StyledNode>
+                }
               >
                 {treeData.nodes &&
                   treeData.nodes.length > 0 &&
@@ -228,30 +234,6 @@ const TreePage = () => {
               </Tree>
             </div>
           ) : (
-            // <div className="relative w-full h-full">
-            //   <img src={TreeBG} className="w-full h-auto object-contain" />
-            //   <div className="absolute top-0 w-full h-2/3">
-            //     <div className="relative w-full h-full">
-            //       {treeArr &&
-            //         treeArr.map((item, index) => {
-            //           const { x, y } = getRandomPosition();
-            //           console.log({ x, y });
-            //           return (
-            //             <img
-            //               key={index}
-            //               src={AppleBG}
-            //               style={{
-            //                 position: "absolute",
-            //                 width: appleWidth,
-            //                 top: `${y}px`,
-            //                 left: `${x}px`,
-            //               }}
-            //             />
-            //           );
-            //         })}
-            //     </div>
-            //   </div>
-            // </div>
             <TreeMenu
               hasSearch={false}
               data={treeDataView}

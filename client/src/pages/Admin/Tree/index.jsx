@@ -8,89 +8,22 @@ import User from "@/api/User";
 import "./index.less";
 
 const colors = [
-  "#16a34a",
   "#ea580c",
   "#d97706",
-  "#ca8a04",
   "#65a30d",
+  "#c026d3",
+  "#be185d",
+  "#e11d48",
   "#059669",
+  "#0284c7",
+  "#ca8a04",
   "#0d9488",
   "#0891b2",
-  "#0284c7",
   "#2563eb",
   "#4f46e5",
   "#7c3aed",
   "#9333ea",
-  "#c026d3",
-  "#be185d",
-  "#e11d48",
 ];
-
-const StyledNode = ({ children, onClick, layer }) => {
-  if (!layer) {
-    layer = 0;
-  }
-  return (
-    <div
-      onClick={onClick}
-      className="cursor-pointer p-3 rotate-180 text-white text-sm rounded-md inline-block"
-      style={{ backgroundColor: colors[layer] }}
-    >
-      <div className="flex flex-col items-center">
-        <span>{children}</span>
-        <svg
-          className="w-10 h-auto text-red-500"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M18.6675 8.40949C15.9295 5.55221 13.2894 7.72919 12.3116 8.91972C11.3167 7.73083 8.14152 5.60094 5.3558 8.45428C1.87366 12.0209 5.85325 19.1543 8.83795 20.6829C10.3303 21.4472 12.3116 20.6543 12.3116 20.1448C12.3116 20.655 13.7783 21.4203 15.245 20.655C18.1785 19.1243 22.0899 11.9811 18.6675 8.40949Z"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M18.6675 8.40949C15.9295 5.55221 13.2894 7.72919 12.3116 8.91972C11.3167 7.73083 8.14152 5.60094 5.3558 8.45428C1.87366 12.0209 5.85325 19.1543 8.83795 20.6829C10.3303 21.4472 12.3116 20.6543 12.3116 20.1448C12.3116 20.655 13.7783 21.4203 15.245 20.655C18.1785 19.1243 22.0899 11.9811 18.6675 8.40949Z"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M12.7395 5.27826L14.5178 3.50002"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </div>
-    </div>
-  );
-};
-
-const TreeNodeItem = ({ node, onClick }) => {
-  return (
-    <TreeNode
-      label={
-        <StyledNode
-          layer={node.layer}
-          onClick={() => onClick(node.key, node.layer)}
-        >
-          {node.label}
-        </StyledNode>
-      }
-    >
-      {node.nodes &&
-        node.nodes.length > 0 &&
-        node.nodes.map((ele) => (
-          <TreeNodeItem key={ele.key} node={ele} onClick={onClick} />
-        ))}
-    </TreeNode>
-  );
-};
 
 const TreePage = ({ match }) => {
   const { id } = match.params;
@@ -102,6 +35,94 @@ const TreePage = ({ match }) => {
   const [treeData, setTreeData] = useState({});
   const [treeDataView, setTreeDataView] = useState([]);
   const [clickedKeys, setClickedKeys] = useState([]);
+  const [userInfo, setUserInfo] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      await User.getUserById(id)
+        .then((response) => {
+          setLoading(false);
+          setUserInfo(response.data);
+        })
+        .catch((error) => {
+          let message =
+            error.response && error.response.data.error
+              ? error.response.data.error
+              : error.message;
+          toast.error(t(message));
+          setLoading(false);
+        });
+    })();
+  }, [id]);
+
+  const StyledNode = useCallback(
+    ({ children, onClick, layer }) => {
+      return (
+        <div
+          onClick={onClick}
+          className={`cursor-pointer p-3 rotate-180 text-white text-sm rounded-md inline-block`}
+          style={{
+            backgroundColor:
+              layer <= userInfo.currentLayer ? colors[layer] : "#16a34a",
+          }}
+        >
+          <div className="flex flex-col items-center">
+            <span>{children}</span>
+            <svg
+              className="w-10 h-auto text-red-500"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M18.6675 8.40949C15.9295 5.55221 13.2894 7.72919 12.3116 8.91972C11.3167 7.73083 8.14152 5.60094 5.3558 8.45428C1.87366 12.0209 5.85325 19.1543 8.83795 20.6829C10.3303 21.4472 12.3116 20.6543 12.3116 20.1448C12.3116 20.655 13.7783 21.4203 15.245 20.655C18.1785 19.1243 22.0899 11.9811 18.6675 8.40949Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M18.6675 8.40949C15.9295 5.55221 13.2894 7.72919 12.3116 8.91972C11.3167 7.73083 8.14152 5.60094 5.3558 8.45428C1.87366 12.0209 5.85325 19.1543 8.83795 20.6829C10.3303 21.4472 12.3116 20.6543 12.3116 20.1448C12.3116 20.655 13.7783 21.4203 15.245 20.655C18.1785 19.1243 22.0899 11.9811 18.6675 8.40949Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M12.7395 5.27826L14.5178 3.50002"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+        </div>
+      );
+    },
+    [userInfo]
+  );
+
+  const TreeNodeItem = ({ node, onClick }) => {
+    return (
+      <TreeNode
+        label={
+          <StyledNode
+            layer={node.layer}
+            onClick={() => onClick(node.key, node.layer)}
+          >
+            {node.label}
+          </StyledNode>
+        }
+      >
+        {node.nodes &&
+          node.nodes.length > 0 &&
+          node.nodes.map((ele) => (
+            <TreeNodeItem key={ele.key} node={ele} onClick={onClick} />
+          ))}
+      </TreeNode>
+    );
+  };
 
   const handleNodeItemClick = useCallback(
     async (id, layer) => {
