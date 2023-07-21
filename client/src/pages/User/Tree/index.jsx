@@ -10,11 +10,35 @@ import TreeBG from "@/assets/img/tree.jpg";
 import AppleBG from "@/assets/img/apple.png";
 import "./index.less";
 
-const StyledNode = ({ children, onClick }) => {
+const colors = [
+  "#16a34a",
+  "#ea580c",
+  "#d97706",
+  "#ca8a04",
+  "#65a30d",
+  "#059669",
+  "#0d9488",
+  "#0891b2",
+  "#0284c7",
+  "#2563eb",
+  "#4f46e5",
+  "#7c3aed",
+  "#9333ea",
+  "#c026d3",
+  "#be185d",
+  "#e11d48",
+];
+
+const StyledNode = ({ children, onClick, layer }) => {
+  console.log({ layer });
+  if (!layer) {
+    layer = 0;
+  }
   return (
     <div
       onClick={onClick}
-      className="cursor-pointer p-3 rotate-180 text-white text-sm rounded-md inline-block bg-green-600"
+      className={`cursor-pointer p-3 rotate-180 text-white text-sm rounded-md inline-block`}
+      style={{ backgroundColor: colors[layer] }}
     >
       <div className="flex flex-col items-center">
         <span>{children}</span>
@@ -55,7 +79,12 @@ const TreeNodeItem = ({ node, onClick }) => {
   return (
     <TreeNode
       label={
-        <StyledNode onClick={() => onClick(node.key)}>{node.label}</StyledNode>
+        <StyledNode
+          layer={node.layer}
+          onClick={() => onClick(node.key, node.layer)}
+        >
+          {node.label}
+        </StyledNode>
       }
     >
       {node.nodes &&
@@ -86,7 +115,10 @@ const TreePage = () => {
         .then((response) => {
           setLoading(false);
           setClickedKeys([response.data.key]);
-          setTreeData(response.data);
+          setTreeData({
+            ...response.data,
+            nodes: response.data.nodes.map((ele) => ({ ...ele, layer: 1 })),
+          });
         })
         .catch((error) => {
           let message =
@@ -101,7 +133,7 @@ const TreePage = () => {
   }, []);
 
   const handleNodeItemClick = useCallback(
-    async (id) => {
+    async (id, layer) => {
       if (loadingItem) {
         toast.error(t("Getting data.Please wait"));
       } else {
@@ -112,7 +144,7 @@ const TreePage = () => {
             const cloneTreeData = { ...treeData };
             const newTreeData = handleFindAndPushChild(
               id,
-              response.data.nodes,
+              response.data.nodes.map((ele) => ({ ...ele, layer: layer + 1 })),
               cloneTreeData
             );
             setTreeData(newTreeData);
@@ -226,7 +258,8 @@ const TreePage = () => {
               data={treeDataView}
               onClickItem={(item) => {
                 const key = item.key.split("/")[item.key.split("/").length - 1];
-                !clickedKeys.includes(key) && handleNodeItemClick(key);
+                !clickedKeys.includes(key) &&
+                  handleNodeItemClick(key, item.layer);
               }}
             ></TreeMenu>
           )}

@@ -55,11 +55,11 @@ Chi phí cũ 4tr
 - thêm cột số lượng con trong xuất excel 500 => done
 - thêm số trang danh sách 1tr => done
 - nhận diện, mới tần màu khác nhau. Hoàn thành la phải trả $22 dk. 1tr
-- thêm chức năng hệ thống báo tài khoản đầy tầng 1, 2, 3,... 1tr
-- trên cây hệ thống của user phải có 2 con số. Danh số và đã trả bao nhiêu lần.
+- thêm chức năng hệ thống báo tài khoản đầy tầng 1, 2, 3,... 1tr => done
+- trên cây hệ thống của user phải có 2 con số. Danh số và đã trả bao nhiêu lần. => done
 
 - ràng buộc dùng 1 ví đăng ký để thanh toán 1tr => done
-- xuống cấp cũng gửi mail => 2tr
+- xuống cấp cũng gửi mail cho admin 2tr => done
 
 // update parent
 db.users.update({
