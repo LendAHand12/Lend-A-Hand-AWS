@@ -30,7 +30,6 @@ const colors = [
 ];
 
 const StyledNode = ({ children, onClick, layer }) => {
-  console.log({ layer });
   if (!layer) {
     layer = 0;
   }
