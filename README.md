@@ -48,18 +48,20 @@ Xuất excel => 2tr => Done
 Nút xoá user chưa KYC 1tr => Done
 Ràng buộc không trùng username 1tr => done
 
-Chi phí cũ 4tr
-
 - Chuyển alert full con 500 => done
 - Lưu thêm số điện thoại 1tr => done
 - thêm cột số lượng con trong xuất excel 500 => done
 - thêm số trang danh sách 1tr => done
-- nhận diện, mới tần màu khác nhau. Hoàn thành la phải trả $22 dk. 1tr
+- nhận diện, mới tần màu khác nhau. Hoàn thành la phải trả $22 dk. 1tr => done
 - thêm chức năng hệ thống báo tài khoản đầy tầng 1, 2, 3,... 1tr => done
 - trên cây hệ thống của user phải có 2 con số. Danh số và đã trả bao nhiêu lần. => done
 
+Chi phí cũ 4tr
+
 - ràng buộc dùng 1 ví đăng ký để thanh toán 1tr => done
 - xuống cấp cũng gửi mail cho admin 2tr => done
+- thêm chọn mã vùng cho số điện thoại 1tr
+- gửi link activation app => 2tr
 
 // update parent
 db.users.update({

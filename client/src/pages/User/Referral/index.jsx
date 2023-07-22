@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import Loading from "@/components/Loading";
 import { ToastContainer, toast } from "react-toastify";
 import { useEffect, useState } from "react";
+import Select from "react-select";
 import User from "@/api/User";
 
 const ReferralPage = () => {
@@ -28,8 +29,11 @@ const ReferralPage = () => {
       setLoading(true);
       await User.getListChild()
         .then((response) => {
-          console.log({ data: response.data });
-          setListChild(response.data);
+          const newData = response.data.map((ele) => ({
+            value: ele.id,
+            label: ele.userId,
+          }));
+          setListChild([{ value: "", label: t("No choose") }, ...newData]);
           setLoading(false);
         })
         .catch((error) => {
@@ -71,7 +75,7 @@ const ReferralPage = () => {
                 {t("Choose children")}
               </label>
               <div>
-                <select
+                {/* <select
                   onChange={(e) => {
                     setChildId(e.target.value);
                   }}
@@ -85,7 +89,15 @@ const ReferralPage = () => {
                         {ele.userId}
                       </option>
                     ))}
-                </select>
+                </select> */}
+                <Select
+                  options={listChild}
+                  onChange={(e) => {
+                    setChildId(e.value);
+                  }}
+                  className="mt-4 border-gray-200 rounded-md border-2"
+                  // value={childId}
+                ></Select>
               </div>
             </div>
 

@@ -48,7 +48,9 @@ const TreePage = () => {
           className={`cursor-pointer p-3 rotate-180 text-white text-sm rounded-md inline-block`}
           style={{
             backgroundColor:
-              layer <= userInfo.currentLayer ? colors[layer] : "#16a34a",
+              layer <= userInfo.currentLayer
+                ? colors[userInfo.currentLayer]
+                : "#16a34a",
           }}
         >
           <div className="flex flex-col items-center">

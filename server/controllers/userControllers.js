@@ -382,27 +382,61 @@ const getUserProfile = asyncHandler(async (req, res) => {
 });
 
 const getListChildOfUser = asyncHandler(async (req, res) => {
-  const result = await getDescendants(req.user.id);
-  result.shift();
+  const result = await getAllDescendants(req.user.id);
+  console.log({ result: result.length });
   res.json(result);
 });
 
-const getDescendants = async (userId) => {
-  const user = await User.findById(userId);
+async function getAllDescendants(targetUserId) {
+  try {
+    const descendants = await User.aggregate([
+      {
+        $match: { _id: new mongoose.Types.ObjectId(targetUserId) },
+      },
+      {
+        $graphLookup: {
+          from: "users", // Collection name
+          startWith: "$children", // Trường con trong mảng children
+          connectFromField: "children",
+          connectToField: "_id",
+          as: "descendants",
+          maxDepth: 100, // Số tầng cấp dưới tối đa (có thể điều chỉnh tùy ý)
+        },
+      },
+    ]);
 
-  if (!user) {
+    // Lấy danh sách các node con
+    const descendantsList = descendants[0].descendants.map((descendant) => ({
+      id: descendant._id,
+      userId: descendant.userId,
+      // Các trường khác của người dùng...
+    }));
+
+    return descendantsList;
+  } catch (error) {
+    console.error("Lỗi khi lấy cấp dưới của người dùng:", error);
     return [];
   }
+}
 
-  let descendants = [];
+// const getDescendants = async (userId) => {
+//   const user = await User.findById(userId).select("userId children");
 
-  for (const childId of user.children) {
-    const childDescendants = await getDescendants(childId);
-    descendants = descendants.concat(childDescendants);
-  }
+//   if (!user) {
+//     return [];
+//   }
 
-  return [{ userId: user.userId, id: user._id }, ...descendants];
-};
+//   console.log({ id: user._id });
+
+//   let descendants = [];
+
+//   for (const childId of user.children) {
+//     const childDescendants = await getDescendants(childId);
+//     descendants = descendants.concat(childDescendants);
+//   }
+
+//   return [{ userId: user.userId, id: user._id }, ...descendants];
+// };
 
 const changeSystem = asyncHandler(async (req, res) => {
   console.log({ req: req.body });
