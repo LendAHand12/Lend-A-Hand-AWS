@@ -48,7 +48,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const userExists = await User.findOne({
     $or: [
-      { email },
+      { email: { $regex: email, $options: "i" } },
       { userId: { $regex: userId, $options: "i" } },
       { walletAddress: { $in: [walletAddress] } },
       { $and: [{ phone: { $ne: "" } }, { phone }] },

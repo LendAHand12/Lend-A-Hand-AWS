@@ -230,7 +230,11 @@ const TreePage = ({ match }) => {
                 lineWidth={"10px"}
                 lineColor={"brown"}
                 lineBorderRadius={"10px"}
-                label={<StyledNode>{treeData.label}</StyledNode>}
+                label={
+                  <StyledNode layer={userInfo.currentLayer}>
+                    {treeData.label}
+                  </StyledNode>
+                }
               >
                 {treeData.nodes &&
                   treeData.nodes.length > 0 &&
