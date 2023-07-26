@@ -9,6 +9,9 @@ import { LOGOUT, UPDATE_USER_INFO } from "@/slices/authSlice";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { ToastContainer, toast } from "react-toastify";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
+import "./index.css";
 
 const Profile = () => {
   const { t } = useTranslation();
@@ -35,6 +38,8 @@ const Profile = () => {
   } = userInfo;
   const [imgFront, setImgFront] = useState("");
   const [imgBack, setImgBack] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState(phone);
+  const [errorPhone, setErrPhone] = useState(false);
 
   const {
     register,
@@ -97,28 +102,32 @@ const Profile = () => {
 
   const onSubmit = useCallback(
     async (data) => {
-      const { phone } = data;
-      setLoading(true);
-      await User.update(id, {
-        phone: phone.trim(),
-        imgFront,
-        imgBack,
-      })
-        .then((response) => {
-          setLoading(false);
-          toast.success(t(response.data.message));
-          dispatch(UPDATE_USER_INFO(response.data.data));
+      // const { phone } = data;
+      if (!phoneNumber || phoneNumber === "") {
+        setErrPhone(true);
+      } else {
+        setLoading(true);
+        await User.update(id, {
+          phone: phoneNumber.trim(),
+          imgFront,
+          imgBack,
         })
-        .catch((error) => {
-          let message =
-            error.response && error.response.data.error
-              ? error.response.data.error
-              : error.message;
-          toast.error(t(message));
-          setLoading(false);
-        });
+          .then((response) => {
+            setLoading(false);
+            toast.success(t(response.data.message));
+            dispatch(UPDATE_USER_INFO(response.data.data));
+          })
+          .catch((error) => {
+            let message =
+              error.response && error.response.data.error
+                ? error.response.data.error
+                : error.message;
+            toast.error(t(message));
+            setLoading(false);
+          });
+      }
     },
-    [imgFront, imgBack]
+    [imgFront, imgBack, phoneNumber]
   );
 
   const handleChangeWallet = async () => {
@@ -226,7 +235,7 @@ const Profile = () => {
                   <div className="grid lg:grid-cols-2 grid-cols-1">
                     <div className="px-4 py-2 font-semibold">{t("phone")}</div>
                     <div className="px-4">
-                      <input
+                      {/* <input
                         className="w-full px-4 py-1 rounded-md border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                         {...register("phone", {
                           required: "Phone is required",
@@ -235,9 +244,14 @@ const Profile = () => {
                             message: t("Please enter the correct phone format"),
                           },
                         })}
+                      /> */}
+                      <PhoneInput
+                        placeholder={t("phone")}
+                        value={phoneNumber}
+                        onChange={setPhoneNumber}
                       />
                       <p className="error-message-text">
-                        {errors.walletAddress?.message}
+                        {errorPhone && t("Phone is required")}
                       </p>
                     </div>
                   </div>

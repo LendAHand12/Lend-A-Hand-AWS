@@ -1,14 +1,18 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { Link, useHistory, useLocation } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import queryString from "query-string";
+import PhoneInput from "react-phone-number-input";
 
 import Layout from "@/containers/layout";
 import Loading from "@/components/Loading";
 import Auth from "@/api/Auth";
+
+import "react-phone-number-input/style.css";
+import "./index.css";
 
 const Register = () => {
   const { t } = useTranslation();
@@ -23,6 +27,7 @@ const Register = () => {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -32,36 +37,44 @@ const Register = () => {
   });
   const [loading, setLoading] = useState(false);
   const [checkingRefUrl, setCheckingRefUrl] = useState(true);
+  const [phone, setPhone] = useState("");
+  const [errorPhone, setErrPhone] = useState(false);
 
-  const onSubmit = async (data) => {
-    setLoading(true);
-    const { userId, email, password, ref, receiveId, walletAddress, phone } =
-      data;
-    await Auth.register({
-      userId: userId.trim(),
-      email: email.trim(),
-      password,
-      ref,
-      receiveId,
-      walletAddress: walletAddress.trim(),
-      phone: phone.trim(),
-    })
-      .then((response) => {
-        setLoading(false);
-        toast.success(t(response.data.message));
-        setTimeout(() => {
-          history.push("/");
-        }, 2000);
+  const onSubmit = useCallback(
+    async (data) => {
+      if (phone === "") {
+        setErrPhone(true);
+        return;
+      }
+      setLoading(true);
+      const { userId, email, password, ref, receiveId, walletAddress } = data;
+      await Auth.register({
+        userId: userId.trim(),
+        email: email.trim(),
+        password,
+        ref,
+        receiveId,
+        walletAddress: walletAddress.trim(),
+        phone: phone.trim(),
       })
-      .catch((error) => {
-        let message =
-          error.response && error.response.data.message
-            ? error.response.data.message
-            : error.message;
-        toast.error(t(message));
-        setLoading(false);
-      });
-  };
+        .then((response) => {
+          setLoading(false);
+          toast.success(t(response.data.message));
+          setTimeout(() => {
+            history.push("/");
+          }, 2000);
+        })
+        .catch((error) => {
+          let message =
+            error.response && error.response.data.message
+              ? error.response.data.message
+              : error.message;
+          toast.error(t(message));
+          setLoading(false);
+        });
+    },
+    [phone]
+  );
 
   useEffect(() => {
     (async () => {
@@ -122,7 +135,7 @@ const Register = () => {
                         {errors.email?.message}
                       </p>
                       {/* Phone */}
-                      <input
+                      {/* <input
                         className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
                         type="text"
                         placeholder={t("phone")}
@@ -134,9 +147,15 @@ const Register = () => {
                           },
                         })}
                         disabled={loading}
+                      /> */}
+                      <PhoneInput
+                        defaultCountry="VN"
+                        placeholder={t("phone")}
+                        value={phone}
+                        onChange={setPhone}
                       />
                       <p className="error-message-text">
-                        {errors.phone?.message}
+                        {errorPhone && t("Phone is required")}
                       </p>
                       {/* Wallet address */}
                       <input

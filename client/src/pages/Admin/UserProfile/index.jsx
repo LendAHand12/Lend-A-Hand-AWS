@@ -7,6 +7,9 @@ import FsLightbox from "fslightbox-react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { ToastContainer, toast } from "react-toastify";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
+import "./index.css";
 
 const UserProfile = (match) => {
   const { id } = match.match.params;
@@ -126,7 +129,13 @@ const UserProfile = (match) => {
                   </div>
                   <div className="grid lg:grid-cols-2 grid-cols-1">
                     <div className="px-4 py-2 font-semibold">{t("phone")}</div>
-                    <div className="px-4 py-2">{data.phone}</div>
+                    <div className="px-4 py-2">
+                      <PhoneInput
+                        placeholder={t("phone")}
+                        value={data.phone}
+                        disabled={true}
+                      />
+                    </div>
                   </div>
                   <div className="grid lg:grid-cols-2 grid-cols-1">
                     <div className="px-4 py-2 font-semibold">

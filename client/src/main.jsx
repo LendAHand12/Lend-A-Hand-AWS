@@ -8,9 +8,9 @@ import { publicProvider } from "wagmi/providers/public";
 import FallbackLoading from "@/components/FallbackLoading";
 import store from "@/store.js";
 import App from "./App.jsx";
-import "./index.css";
 import "react-toastify/dist/ReactToastify.css";
 import "./i18n";
+import "./index.css";
 
 const { publicClient, webSocketPublicClient } = configureChains(
   [bsc],

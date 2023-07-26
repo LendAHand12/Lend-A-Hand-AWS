@@ -4,6 +4,8 @@ import Transaction from "../models/transactionModel.js";
 import getParentWithCountPay from "../utils/getParentWithCountPay.js";
 import Refund from "../models/refundModel.js";
 import { checkCanIncreaseNextTier } from "../cronJob/index.js";
+import { getActiveLink } from "../utils/getLinksActive.js";
+import { sendActiveLink } from "../utils/sendMailCustom.js";
 
 const getPaymentInfo = asyncHandler(async (req, res) => {
   const { user } = req;
@@ -104,8 +106,6 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         },
       ],
     });
-
-    console.log({ pay: user.countPay, listTransSuccess });
 
     let step = 0;
     if (listTransSuccess.length === 0) {
@@ -330,6 +330,12 @@ const onDonePayment = asyncHandler(async (req, res) => {
     }
 
     const user = await User.findOne({ _id: req.user.id }).select("-password");
+    if (user.countPay === 0) {
+      const links = await getActiveLink(user.email, user.userId, user.phone);
+      if (links.length === 1) {
+        await sendActiveLink(user.email, links[0]);
+      }
+    }
     user.countPay = user.countPay + 1;
 
     const updatedUser = await user.save();

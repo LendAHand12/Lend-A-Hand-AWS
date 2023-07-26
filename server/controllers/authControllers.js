@@ -65,6 +65,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const user = await User.create({
       userId,
       email,
+      phone,
       password,
       avatar,
       walletAddress: [walletAddress],
@@ -140,6 +141,7 @@ const mailForPasswordReset = asyncHandler(async (req, res) => {
 });
 
 const authUser = asyncHandler(async (req, res) => {
+  console.log(req.body);
   const { code, password } = req.body;
 
   let user = await User.findOne({

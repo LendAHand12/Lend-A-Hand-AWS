@@ -56,12 +56,13 @@ Ràng buộc không trùng username 1tr => done
 - thêm chức năng hệ thống báo tài khoản đầy tầng 1, 2, 3,... 1tr => done
 - trên cây hệ thống của user phải có 2 con số. Danh số và đã trả bao nhiêu lần. => done
 
-Chi phí cũ 4tr
-
 - ràng buộc dùng 1 ví đăng ký để thanh toán 1tr => done
 - xuống cấp cũng gửi mail cho admin 2tr => done
 - thêm chọn mã vùng cho số điện thoại 1tr
 - gửi link activation app => 2tr
+
+- xoá user => 3tr
+- mở khoá + điều chỉnh phí phạt => 1tr
 
 // update parent
 db.users.update({
