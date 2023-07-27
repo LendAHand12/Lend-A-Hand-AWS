@@ -215,7 +215,7 @@ const PaymentPage = () => {
                   <div className="text-center mt-10">
                     <button
                       onClick={() => onDonePay(onClose)}
-                      className="animate-bounce hover:animate-none w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                      className=" w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                     >
                       {loadingDonePayment && <Loading />}
                       {t("donePayment")}
@@ -228,7 +228,7 @@ const PaymentPage = () => {
         },
       });
     }
-  }, [payStep]);
+  }, [payStep, loadingDonePayment]);
 
   return (
     <>

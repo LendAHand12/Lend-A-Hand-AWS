@@ -151,7 +151,6 @@ const mailForPasswordReset = asyncHandler(async (req, res) => {
 });
 
 const authUser = asyncHandler(async (req, res) => {
-  console.log(req.body);
   const { code, password } = req.body;
 
   let user = await User.findOne({
