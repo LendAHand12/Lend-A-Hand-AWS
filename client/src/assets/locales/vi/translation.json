@@ -203,5 +203,14 @@
   "Please connect your wallet": "Vui lòng kết nối ví của Bạn",
   "Please connect your true wallet": "Vui lòng kết nối đúng ví Bạn đã đăng ký",
 
-  "congrateLayer": "Chúc mừng Anh/Chị đã đạt được một bước ngoặc quan trọng.Tài khoản của Bạn đã hoàn thành tầng : "
+  "congrateLayer": "Chúc mừng Anh/Chị đã đạt được một bước ngoặc quan trọng.Tài khoản của Bạn đã hoàn thành tầng : ",
+
+  "id code": "Số CCCD",
+  "id code is required": "CCCD là bắt buộc",
+  "edit": "Chỉnh sửa",
+  "delete": "Xoá",
+  "show password": "Hiển thị mật khẩu",
+  "hide password": "Ẩn mật khẩu",
+
+  "Please click complete payment below": "Vui lòng ấn hoàn tất thanh toán bên dưới"
 }

@@ -35,6 +35,7 @@ const Profile = () => {
     phone,
     oldLayer,
     currentLayer,
+    idCode,
   } = userInfo;
   const [imgFront, setImgFront] = useState("");
   const [imgBack, setImgBack] = useState("");
@@ -48,6 +49,7 @@ const Profile = () => {
   } = useForm({
     defaultValues: {
       // walletAddress: walletAddress,
+      idCode,
       phone,
       imgBackData: "",
       imgFrontData: "",
@@ -102,13 +104,14 @@ const Profile = () => {
 
   const onSubmit = useCallback(
     async (data) => {
-      // const { phone } = data;
+      const { idCode } = data;
       if (!phoneNumber || phoneNumber === "") {
         setErrPhone(true);
       } else {
         setLoading(true);
         await User.update(id, {
           phone: phoneNumber.trim(),
+          idCode: idCode.trim(),
           imgFront,
           imgBack,
         })
@@ -252,6 +255,23 @@ const Profile = () => {
                       />
                       <p className="error-message-text">
                         {errorPhone && t("Phone is required")}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid lg:grid-cols-2 grid-cols-1">
+                    <div className="px-4 py-2 font-semibold">
+                      {t("id code")}
+                    </div>
+                    <div className="px-4">
+                      <input
+                        className="w-full px-4 py-1.5 rounded-md border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                        {...register("idCode", {
+                          required: "id code is required",
+                        })}
+                        autoComplete="off"
+                      />
+                      <p className="error-message-text">
+                        {errors.idCode?.message}
                       </p>
                     </div>
                   </div>

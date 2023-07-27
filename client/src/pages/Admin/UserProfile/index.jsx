@@ -7,6 +7,7 @@ import FsLightbox from "fslightbox-react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { ToastContainer, toast } from "react-toastify";
+import Loading from "@/components/Loading";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import "./index.css";
@@ -139,6 +140,12 @@ const UserProfile = (match) => {
                   </div>
                   <div className="grid lg:grid-cols-2 grid-cols-1">
                     <div className="px-4 py-2 font-semibold">
+                      {t("id code")}
+                    </div>
+                    <div className="px-4 py-2">{data.idCode}</div>
+                  </div>
+                  <div className="grid lg:grid-cols-2 grid-cols-1">
+                    <div className="px-4 py-2 font-semibold">
                       {t("walletAddress")}
                     </div>
                     <div className="px-4 py-2 break-words">
@@ -233,13 +240,28 @@ const UserProfile = (match) => {
                   </div>
                 </div>
               </div>
-              {/* <button
+              <button
                 type="submit"
+                disabled={loading}
                 className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
               >
                 {loading && <Loading />}
-                Update
-              </button> */}
+                {t("update")}
+              </button>
+              <button
+                // onClick={handleChangeWallet}
+                // disabled={loadingChangeWallet}
+                className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+              >
+                {/* {loadingChangeWallet && <Loading />} */}
+                {t("edit")}
+              </button>
+              <button
+                // onClick={handleLogout}
+                className="w-full flex justify-center items-center hover:underline border font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out bg-red-500 text-white"
+              >
+                {t("delete")}
+              </button>
             </form>
           </div>
         </div>

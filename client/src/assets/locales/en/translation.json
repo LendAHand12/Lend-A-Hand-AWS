@@ -197,5 +197,12 @@
   "Please connect your wallet": "Please connect your wallet",
   "Please connect your true wallet": "Please connect the correct wallet you have registered",
 
-  "congrateLayer": "Congratulations you have reached an important milestone. Your account has completed the floor :"
+  "congrateLayer": "Congratulations you have reached an important milestone. Your account has completed the floor :",
+
+  "id code": "ID code",
+  "id code is required": "ID CODE is required",
+  "edit": "Edit",
+  "delete": "Delete",
+  "show password": "Show password",
+  "hide password": "Hide password"
 }

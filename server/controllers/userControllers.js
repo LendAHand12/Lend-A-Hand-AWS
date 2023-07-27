@@ -146,6 +146,7 @@ const getUserById = asyncHandler(async (req, res) => {
       imgBack: user.imgBack,
       countPay: user.countPay,
       phone: user.phone,
+      idCode: user.idCode,
       oldLayer: user.oldLayer,
       currentLayer: user.currentLayer,
       listDirectUser: listDirectUser,
@@ -157,17 +158,21 @@ const getUserById = asyncHandler(async (req, res) => {
 });
 
 const updateUser = asyncHandler(async (req, res) => {
-  const { phone, imgFront, imgBack } = req.body;
+  const { phone, imgFront, imgBack, idCode } = req.body;
   const user = await User.findOne({ _id: req.params.id }).select("-password");
   const userHavePhone = await User.find({
     $and: [{ phone }, { email: { $ne: user.email } }],
   });
+  const userHaveIdCode = await User.find({
+    $and: [{ idCode }, { email: { $ne: user.email } }],
+  });
 
-  if (userHavePhone.length >= 1) {
-    res.status(400).json({ error: "Dupplicate phone" });
+  if (userHavePhone.length >= 1 || userHaveIdCode.length >= 1) {
+    res.status(400).json({ error: "duplicateInfo" });
   }
   if (user) {
     user.phone = phone || user.phone;
+    user.idCode = idCode || user.idCode;
     if (imgFront !== "" && imgBack !== "") {
       if (
         imgFront.includes("https://res.cloudinary.com/dhqggkmto") &&
@@ -201,6 +206,7 @@ const updateUser = asyncHandler(async (req, res) => {
           imgBack: updatedUser.imgBack,
           countPay: updatedUser.countPay,
           phone: updatedUser.phone,
+          idCode: updatedUser.idCode,
           oldLayer: updatedUser.oldLayer,
           currentLayer: updatedUser.currentLayer,
           listDirectUser,
@@ -371,6 +377,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
       imgBack: user.imgBack,
       countPay: user.countPay,
       phone: user.phone,
+      idCode: user.idCode,
       oldLayer: user.oldLayer,
       currentLayer: user.currentLayer,
       listDirectUser: listDirectUser,

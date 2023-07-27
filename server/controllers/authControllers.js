@@ -43,8 +43,16 @@ const checkLinkRef = asyncHandler(async (req, res) => {
 });
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { userId, walletAddress, email, password, ref, receiveId, phone } =
-    req.body;
+  const {
+    userId,
+    walletAddress,
+    email,
+    password,
+    ref,
+    receiveId,
+    phone,
+    idCode,
+  } = req.body;
 
   const userExists = await User.findOne({
     $or: [
@@ -52,6 +60,7 @@ const registerUser = asyncHandler(async (req, res) => {
       { userId: { $regex: userId, $options: "i" } },
       { walletAddress: { $in: [walletAddress] } },
       { $and: [{ phone: { $ne: "" } }, { phone }] },
+      { $and: [{ idCode: { $ne: "" } }, { idCode }] },
     ],
   });
 
@@ -71,6 +80,7 @@ const registerUser = asyncHandler(async (req, res) => {
       walletAddress: [walletAddress],
       parentId: receiveId,
       refId: ref,
+      idCode,
     });
 
     const receiveUser = await User.findById(receiveId);
@@ -193,6 +203,7 @@ const authUser = asyncHandler(async (req, res) => {
         phone: user.phone,
         oldLayer: user.oldLayer,
         currentLayer: user.currentLayer,
+        idCode: user.idCode,
         listDirectUser: listDirectUser,
       },
       accessToken,

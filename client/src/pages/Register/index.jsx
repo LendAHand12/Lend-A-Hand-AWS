@@ -39,6 +39,7 @@ const Register = () => {
   const [checkingRefUrl, setCheckingRefUrl] = useState(true);
   const [phone, setPhone] = useState("");
   const [errorPhone, setErrPhone] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = useCallback(
     async (data) => {
@@ -47,7 +48,8 @@ const Register = () => {
         return;
       }
       setLoading(true);
-      const { userId, email, password, ref, receiveId, walletAddress } = data;
+      const { userId, email, password, ref, receiveId, walletAddress, idCode } =
+        data;
       await Auth.register({
         userId: userId.trim(),
         email: email.trim(),
@@ -56,6 +58,7 @@ const Register = () => {
         receiveId,
         walletAddress: walletAddress.trim(),
         phone: phone.trim(),
+        idCode: idCode.trim(),
       })
         .then((response) => {
           setLoading(false);
@@ -157,6 +160,19 @@ const Register = () => {
                       <p className="error-message-text">
                         {errorPhone && t("Phone is required")}
                       </p>
+                      {/* Id code */}
+                      <input
+                        className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                        type="text"
+                        placeholder={`${t("id code")}`}
+                        {...register("idCode", {
+                          required: t("id code is required"),
+                        })}
+                        disabled={loading}
+                      />
+                      <p className="error-message-text">
+                        {errors.idCode?.message}
+                      </p>
                       {/* Wallet address */}
                       <input
                         className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
@@ -179,7 +195,7 @@ const Register = () => {
                       {/* Password */}
                       <input
                         className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         placeholder={t("password")}
                         {...register("password", {
                           required: t("Password is required"),
@@ -195,6 +211,12 @@ const Register = () => {
                       <p className="error-message-text">
                         {errors.password?.message}
                       </p>
+                      <div
+                        className="mt-2 text-primary hover:underline cursor-pointer text-xs"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? t("hide password") : t("show password")}
+                      </div>
                       {/* Confirm Password */}
                       <input
                         className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"

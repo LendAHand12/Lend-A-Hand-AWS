@@ -19,6 +19,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const history = useHistory();
+  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (data) => {
     const { code, password } = data;
@@ -66,7 +67,7 @@ const Login = () => {
                   <p className="error-message-text">{errors.code?.message}</p>
                   <input
                     className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder={t("password")}
                     {...register("password", {
                       required: t("Password is required"),
@@ -81,6 +82,12 @@ const Login = () => {
                   <p className="error-message-text">
                     {errors.password?.message}
                   </p>
+                  <div
+                    className="mt-2 text-primary hover:underline cursor-pointer text-xs"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? t("hide password") : t("show password")}
+                  </div>
                   <div className="mt-5 flex items-center justify-between ">
                     <div className="flex items-center">
                       <input

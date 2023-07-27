@@ -12,3 +12,17 @@
   outline: none;
   border: none;
 }
+
+.PhoneInputInput::placeholder {
+  color: #6b7280;
+}
+
+.PhoneInputInput:-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: #6b7280;
+}
+
+.PhoneInputInput::-ms-input-placeholder {
+  /* Microsoft Edge */
+  color: #6b7280;
+}

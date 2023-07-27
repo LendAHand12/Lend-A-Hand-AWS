@@ -8,6 +8,8 @@ import Payment from "@/api/Payment";
 import { transfer, getBalance, getAccount } from "@/utils/smartContract.js";
 import { useHistory } from "react-router-dom";
 import { useAccount } from "wagmi";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 
 const PaymentPage = () => {
   const history = useHistory();
@@ -20,6 +22,7 @@ const PaymentPage = () => {
     useState(false);
   const [loadingAddReferralCommission, setLoadingAddReferralCommission] =
     useState(false);
+  const [loadingDonePayment, setLoadingDonePayment] = useState(false);
   const [payStep, setPayStep] = useState(0);
   const { userInfo } = useSelector((state) => state.auth);
   const [total, setTotal] = useState(0);
@@ -28,20 +31,6 @@ const PaymentPage = () => {
   const [yourBalance, setYourBalance] = useState(0);
   const { address, isConnected } = useAccount();
   const [canPay, setCanPay] = useState(true);
-
-  // useEffect(() => {
-  //   if (!isConnected) {
-  //     toast.error(t("Please connect your wallet"));
-  //     setCanPay(false);
-  //   } else {
-  //     if (address !== userInfo.walletAddress) {
-  //       toast.error(t("Please connect your true wallet"));
-  //       setCanPay(false);
-  //     } else {
-  //       setCanPay(true);
-  //     }
-  //   }
-  // }, [address, isConnected]);
 
   const paymentRegisterFee = useCallback(async () => {
     if (paymentInfo && paymentInfo.registerFee !== 0) {
@@ -140,23 +129,30 @@ const PaymentPage = () => {
       });
   };
 
-  const onDonePay = useCallback(async () => {
-    await Payment.onDonePayment({
-      transIds: paymentInfo.transIds,
-    })
-      .then((response) => {
-        const { message } = response.data;
-        toast.success(t(message));
-        history.push("/");
+  const onDonePay = useCallback(
+    async (onClose) => {
+      setLoadingDonePayment(true);
+      await Payment.onDonePayment({
+        transIds: paymentInfo.transIds,
       })
-      .catch((error) => {
-        let message =
-          error.response && error.response.data.message
-            ? error.response.data.message
-            : error.message;
-        toast.error(t(message));
-      });
-  }, [paymentInfo]);
+        .then((response) => {
+          const { message } = response.data;
+          toast.success(t(message));
+          setLoadingDonePayment(false);
+          onClose();
+          history.push("/");
+        })
+        .catch((error) => {
+          let message =
+            error.response && error.response.data.message
+              ? error.response.data.message
+              : error.message;
+          toast.error(t(message));
+          setLoadingDonePayment(false);
+        });
+    },
+    [paymentInfo]
+  );
 
   useEffect(() => {
     setTotal(registrationFee + weeks * 15 * Math.pow(2, userInfo.tier));
@@ -191,6 +187,48 @@ const PaymentPage = () => {
   useEffect(() => {
     onGetPaymentInfo();
   }, []);
+
+  useEffect(() => {
+    if (payStep === 4) {
+      confirmAlert({
+        closeOnClickOutside: false,
+        customUI: ({ onClose }) => {
+          return (
+            <div className="custom-ui">
+              <div className="bg-gray-50 p-6 md:mx-auto">
+                <svg
+                  viewBox="0 0 24 24"
+                  className="text-green-600 w-16 h-16 mx-auto my-6"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M12,0A12,12,0,1,0,24,12,12.014,12.014,0,0,0,12,0Zm6.927,8.2-6.845,9.289a1.011,1.011,0,0,1-1.43.188L5.764,13.769a1,1,0,1,1,1.25-1.562l4.076,3.261,6.227-8.451A1,1,0,1,1,18.927,8.2Z"
+                  ></path>
+                </svg>
+                <div className="text-center">
+                  {/* <h3 className="md:text-2xl text-base text-gray-900 font-semibold text-center">
+                    Payment Done!
+                  </h3> */}
+                  <p className="text-gray-600 my-4">
+                    {t("Please click complete payment below")}
+                  </p>
+                  <div className="text-center mt-10">
+                    <button
+                      onClick={() => onDonePay(onClose)}
+                      className="animate-bounce hover:animate-none w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                    >
+                      {loadingDonePayment && <Loading />}
+                      {t("donePayment")}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        },
+      });
+    }
+  }, [payStep]);
 
   return (
     <>
@@ -589,7 +627,7 @@ const PaymentPage = () => {
                             {paymentInfo.referralCommissionFee} USDT)
                           </div>
                         </div>
-                        <div>
+                        {/* <div>
                           <button
                             type="submit"
                             onClick={onDonePay}
@@ -597,7 +635,7 @@ const PaymentPage = () => {
                           >
                             {t("donePayment")}
                           </button>
-                        </div>
+                        </div> */}
                       </>
                     )}
                   </>
