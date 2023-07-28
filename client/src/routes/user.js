@@ -19,36 +19,42 @@ const routes = [
       "REJECTED",
       "LOCKED",
     ],
+    noNeedCheckInfo: true,
     component: Profile,
   },
   {
     path: "/payment",
     title: "payment",
     permissionWithStatus: ["APPROVED", "LOCKED"],
+
     component: Payment,
   },
   {
     path: "/tree",
     title: "tree",
     permissionWithStatus: ["APPROVED"],
+
     component: Tree,
   },
   {
     path: "/transactions",
     title: "transactions",
     permissionWithStatus: ["APPROVED"],
+
     component: Transactions,
   },
   {
     path: "/ref",
     title: "referral",
     permissionWithStatus: ["APPROVED"],
+
     component: Referral,
   },
   {
     path: "/changeWallet",
     title: "",
     permissionWithStatus: ["APPROVED"],
+
     component: ChangeWallet,
   },
 ];

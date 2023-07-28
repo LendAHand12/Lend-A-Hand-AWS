@@ -216,5 +216,7 @@
 
   "cancel": "Huỷ bỏ",
   "active": "Đang hoạt động",
-  "inactive": "Khoá"
+  "inactive": "Khoá",
+
+  "infoAccountAlert": "Vui lòng cung cấp đầy đủ thông tin tài khoản của Bạn (SĐT, Số CCCD)"
 }

@@ -108,6 +108,7 @@ const Profile = () => {
       if (!phoneNumber || phoneNumber === "") {
         setErrPhone(true);
       } else {
+        setErrPhone(false);
         setLoading(true);
         await User.update(id, {
           phone: phoneNumber.trim(),
@@ -162,6 +163,15 @@ const Profile = () => {
             role="alert"
           >
             <span className="block sm:inline">{t("verifyAccountAlert")}</span>
+          </div>
+        )}
+
+        {(phone === "" || idCode === "") && (
+          <div
+            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-5"
+            role="alert"
+          >
+            <span className="block sm:inline">{t("infoAccountAlert")}</span>
           </div>
         )}
 
@@ -256,7 +266,7 @@ const Profile = () => {
                       <input
                         className="w-full px-4 py-1.5 rounded-md border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                         {...register("idCode", {
-                          required: "id code is required",
+                          required: t("id code is required"),
                         })}
                         autoComplete="off"
                       />
@@ -492,14 +502,16 @@ const Profile = () => {
                 {loading && <Loading />}
                 {t("update")}
               </button>
-              <button
-                onClick={handleChangeWallet}
-                disabled={loadingChangeWallet}
-                className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-              >
-                {loadingChangeWallet && <Loading />}
-                {t("change wallet")}
-              </button>
+              {phone !== "" && idCode !== "" && (
+                <button
+                  onClick={handleChangeWallet}
+                  disabled={loadingChangeWallet}
+                  className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                >
+                  {loadingChangeWallet && <Loading />}
+                  {t("change wallet")}
+                </button>
+              )}
               <button
                 onClick={handleLogout}
                 className="w-full flex justify-center items-center hover:underline border font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"

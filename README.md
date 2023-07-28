@@ -62,7 +62,9 @@ Ràng buộc không trùng username 1tr => done
 - gửi link activation app => 2tr
 
 - xoá user => 3tr
-- mở khoá + điều chỉnh phí phạt => 1tr
+- mở khoá + điều chỉnh phí phạt 1tr => done
+
+- bắt buộc update thông tin SĐT, CCCD cho đúng => 1tr
 
 // update parent
 db.users.update({

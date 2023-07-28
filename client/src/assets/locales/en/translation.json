@@ -206,5 +206,11 @@
   "show password": "Show password",
   "hide password": "Hide password",
 
-  "Please click complete payment below": "Please click complete payment below"
+  "Please click complete payment below": "Please click complete payment below",
+
+  "cancel": "Cancel",
+  "active": "Active",
+  "inactive": "Lock",
+
+  "infoAccountAlert": "Please provide your account information (Phone number, ID code)"
 }

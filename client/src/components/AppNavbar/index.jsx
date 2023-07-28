@@ -23,9 +23,17 @@ const AppNav = () => {
   if (auth.userInfo.isAdmin) {
     routes = AdminRoutes;
   } else {
-    routes = UserRoutes.filter((route) =>
-      route.permissionWithStatus.includes(auth.userInfo.status)
-    );
+    routes = UserRoutes.filter((route) => {
+      if (route.permissionWithStatus.includes(auth.userInfo.status)) {
+        if (auth.userInfo.phone === "" || auth.userInfo.idCode === "") {
+          if (route.noNeedCheckInfo) {
+            return route;
+          }
+        } else {
+          return route;
+        }
+      }
+    });
   }
   const { address, isConnected } = useAccount();
   const connector = new MetaMaskConnector({
@@ -80,6 +88,8 @@ const AppNav = () => {
       connect();
     }
   };
+
+  console.log({ routes });
 
   return (
     <>

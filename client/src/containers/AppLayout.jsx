@@ -25,9 +25,17 @@ const AppLayout = () => {
     if (userInfo.isAdmin) {
       routes = AdminRoutes;
     } else {
-      routes = UserRoutes.filter((route) =>
-        route.permissionWithStatus.includes(userInfo.status)
-      );
+      routes = UserRoutes.filter((route) => {
+        if (route.permissionWithStatus.includes(userInfo.status)) {
+          if (userInfo.phone === "" || userInfo.idCode === "") {
+            if (route.noNeedCheckInfo) {
+              return route;
+            }
+          } else {
+            return route;
+          }
+        }
+      });
     }
   }
 
