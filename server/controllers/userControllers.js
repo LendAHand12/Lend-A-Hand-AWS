@@ -218,6 +218,24 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 });
 
+const adminUpdateUser = asyncHandler(async (req, res) => {
+  const { newStatus, newFine } = req.body;
+  const user = await User.findOne({ _id: req.params.id }).select("-password");
+
+  if (user) {
+    user.status = newStatus || user.status;
+    user.fine = newFine || user.fine;
+    const updatedUser = await user.save();
+    if (updatedUser) {
+      res.status(200).json({
+        message: "Update successful",
+      });
+    }
+  } else {
+    res.status(400).json({ error: "User not found" });
+  }
+});
+
 const changeStatusUser = asyncHandler(async (req, res) => {
   const { id, status } = req.body;
   const user = await User.findOne({ _id: id }).select("-password");
@@ -425,25 +443,6 @@ async function getAllDescendants(targetUserId) {
     return [];
   }
 }
-
-// const getDescendants = async (userId) => {
-//   const user = await User.findById(userId).select("userId children");
-
-//   if (!user) {
-//     return [];
-//   }
-
-//   console.log({ id: user._id });
-
-//   let descendants = [];
-
-//   for (const childId of user.children) {
-//     const childDescendants = await getDescendants(childId);
-//     descendants = descendants.concat(childDescendants);
-//   }
-
-//   return [{ userId: user.userId, id: user._id }, ...descendants];
-// };
 
 const changeSystem = asyncHandler(async (req, res) => {
   console.log({ req: req.body });
@@ -665,4 +664,5 @@ export {
   getAllUsersForExport,
   mailForChangeWallet,
   changeWallet,
+  adminUpdateUser,
 };

@@ -212,5 +212,9 @@
   "show password": "Hiển thị mật khẩu",
   "hide password": "Ẩn mật khẩu",
 
-  "Please click complete payment below": "Vui lòng ấn hoàn tất thanh toán bên dưới"
+  "Please click complete payment below": "Vui lòng ấn hoàn tất thanh toán bên dưới",
+
+  "cancel": "Huỷ bỏ",
+  "active": "Đang hoạt động",
+  "inactive": "Khoá"
 }

@@ -238,16 +238,6 @@ const Profile = () => {
                   <div className="grid lg:grid-cols-2 grid-cols-1">
                     <div className="px-4 py-2 font-semibold">{t("phone")}</div>
                     <div className="px-4">
-                      {/* <input
-                        className="w-full px-4 py-1 rounded-md border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                        {...register("phone", {
-                          required: "Phone is required",
-                          pattern: {
-                            value: /(0[3|5|7|8|9])+([0-9]{8})\b/g,
-                            message: t("Please enter the correct phone format"),
-                          },
-                        })}
-                      /> */}
                       <PhoneInput
                         placeholder={t("phone")}
                         value={phoneNumber}
@@ -280,21 +270,6 @@ const Profile = () => {
                       {t("walletAddress")}
                     </div>
                     <div className="">
-                      {/* <input
-                        className="w-full px-4 py-1 rounded-md border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                        {...register("walletAddress", {
-                          required: "Wallet address is required",
-                          pattern: {
-                            value: /^0x[a-fA-F0-9]{40}$/g,
-                            message: t(
-                              "Please enter the correct wallet format"
-                            ),
-                          },
-                        })}
-                      />
-                      <p className="error-message-text">
-                        {errors.walletAddress?.message}
-                      </p> */}
                       <div className="px-4 py-2 break-words">
                         {walletAddress}
                       </div>

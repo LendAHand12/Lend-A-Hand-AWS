@@ -17,6 +17,7 @@ import {
   getAllUsersForExport,
   mailForChangeWallet,
   changeWallet,
+  adminUpdateUser,
 } from "../controllers/userControllers.js";
 import { protectRoute, isAdmin } from "../middleware/authMiddleware.js";
 import uploadCloud from "../middleware/uploadCloud.js";
@@ -58,5 +59,7 @@ router
     ]),
     updateUser
   );
+
+router.route("/update/:id").post(protectRoute, isAdmin, adminUpdateUser);
 
 export default router;

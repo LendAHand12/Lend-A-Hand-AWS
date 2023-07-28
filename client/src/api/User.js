@@ -57,6 +57,9 @@ const User = {
   changeWallet: (body) => {
     return API.post(`${URL_API_USER}/changeWallet`, body);
   },
+  adminUpdateUser: (id, body) => {
+    return API.post(`${URL_API_USER}/update/${id}`, body);
+  },
 };
 
 export default User;
