@@ -89,8 +89,6 @@ const AppNav = () => {
     }
   };
 
-  console.log({ routes });
-
   return (
     <>
       <ToastContainer />

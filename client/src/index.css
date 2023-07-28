@@ -70,3 +70,7 @@ body {
 .pagination .page-item.active .page-link {
   color: #000;
 }
+
+.Toastify__toast-container {
+  z-index: 1000 !important;
+}

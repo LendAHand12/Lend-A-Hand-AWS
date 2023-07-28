@@ -197,7 +197,7 @@
   "Phone is required": "Số điện thoại là bắt buộc",
   "Please enter the correct phone format": "Vui lòng điền đúng định dạng số điện thoại",
   "Dupplicate phone": "Số điện thoại bị trùng",
-  "This account have child": "Tài khoản này đã có cấp dưới",
+  "This account have child": "Tài khoản này đã có cấp dưới.Tính năng sẽ bổ sung sau",
   "countChild": "Số lượng cấp dưới",
 
   "Please connect your wallet": "Vui lòng kết nối ví của Bạn",
@@ -218,5 +218,6 @@
   "active": "Đang hoạt động",
   "inactive": "Khoá",
 
-  "infoAccountAlert": "Vui lòng cung cấp đầy đủ thông tin tài khoản của Bạn (SĐT, Số CCCD)"
+  "infoAccountAlert": "Vui lòng cung cấp đầy đủ thông tin tài khoản của Bạn (SĐT, Số CCCD)",
+  "deleting": "Đang tiến hành xoá..."
 }

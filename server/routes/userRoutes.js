@@ -18,6 +18,7 @@ import {
   mailForChangeWallet,
   changeWallet,
   adminUpdateUser,
+  adminDeleteUser,
 } from "../controllers/userControllers.js";
 import { protectRoute, isAdmin } from "../middleware/authMiddleware.js";
 import uploadCloud from "../middleware/uploadCloud.js";
@@ -49,7 +50,7 @@ router.route("/listChild").get(protectRoute, getListChildOfUser);
 
 router
   .route("/:id")
-  .delete(protectRoute, isAdmin, deleteUser)
+  .delete(protectRoute, isAdmin, adminDeleteUser)
   .get(protectRoute, isAdmin, getUserById)
   .put(
     protectRoute,

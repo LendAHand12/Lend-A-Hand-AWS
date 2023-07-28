@@ -1,5 +1,6 @@
 import asyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
+import Transaction from "../models/transactionModel.js";
 import DeleteUser from "../models/deleteUserModel.js";
 import mongoose from "mongoose";
 import sendMail from "../utils/sendMail.js";
@@ -125,10 +126,11 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 const getUserById = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id).select("-password");
-  const listDirectUser = await User.find({ refId: user._id }).select(
-    "userId email walletAddress"
-  );
-  if (user)
+
+  if (user) {
+    const listDirectUser = await User.find({ refId: user._id }).select(
+      "userId email walletAddress"
+    );
     res.json({
       id: user._id,
       email: user.email,
@@ -151,7 +153,7 @@ const getUserById = asyncHandler(async (req, res) => {
       currentLayer: user.currentLayer,
       listDirectUser: listDirectUser,
     });
-  else {
+  } else {
     res.status(404);
     throw new Error("User does not exist");
   }
@@ -645,6 +647,176 @@ const changeWallet = asyncHandler(async (req, res) => {
   }
 });
 
+const adminDeleteUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  const parent = await User.findById(user.parentId);
+  if (!user || !parent) {
+    res.status(404);
+    throw new Error("User not found");
+  } else {
+    if (user.children.length === 0) {
+      await removeIdFromChildrenOfParent(user, parent);
+      await deleteTransactions(user._id);
+      await addDeleteUserToData(user);
+      res.json({
+        message: "Delete user successfull",
+      });
+    } else {
+      res.status(404);
+      throw new Error("This account have child");
+    }
+    // } else if (user.children.length === 1) {
+    //   // User có 1 con, xoá user và cập nhật parent
+    //   const child = await User.findById(user.children[0]);
+    //   child.parentId = user.parentId;
+    //   child.refId = child.refId === user._id ? user.parentId : child.refId;
+    //   parent.children = parent.children
+    //     .filter((childId) => childId !== user._id)
+    //     .concat(child._id);
+    //   await child.save();
+    //   await parent.save();
+    //   await DeleteUser.create({
+    //     userId: user.userId,
+    //     oldId: user._id,
+    //     phone: user.phone,
+    //     email: user.email,
+    //     password: user.password,
+    //     walletAddress: user.walletAddress,
+    //     parentId: user.parentId,
+    //     refId: user.refId,
+    //   });
+    //   await User.deleteOne({ _id: user._id });
+    // } else if (user.children.length > 1) {
+    //   // User có nhiều hơn 1 con
+    //   const child1 = await User.findById(user.children[0]);
+    //   const child1Children = child1.children;
+
+    //   if (child1Children.length < 3) {
+    //     // Đào sâu vào con 1 của user để đưa con 2 và 3 vào nếu con 1 chưa đủ 3 con
+    //     let currentChild = child1;
+    //     let i = 1;
+
+    //     while (
+    //       currentChild.children.length >= 2 &&
+    //       i <= user.children.length - 2
+    //     ) {
+    //       const nextChild = await User.findById(user.children[i]);
+
+    //       if (currentChild.children.length + nextChild.children.length <= 3) {
+    //         currentChild.children = currentChild.children.concat(
+    //           nextChild.children
+    //         );
+    //         await currentChild.save();
+    //         await DeleteUser.create({
+    //           userId: nextChild.userId,
+    //           oldId: nextChild._id,
+    //           phone: nextChild.phone,
+    //           email: nextChild.email,
+    //           password: nextChild.password,
+    //           walletAddress: nextChild.walletAddress,
+    //           parentId: nextChild.parentId,
+    //           refId: nextChild.refId,
+    //         });
+    //         await User.deleteOne({ _id: nextChild._id });
+    //         i++;
+    //       } else {
+    //         currentChild = nextChild;
+    //         i = 1;
+    //       }
+    //     }
+
+    //     const remainingChildren = user.children.slice(i);
+    //     parent.children = parent.children
+    //       .filter((childId) => childId !== user._id)
+    //       .concat(child1._id);
+    //     child1.children = child1Children.concat(remainingChildren);
+    //     await child1.save();
+    //     await parent.save();
+    //     await DeleteUser.create({
+    //       userId: user.userId,
+    //       oldId: user._id,
+    //       phone: user.phone,
+    //       email: user.email,
+    //       password: user.password,
+    //       walletAddress: user.walletAddress,
+    //       parentId: user.parentId,
+    //       refId: user.refId,
+    //     });
+    //     await User.deleteOne({ _id: user._id });
+    //   } else {
+    //     // Đào sâu vào con 1 của con 1 của user
+    //     const grandchild1 = await User.findById(child1Children[0]);
+
+    //     while (grandchild1.children.length >= 2) {
+    //       const nextChild = await User.findById(grandchild1.children[1]);
+    //       grandchild1.children = grandchild1.children.concat(
+    //         nextChild.children
+    //       );
+    //       await grandchild1.save();
+    //       await DeleteUser.create({
+    //         userId: nextChild.userId,
+    //         oldId: nextChild._id,
+    //         phone: nextChild.phone,
+    //         email: nextChild.email,
+    //         password: nextChild.password,
+    //         walletAddress: nextChild.walletAddress,
+    //         parentId: nextChild.parentId,
+    //         refId: nextChild.refId,
+    //       });
+    //       await User.deleteOne({ _id: nextChild._id });
+    //     }
+
+    //     // Cắm con 2 và 3 vào con 1 của con 1 của user
+    //     const remainingChildren = user.children.slice(1);
+    //     parent.children = parent.children
+    //       .filter((childId) => childId !== user._id)
+    //       .concat(grandchild1._id);
+    //     grandchild1.children = grandchild1.children.concat(remainingChildren);
+    //     await grandchild1.save();
+    //     await parent.save();
+    //     await DeleteUser.create({
+    //       userId: user.userId,
+    //       oldId: user._id,
+    //       phone: user.phone,
+    //       email: user.email,
+    //       password: user.password,
+    //       walletAddress: user.walletAddress,
+    //       parentId: user.parentId,
+    //       refId: user.refId,
+    //     });
+    //     await User.deleteOne({ _id: user._id });
+    //   }
+    // }
+  }
+});
+
+const deleteTransactions = async (userId) => {
+  await Transaction.deleteMany({ userId });
+};
+
+const addDeleteUserToData = async (user) => {
+  await DeleteUser.create({
+    userId: user.userId,
+    oldId: user._id,
+    phone: user.phone,
+    email: user.email,
+    password: user.password,
+    walletAddress: user.walletAddress,
+    parentId: user.parentId,
+    refId: user.refId,
+  });
+  await User.deleteOne({ _id: user._id });
+};
+
+const removeIdFromChildrenOfParent = async (user, parent) => {
+  let childs = parent.children;
+  let newChilds = childs.filter((item) => {
+    if (item.toString() !== user._id.toString()) return item;
+  });
+  parent.children = [...newChilds];
+  await parent.save();
+};
+
 export {
   getUserProfile,
   getAllUsers,
@@ -665,4 +837,5 @@ export {
   mailForChangeWallet,
   changeWallet,
   adminUpdateUser,
+  adminDeleteUser,
 };
