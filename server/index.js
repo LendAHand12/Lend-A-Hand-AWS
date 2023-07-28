@@ -23,7 +23,6 @@ import {
   deleteUserNotPay,
   countLayerToData,
 } from "./cronJob/index.js";
-import User from "./models/userModel.js";
 
 const app = express();
 
@@ -91,19 +90,6 @@ const cron6 = new CronJob("30 23 * * *", () => {
 // cron4.start();
 // cron5.start();
 // cron6.start();
-
-// const changePhone = async () => {
-//   const listUser = await User.find({ phone: { $regex: "^09", $options: "i" } });
-//   console.log({ length: listUser.length });
-//   for (let user of listUser) {
-//     const removeZero = user.phone.substring(1);
-//     user.phone = "+84" + removeZero;
-
-//     user.save();
-//   }
-// };
-
-// changePhone();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
