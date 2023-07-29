@@ -374,7 +374,7 @@ const UserProfile = (match) => {
                     {t("edit")}
                   </button>
                 )}
-                {!isEditting && data.status !== "UNVERIFY" && (
+                {!isEditting && (
                   <div
                     onClick={handleDelete}
                     className="w-full flex justify-center items-center cursor-pointer hover:underline border font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out bg-red-500 text-white"

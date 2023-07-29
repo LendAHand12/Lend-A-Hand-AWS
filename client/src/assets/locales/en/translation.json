@@ -16,7 +16,7 @@
   "status": "Status",
   "memberSince": "Member since",
   "walletAddress": "Wallet address",
-  "fine": "fine",
+  "fine": "Fine",
   "idCardFront": "ID card Front",
   "idCardBack": "ID card Back",
   "update": "Update",
@@ -85,7 +85,7 @@
   "REFERRAL": "LAH Fund",
   "linkVerify": "Link mail",
 
-  "referral": "Introduction",
+  "referral": "Referral",
   "Create referral link": "Create referral link",
   "copied": "Copied",
   "Choose children": "Select subordinates",
@@ -115,7 +115,7 @@
   "Receive User Email": "Receiver Email",
   "Receive User Wallet": "Receiver Wallet",
   "amount": "Amount",
-  "count pay": "Number of contribution",
+  "count pay": "Number of Contribution",
   "send": "Sender",
   "receive": "Recipient",
   "type": "Type",
@@ -146,7 +146,7 @@
   "Dupplicate wallet address": "Dupplicate wallet address",
 
   "fineFee": "penalty fee",
-  "FINE": "Penalty",
+  "FINE": "FINE",
 
   "trash": "Trash",
 
@@ -181,7 +181,7 @@
   "receiverEmail": "Receiver Email",
   "senderEmail": "Sender Email",
   "the next pay count": "The next distribution",
-  "isRegistered": "Completed registration",
+  "isRegistered": "Completed Registration",
 
   "full3child": "The account has enough 3 branches",
   "confirm password": "Confirm password",
@@ -199,8 +199,8 @@
 
   "congrateLayer": "Congratulations you have reached an important milestone. Your account has completed the floor :",
 
-  "id code": "ID code",
-  "id code is required": "ID CODE is required",
+  "id code": "ID/DL/Passport number",
+  "id code is required": "ID/DL/Passport number is required",
   "edit": "Edit",
   "delete": "Delete",
   "show password": "Show password",

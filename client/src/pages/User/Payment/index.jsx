@@ -334,13 +334,15 @@ const PaymentPage = () => {
                       <span className="sr-only">Info</span>
                       <div>
                         <span className="font-medium">{t("fineFee")}!</span>{" "}
-                        {t("pleasePay")}. (2 USDT)
+                        {t("pleasePay")}. ({paymentInfo.transactionFine.amount}{" "}
+                        USDT)
                       </div>
                     </div>
                     <div>
                       <button
                         type="submit"
                         onClick={paymentFineFee}
+                        disabled={loadingAddFine}
                         className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                       >
                         {loadingAddFine && <Loading />}
@@ -381,6 +383,7 @@ const PaymentPage = () => {
                           <button
                             type="submit"
                             onClick={paymentRegisterFee}
+                            disabled={loadingAddRegister}
                             className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                           >
                             {loadingAddRegister && <Loading />}
@@ -447,6 +450,7 @@ const PaymentPage = () => {
                         <div>
                           <button
                             type="submit"
+                            disabled={loadingAddDirectCommission}
                             onClick={paymentDirectionCommission}
                             className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                           >
@@ -539,6 +543,7 @@ const PaymentPage = () => {
                           <button
                             type="submit"
                             onClick={paymentReferralCommission}
+                            disabled={loadingAddReferralCommission}
                             className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                           >
                             {loadingAddReferralCommission && <Loading />}
