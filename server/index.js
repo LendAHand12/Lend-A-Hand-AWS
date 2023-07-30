@@ -23,6 +23,8 @@ import {
   deleteUserNotPay,
   countLayerToData,
 } from "./cronJob/index.js";
+import Transaction from "./models/transactionModel.js";
+import User from "./models/userModel.js";
 
 const app = express();
 
@@ -83,6 +85,19 @@ const cron6 = new CronJob("30 23 * * *", () => {
   console.log("Refresh layer");
   countLayerToData();
 });
+
+// const fineTrans = async () => {
+//   const listTrans = await Transaction.find();
+//   for (let trans of listTrans) {
+//     const user = await User.findById(trans.userId);
+//     if (!user) {
+//       console.log({ delete: trans._id });
+//       await Transaction.deleteOne({ _id: trans._id });
+//     }
+//   }
+// };
+
+// fineTrans();
 
 cron1.start();
 cron2.start();

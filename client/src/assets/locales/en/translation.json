@@ -212,5 +212,6 @@
   "active": "Active",
   "inactive": "Lock",
 
-  "infoAccountAlert": "Please provide your account information (Phone number, ID code)"
+  "infoAccountAlert": "Please provide your account information (Phone number, ID code)",
+  "deleting": "Deleting in progress..."
 }
