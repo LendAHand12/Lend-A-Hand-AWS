@@ -27,11 +27,7 @@ const UserProfile = (match) => {
 
   const handleToggler = () => setToggler(!toggler);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  const { register, handleSubmit } = useForm();
 
   useEffect(() => {
     (async () => {
