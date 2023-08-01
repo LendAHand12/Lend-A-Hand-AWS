@@ -68,6 +68,8 @@ Ràng buộc không trùng username 1tr => done
 - lưu thêm CCCD 1tr => done
 - lưu cây theo tier và thay đổi điều kiện tăng tier => 5tr
 
+- User không thanh toán trong 24h -> xoá 500
+
 // update parent
 db.users.update({
 $and: [

@@ -221,12 +221,15 @@ const updateUser = asyncHandler(async (req, res) => {
 });
 
 const adminUpdateUser = asyncHandler(async (req, res) => {
-  const { newStatus, newFine } = req.body;
+  const { newStatus, newFine, isRegistered } = req.body;
   const user = await User.findOne({ _id: req.params.id }).select("-password");
 
   if (user) {
     user.status = newStatus || user.status;
     user.fine = newFine || user.fine;
+    if (isRegistered && isRegistered === "on" && user.countPay === 0) {
+      user.countPay = 1;
+    }
     const updatedUser = await user.save();
     if (updatedUser) {
       res.status(200).json({

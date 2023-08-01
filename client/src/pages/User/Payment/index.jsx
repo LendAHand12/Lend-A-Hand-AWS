@@ -189,11 +189,11 @@ const PaymentPage = () => {
   }, []);
 
   useEffect(() => {
-    if (address !== userInfo.walletAddress) {
+    if (isConnected && address !== userInfo.walletAddress) {
       setCanPay(false);
       toast.error(t("Please login your registered wallet"));
     }
-  }, [address]);
+  }, [address, isConnected]);
 
   useEffect(() => {
     if (payStep === 4) {
