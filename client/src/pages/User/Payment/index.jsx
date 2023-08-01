@@ -189,6 +189,13 @@ const PaymentPage = () => {
   }, []);
 
   useEffect(() => {
+    if (address !== userInfo.walletAddress) {
+      setCanPay(false);
+      toast.error(t("Please login your registered wallet"));
+    }
+  }, [address]);
+
+  useEffect(() => {
     if (payStep === 4) {
       confirmAlert({
         closeOnClickOutside: false,
