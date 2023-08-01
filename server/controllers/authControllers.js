@@ -6,6 +6,7 @@ import sendMail from "../utils/sendMail.js";
 import generateGravatar from "../utils/generateGravatar.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import Tree from "../models/treeModel.js";
 
 const checkLinkRef = asyncHandler(async (req, res) => {
   const { ref, receiveId } = req.body;
@@ -20,7 +21,10 @@ const checkLinkRef = asyncHandler(async (req, res) => {
     });
 
     if (userReceive && userRef) {
-      if (userReceive.children.length < 3) {
+      const treeUserReceive = await Tree.findOne({
+        userId: userReceive._id,
+      });
+      if (treeUserReceive.children.length < 3) {
         message = "validUrl";
         res.status(200).json({
           message,
@@ -69,27 +73,32 @@ const registerUser = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error(message);
   } else {
-    const avatar = generateGravatar(email);
+    const treeReceiveUser = await Tree.findOne({ userId: receiveId });
 
-    const user = await User.create({
-      userId,
-      email,
-      phone,
-      password,
-      avatar,
-      walletAddress: [walletAddress],
-      parentId: receiveId,
-      refId: ref,
-      idCode,
-    });
+    if (treeReceiveUser.children.length < 3) {
+      const avatar = generateGravatar(email);
 
-    const receiveUser = await User.findById(receiveId);
+      const user = await User.create({
+        userId,
+        email,
+        phone,
+        password,
+        avatar,
+        walletAddress: [walletAddress],
+        idCode,
+      });
 
-    if (user && receiveUser.children.length < 3) {
+      const tree = await Tree.create({
+        userId: user._id,
+        parentId: receiveId,
+        refId: ref,
+        children: [],
+      });
+
       await sendMail(user._id, email, "email verification");
 
-      receiveUser.children.push(user._id);
-      await receiveUser.save();
+      treeReceiveUser.children.push(user._id);
+      await treeReceiveUser.save();
 
       let message = "registerSuccessful";
 
@@ -98,6 +107,7 @@ const registerUser = asyncHandler(async (req, res) => {
       });
     } else {
       res.status(400);
+      throw new Error("Internal error");
     }
   }
 });
@@ -178,9 +188,16 @@ const authUser = asyncHandler(async (req, res) => {
       existingToken.save();
     }
 
-    const listDirectUser = await User.find({ refId: user._id }).select(
-      "userId email walletAddress"
-    );
+    const listDirectUser = [];
+    const listRefIdOfUser = await Tree.find({ refId: user._id });
+    if (listRefIdOfUser && listRefIdOfUser.length > 0) {
+      for (let refId of listRefIdOfUser) {
+        const refedUser = await User.findById(refId.userId).select(
+          "userId email walletAddress"
+        );
+        listDirectUser.push(refedUser);
+      }
+    }
 
     res.status(200).json({
       userInfo: {

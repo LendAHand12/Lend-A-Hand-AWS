@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 import sendMail from "../utils/sendMail.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import Tree from "../models/treeModel.js";
 
 dotenv.config();
 
@@ -128,9 +129,17 @@ const getUserById = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id).select("-password");
 
   if (user) {
-    const listDirectUser = await User.find({ refId: user._id }).select(
-      "userId email walletAddress"
-    );
+    const listDirectUser = [];
+    const listRefIdOfUser = await Tree.find({ refId: user._id });
+    if (listRefIdOfUser && listRefIdOfUser.length > 0) {
+      for (let refId of listRefIdOfUser) {
+        const refedUser = await User.findById(refId.userId).select(
+          "userId email walletAddress"
+        );
+        listDirectUser.push(refedUser);
+      }
+    }
+
     res.json({
       id: user._id,
       email: user.email,
@@ -376,9 +385,16 @@ const getCountAllChildren = async (userId) => {
 const getUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.id).select("-password");
   if (user) {
-    const listDirectUser = await User.find({ refId: user._id }).select(
-      "userId email walletAddress"
-    );
+    const listDirectUser = [];
+    const listRefIdOfUser = await Tree.find({ refId: user._id });
+    if (listRefIdOfUser && listRefIdOfUser.length > 0) {
+      for (let refId of listRefIdOfUser) {
+        const refedUser = await User.findById(refId.userId).select(
+          "userId email walletAddress"
+        );
+        listDirectUser.push(refedUser);
+      }
+    }
 
     res.json({
       id: user._id,

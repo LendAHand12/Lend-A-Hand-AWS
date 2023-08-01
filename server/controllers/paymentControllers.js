@@ -6,6 +6,7 @@ import Refund from "../models/refundModel.js";
 import { checkCanIncreaseNextTier } from "../cronJob/index.js";
 import { getActiveLink } from "../utils/getLinksActive.js";
 import { sendActiveLink } from "../utils/sendMailCustom.js";
+// import { getParentUser, getRefParentUser } from "../utils/methods.js";
 
 const getPaymentInfo = asyncHandler(async (req, res) => {
   const { user } = req;
@@ -30,10 +31,8 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         throw new Error("You are not eligible for next step payment");
       }
     }
-    const parentUser = await User.findOne({ _id: user.parentId }).select(
-      "-password"
-    );
-    const refUser = await User.findOne({ _id: user.refId }).select("-password");
+    const parentUser = await getParentUser(user._id);
+    const refUser = await getRefParentUser(user._id);
 
     if (!parentUser || !refUser) {
       res.status(404);

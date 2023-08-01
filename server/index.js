@@ -23,8 +23,7 @@ import {
   deleteUserNotPay,
   countLayerToData,
 } from "./cronJob/index.js";
-import Transaction from "./models/transactionModel.js";
-import User from "./models/userModel.js";
+// import { transferUserToTree, addTreeToUser } from "./common.js";
 
 const app = express();
 
@@ -86,25 +85,26 @@ const cron6 = new CronJob("30 23 * * *", () => {
   countLayerToData();
 });
 
-// const fineTrans = async () => {
-//   const listTrans = await Transaction.find();
-//   for (let trans of listTrans) {
-//     const user = await User.findById(trans.userId);
-//     if (!user) {
-//       console.log({ delete: trans._id });
-//       await Transaction.deleteOne({ _id: trans._id });
-//     }
-//   }
-// };
+// TRANSFER
+// transferUserToTree();
 
-// fineTrans();
+// Chuyển refId parentId của các admin
 
-cron1.start();
-cron2.start();
-cron3.start();
-cron4.start();
-cron5.start();
-cron6.start();
+// UPDATE DATA
+// db.users.updateMany(
+//   { },
+//   { $unset: { children: "", parentId: "", refId: "" } }
+// )
+
+// ADD TREE TO USER
+// addTreeToUser();
+
+// cron1.start();
+// cron2.start();
+// cron3.start();
+// cron4.start();
+// cron5.start();
+// cron6.start();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>

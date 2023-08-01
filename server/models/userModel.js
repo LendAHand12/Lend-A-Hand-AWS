@@ -9,7 +9,6 @@ const userSchema = mongoose.Schema(
     },
     walletAddress: {
       type: Array,
-      // unique: true,
       required: true,
     },
     email: {
@@ -19,7 +18,7 @@ const userSchema = mongoose.Schema(
     },
     password: {
       type: String,
-      // required: true,
+      required: true,
     },
     tier: {
       type: Number,
