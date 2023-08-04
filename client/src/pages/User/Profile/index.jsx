@@ -175,16 +175,28 @@ const Profile = () => {
           </div>
         )}
 
-        {oldLayer < currentLayer && (
+        {oldLayer.length < currentLayer.length && (
           <div
             className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-5"
             role="alert"
           >
             <span className="block sm:inline">
-              {t("congrateLayer")} {currentLayer}
+              {t("congrateTier")} {tier}
             </span>
           </div>
         )}
+
+        {oldLayer.length === currentLayer.length &&
+          oldLayer[tier - 1] < currentLayer[tier - 1] && (
+            <div
+              className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-5"
+              role="alert"
+            >
+              <span className="block sm:inline">
+                {t("congrateLayer")} {currentLayer}
+              </span>
+            </div>
+          )}
 
         <div className="md:flex no-wrap md:-mx-2 ">
           <div className="w-full lg:w-3/12 lg:mx-2 mb-4 lg:mb-0">
@@ -303,7 +315,7 @@ const Profile = () => {
                   </div>
                   <div className="grid lg:grid-cols-2 grid-cols-1">
                     <div className="px-4 py-2 font-semibold">Tier</div>
-                    <div className="px-4 py-2">{tier + 1}</div>
+                    <div className="px-4 py-2">{tier}</div>
                   </div>
                   <div className="grid lg:grid-cols-2 grid-cols-1">
                     <div className="px-4 py-2 font-semibold">{t("fine")}</div>

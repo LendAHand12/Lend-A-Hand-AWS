@@ -69,6 +69,7 @@ Ràng buộc không trùng username 1tr => done
 
 - User không thanh toán trong 24h done -> xoá 500
 - chuyển từ chưa hoàn thành thanh toán thành hoàn thành done -> 500
+- Thêm hiển thị màu đỏ trên cây hệ thống khi user : chưa thanh toán, bị phạt, bị lock, xuống cấp => 2tr
 
 // update parent
 db.users.update({

@@ -172,10 +172,12 @@ const Transactions = () => {
                   </th>
                 </>
               )}
+              <th scope="col" className="px-6 py-3">
+                {t("tier")}
+              </th>
               {/* <th scope="col" className="px-6 py-3">
                 Hash
               </th> */}
-
               <th scope="col" className="px-6 py-3">
                 {t("amount")}
               </th>
@@ -231,6 +233,7 @@ const Transactions = () => {
                       </td>
                     </>
                   )}
+                  <td className="px-6 py-4">{ele.tier}</td>
                   {/* <td className="px-6 py-4 text-blue-600">
                     <a
                       href={`https://bscscan.com/tx/${ele.hash}`}

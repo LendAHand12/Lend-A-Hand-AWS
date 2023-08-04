@@ -5,9 +5,7 @@ import User from "@/api/User";
 import { toast, ToastContainer } from "react-toastify";
 import Loading from "@/components/Loading";
 import { useTranslation } from "react-i18next";
-import TreeMenu, { ItemComponent } from "react-simple-tree-menu";
-import TreeBG from "@/assets/img/tree.jpg";
-import AppleBG from "@/assets/img/apple.png";
+import TreeMenu from "react-simple-tree-menu";
 import "./index.less";
 
 const colors = [
@@ -39,18 +37,20 @@ const TreePage = () => {
   const [clickedKeys, setClickedKeys] = useState([]);
   const [loadingItem, setLoadingItem] = useState("");
   const { userInfo } = useSelector((state) => state.auth);
+  const [currentTier, setCurrentTier] = useState(1);
 
   const StyledNode = useCallback(
-    ({ children, onClick, layer }) => {
+    ({ children, onClick, layer, isRed }) => {
       return (
         <div
           onClick={onClick}
           className={`cursor-pointer p-3 rotate-180 text-white text-sm rounded-md inline-block`}
           style={{
-            backgroundColor:
-              layer <= userInfo.currentLayer
-                ? colors[userInfo.currentLayer]
-                : "#16a34a",
+            backgroundColor: isRed
+              ? "#b91c1c"
+              : layer <= userInfo.currentLayer[currentTier - 1]
+              ? colors[userInfo.currentLayer[currentTier - 1]]
+              : "#16a34a",
           }}
         >
           <div className="flex flex-col items-center">
@@ -97,6 +97,7 @@ const TreePage = () => {
           <StyledNode
             layer={node.layer}
             onClick={() => onClick(node.key, node.layer)}
+            isRed={node.isRed}
           >
             {node.label}
           </StyledNode>
@@ -114,7 +115,7 @@ const TreePage = () => {
   useEffect(() => {
     (async () => {
       setLoading(true);
-      await User.getChildsOfUserForTree({ id: userInfo.id })
+      await User.getChildsOfUserForTree({ id: userInfo.id, currentTier })
         .then((response) => {
           setLoading(false);
           setClickedKeys([response.data.key]);
@@ -129,11 +130,12 @@ const TreePage = () => {
               ? error.response.data.message
               : error.message;
           toast.error(t(message));
+          setTreeData({});
           setLoading(false);
         });
       // }
     })();
-  }, []);
+  }, [currentTier]);
 
   const handleNodeItemClick = useCallback(
     async (id, layer) => {
@@ -141,7 +143,7 @@ const TreePage = () => {
         toast.error(t("Getting data.Please wait"));
       } else {
         setLoadingItem(true);
-        await User.getChildsOfUserForTree({ id })
+        await User.getChildsOfUserForTree({ id, currentTier })
           .then((response) => {
             setLoadingItem(false);
             const cloneTreeData = { ...treeData };
@@ -163,7 +165,7 @@ const TreePage = () => {
           });
       }
     },
-    [treeData]
+    [treeData, currentTier]
   );
 
   const handleFindAndPushChild = (id, newChildren, cloneTreeData) => {
@@ -185,6 +187,21 @@ const TreePage = () => {
   return (
     <>
       <ToastContainer />
+      {userInfo && (
+        <div className="flex items-center gap-4">
+          {[...Array(userInfo.tier)].map((item, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentTier(i + 1)}
+              className={`flex justify-center items-center hover:underline gradient text-white font-bold ${
+                currentTier === i + 1 ? "border-2 border-gray-700" : ""
+              } rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out`}
+            >
+              {t("tier")} {i + 1}
+            </button>
+          ))}
+        </div>
+      )}
       {loading ? (
         <div className="flex justify-center">
           <Loading />

@@ -158,7 +158,7 @@ const TransactionDetail = () => {
 	h33.2c0.8,0,1.5-0.6,1.5-1.4v-3C50,23.8,49.4,23,48.6,23z"
                 />
               </svg>
-              Transactions
+              {t("transactionsList")}
             </Link>
           </div>
           <div className="md:flex no-wrap md:-mx-2 ">

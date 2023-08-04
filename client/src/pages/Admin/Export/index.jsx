@@ -60,6 +60,7 @@ const ExportPage = () => {
           [t("address_ref")]: null,
           [t("type")]: null,
           [t("amount")]: null,
+          [t("tier")]: null,
           [t("isHoldRefund")]: null,
           [t("status")]: null,
         });

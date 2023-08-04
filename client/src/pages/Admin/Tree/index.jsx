@@ -36,6 +36,7 @@ const TreePage = ({ match }) => {
   const [treeDataView, setTreeDataView] = useState([]);
   const [clickedKeys, setClickedKeys] = useState([]);
   const [userInfo, setUserInfo] = useState(null);
+  const [currentTier, setCurrentTier] = useState(1);
 
   useEffect(() => {
     (async () => {
@@ -56,16 +57,17 @@ const TreePage = ({ match }) => {
   }, [id]);
 
   const StyledNode = useCallback(
-    ({ children, onClick, layer }) => {
+    ({ children, onClick, layer, isRed }) => {
       return (
         <div
           onClick={onClick}
           className={`cursor-pointer p-3 rotate-180 text-white text-sm rounded-md inline-block`}
           style={{
-            backgroundColor:
-              layer <= userInfo.currentLayer
-                ? colors[userInfo.currentLayer]
-                : "#16a34a",
+            backgroundColor: isRed
+              ? "#b91c1c"
+              : layer <= userInfo.currentLayer[currentTier - 1]
+              ? colors[userInfo.currentLayer[currentTier - 1]]
+              : "#16a34a",
           }}
         >
           <div className="flex flex-col items-center">
@@ -102,7 +104,7 @@ const TreePage = ({ match }) => {
         </div>
       );
     },
-    [userInfo]
+    [userInfo, currentTier]
   );
 
   const TreeNodeItem = ({ node, onClick }) => {
@@ -112,6 +114,7 @@ const TreePage = ({ match }) => {
           <StyledNode
             layer={node.layer}
             onClick={() => onClick(node.key, node.layer)}
+            isRed={node.isRed}
           >
             {node.label}
           </StyledNode>
@@ -132,7 +135,7 @@ const TreePage = ({ match }) => {
         toast.error(t("Getting data.Please wait"));
       } else {
         setLoadingItem(true);
-        await User.getChildsOfUserForTree({ id })
+        await User.getChildsOfUserForTree({ id, currentTier })
           .then((response) => {
             setLoadingItem(false);
             const cloneTreeData = { ...treeData };
@@ -154,7 +157,7 @@ const TreePage = ({ match }) => {
           });
       }
     },
-    [treeData]
+    [treeData, currentTier]
   );
 
   const handleFindAndPushChild = (id, newChildren, cloneTreeData) => {
@@ -172,7 +175,7 @@ const TreePage = ({ match }) => {
   useEffect(() => {
     (async () => {
       setLoading(true);
-      await User.getChildsOfUserForTree({ id })
+      await User.getChildsOfUserForTree({ id, currentTier })
         .then((response) => {
           setLoading(false);
           setClickedKeys([response.data.key]);
@@ -187,10 +190,11 @@ const TreePage = ({ match }) => {
               ? error.response.data.message
               : error.message;
           toast.error(t(message));
+          setTreeData({});
           setLoading(false);
         });
     })();
-  }, []);
+  }, [currentTier]);
 
   useEffect(() => {
     setTreeDataView([treeData]);
@@ -199,6 +203,21 @@ const TreePage = ({ match }) => {
   return (
     <>
       <ToastContainer />
+      {userInfo && (
+        <div className="flex items-center gap-4">
+          {[...Array(userInfo.tier)].map((item, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentTier(i + 1)}
+              className={`flex justify-center items-center hover:underline gradient text-white font-bold ${
+                currentTier === i + 1 ? "border-2 border-gray-700" : ""
+              } rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out`}
+            >
+              {t("tier")} {i + 1}
+            </button>
+          ))}
+        </div>
+      )}
       {loading ? (
         <div className="flex justify-center">
           <Loading />
@@ -207,7 +226,7 @@ const TreePage = ({ match }) => {
         <>
           <button
             onClick={() => setShowType(!showType)}
-            className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+            className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full mt-2 mb-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
           >
             {t("another choose")}
           </button>

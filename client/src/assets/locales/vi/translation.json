@@ -219,5 +219,11 @@
   "inactive": "Khoá",
 
   "infoAccountAlert": "Vui lòng cung cấp đầy đủ thông tin tài khoản của Bạn (SĐT, Số CCCD)",
-  "deleting": "Đang tiến hành xoá..."
+  "deleting": "Đang tiến hành xoá...",
+
+  "System not found": "Không tìm thấy hệ thống",
+  "Couldn't find any superior information": "Không tìm thấy thông tin cấp trên",
+  "No referrer information found": "Không tìm thấy thông tin người giới thiệu",
+  "congrateTier": "Chúc mừng Bạn đã hoàn thành tier ",
+  "transactionsList": "Danh sách giao dịch"
 }
