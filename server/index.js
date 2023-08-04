@@ -75,15 +75,15 @@ const cron4 = new CronJob("00 21 * * *", () => {
   countChildToData();
 });
 
-// const cron5 = new CronJob("00 23 * * *", () => {
-// console.log("Refresh layer");
-// countLayerToData();
-// });
+const cron5 = new CronJob("00 23 * * *", () => {
+  console.log("Refresh layer");
+  countLayerToData();
+});
 
-// const cron6 = new CronJob("30 23 * * *", () => {
-// console.log("Check increase tier");
-// checkIncreaseTier();
-// });
+const cron6 = new CronJob("30 23 * * *", () => {
+  console.log("Check increase tier");
+  checkIncreaseTier();
+});
 
 // TRANSFER
 // transferUserToTree();
