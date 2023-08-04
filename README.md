@@ -57,7 +57,6 @@ Ràng buộc không trùng username 1tr => done
 - trên cây hệ thống của user phải có 2 con số. Danh số và đã trả bao nhiêu lần. => done
 
 - ràng buộc dùng 1 ví đăng ký để thanh toán 1tr => done
-  z-nlkndlnsjvnbkjhnlkndvkiubhvjsn lnvksflN aljvkjvlknlnl ádafnonvn nvhnfltrhot ôi iết khi nào san còn bông cfnnghovoewcx ình nôngds thăm dsnc boẻ vctistd phôd saaysaajfef;aoefhhanfqinhf cờ quen nháu ngjsngsnk flnfwhkjwb fougiowef nsyf nbafiabfa xuống cấp cũng gửi mail cho admin 2tr => done cinh có vẹ rooiifo n hlnnhalnnbn;
 - thêm chọn mã vùng cho số điện thoại 1tr => done
 - gửi link activation app 2tr => done
 
@@ -67,6 +66,9 @@ Ràng buộc không trùng username 1tr => done
 - xoá user => thêm 1tr
 - lưu thêm CCCD 1tr => done
 - lưu cây theo tier và thay đổi điều kiện tăng tier => 5tr
+
+- User không thanh toán trong 24h done -> xoá 500
+- chuyển từ chưa hoàn thành thanh toán thành hoàn thành done -> 500
 
 // update parent
 db.users.update({

@@ -6,7 +6,7 @@ import Refund from "../models/refundModel.js";
 import { checkCanIncreaseNextTier } from "../cronJob/index.js";
 import { getActiveLink } from "../utils/getLinksActive.js";
 import { sendActiveLink } from "../utils/sendMailCustom.js";
-// import { getParentUser, getRefParentUser } from "../utils/methods.js";
+import { getParentUser, getRefParentUser } from "../utils/methods.js";
 
 const getPaymentInfo = asyncHandler(async (req, res) => {
   const { user } = req;
@@ -24,69 +24,90 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
   let parentWithCountPay;
 
   if (user) {
-    if (user.countPay > 0 && user.countPay % 13 === 0) {
+    if (user.countPay === 13) {
       const canIncreaseTier = await checkCanIncreaseNextTier(user);
       if (!canIncreaseTier) {
         res.status(404);
         throw new Error("You are not eligible for next step payment");
       }
     }
-    const parentUser = await getParentUser(user._id);
-    const refUser = await getRefParentUser(user._id);
+    const parentUser = await getParentUser(user._id, user.tier);
+    const refUser = await getRefParentUser(user._id, user.tier);
 
     if (!parentUser || !refUser) {
       res.status(404);
       throw new Error("Parent not found");
     }
 
-    let registerFee = 0;
+    let registerFee = 7 * user.tier;
     let directCommissionWallet = "";
-    let directCommissionFee = 0;
+    let directCommissionFee = 5 * user.tier;
     let referralCommissionWallet = "";
-    let referralCommissionFee = 0;
+    let referralCommissionFee = 10 * user.tier;
 
-    parentWithCountPay = await getParentWithCountPay(user.id, user.countPay);
+    parentWithCountPay = await getParentWithCountPay(
+      user.id,
+      user.countPay,
+      user.tier
+    );
 
     if (user.countPay === 0) {
-      registerFee = 7;
-      if (refUser.countPay < user.countPay + 1) {
+      if (
+        refUser.fine > 0 ||
+        refUser.status === "LOCKED" ||
+        refUser.tier < user.tier ||
+        (refUser.tier === user.tier && refUser.countPay < user.countPay + 1)
+      ) {
         directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
         haveRefNotPayEnough = true;
       } else {
         directCommissionWallet = refUser.walletAddress[0];
       }
-      directCommissionFee = 5;
-      if (parentUser.countPay < user.countPay + 1) {
+      if (
+        parentUser.fine > 0 ||
+        parentUser.status === "LOCKED" ||
+        parentUser.tier < user.tier ||
+        (parentUser.tier === user.tier &&
+          parentUser.countPay < user.countPay + 1)
+      ) {
         referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
         haveParentNotPayEnough = true;
       } else {
         referralCommissionWallet = parentUser.walletAddress[0];
       }
-      referralCommissionFee = 10;
     } else {
-      if (refUser.countPay < user.countPay + 1) {
+      if (
+        refUser.fine > 0 ||
+        refUser.status === "LOCKED" ||
+        refUser.tier < user.tier ||
+        (refUser.tier === user.tier && refUser.countPay < user.countPay + 1)
+      ) {
         directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
         haveRefNotPayEnough = true;
       } else {
         directCommissionWallet = refUser.walletAddress[0];
       }
-      directCommissionFee = 5 * Math.pow(2, user.tier);
 
       if (!parentWithCountPay) {
         referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
-      } else if (parentWithCountPay.countPay < user.countPay + 1) {
+      } else if (
+        parentUser.fine > 0 ||
+        parentUser.status === "LOCKED" ||
+        parentWithCountPay.tier < user.tier ||
+        (parentWithCountPay.tier === user.tier &&
+          parentWithCountPay.countPay < user.countPay + 1)
+      ) {
         referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
         haveParentNotPayEnough = true;
       } else {
         referralCommissionWallet = parentWithCountPay.walletAddress[0];
       }
-      referralCommissionFee = 10 * Math.pow(2, user.tier);
     }
 
-    if (user.userId === "THOALOCPHAT668") {
-      haveParentNotPayEnough = true; // termp
-      referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS; // termp
-    }
+    // if (user.userId === "THOALOCPHAT668") {
+    haveParentNotPayEnough = true; // termp
+    referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS; // termp
+    // }
 
     let transactionRegister = null;
     let transactionDirect = null;
@@ -117,6 +138,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           address_ref: process.env.MAIN_WALLET_ADDRESS,
           address_from: user.walletAddress[0],
           address_to: process.env.MAIN_WALLET_ADDRESS,
+          tier: user.tier,
           hash: "",
           type: "REGISTER",
           status: "PENDING",
@@ -133,6 +155,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         address_ref: refUser.walletAddress[0],
         address_from: user.walletAddress[0],
         address_to: directCommissionWallet,
+        tier: user.tier,
         hash: "",
         type: haveRefNotPayEnough ? "DIRECTHOLD" : "DIRECT",
         status: "PENDING",
@@ -146,6 +169,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         address_ref: parentWithCountPay.walletAddress[0],
         address_from: user.walletAddress[0],
         address_to: referralCommissionWallet,
+        tier: user.tier,
         hash: "",
         type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
         status: "PENDING",
@@ -163,6 +187,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           address_ref: refUser.walletAddress[0],
           address_from: user.walletAddress[0],
           address_to: directCommissionWallet,
+          tier: user.tier,
           hash: "",
           type: haveRefNotPayEnough ? "DIRECTHOLD" : "DIRECT",
           status: "PENDING",
@@ -176,6 +201,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           address_ref: parentWithCountPay.walletAddress[0],
           address_from: user.walletAddress[0],
           address_to: referralCommissionWallet,
+          tier: user.tier,
           hash: "",
           type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
           status: "PENDING",
@@ -195,6 +221,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           address_ref: parentWithCountPay.walletAddress[0],
           address_from: user.walletAddress[0],
           address_to: referralCommissionWallet,
+          tier: user.tier,
           hash: "",
           type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
           status: "PENDING",
@@ -222,6 +249,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           address_ref: parentWithCountPay.walletAddress[0],
           address_from: user.walletAddress[0],
           address_to: referralCommissionWallet,
+          tier: user.tier,
           hash: "",
           type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
           status: "PENDING",
@@ -266,6 +294,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         address_ref: process.env.MAIN_WALLET_ADDRESS,
         address_from: user.walletAddress[0],
         address_to: process.env.MAIN_WALLET_ADDRESS,
+        tier: user.tier,
         hash: "",
         type: "FINE",
         status: "PENDING",
@@ -411,6 +440,7 @@ const getAllPayments = asyncHandler(async (req, res) => {
       result.push({
         _id: pay._id,
         address_from: pay.address_from,
+        tier: pay.tier,
         // hash: pay.hash,
         amount: pay.amount,
         userId: user.userId,
@@ -425,6 +455,7 @@ const getAllPayments = asyncHandler(async (req, res) => {
       result.push({
         _id: pay._id,
         address_from: pay.address_from,
+        tier: pay.tier,
         // hash: pay.hash,
         amount: pay.amount,
         userId: user.userId,
@@ -442,6 +473,7 @@ const getAllPayments = asyncHandler(async (req, res) => {
       result.push({
         _id: pay._id,
         address_from: pay.address_from,
+        tier: pay.tier,
         // hash: pay.hash,
         amount: pay.amount,
         userId: user.userId,
@@ -685,6 +717,7 @@ const getAllTransForExport = asyncHandler(async (req, res) => {
         status: 1,
         createdAt: 1,
         address_from: 1,
+        tier: 1,
         address_ref: 1,
         senderName: "$sender.userId",
         senderEmail: "$sender.email",

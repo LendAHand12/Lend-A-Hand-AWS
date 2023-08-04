@@ -9,6 +9,10 @@ const transactionSchema = mongoose.Schema(
     userCountPay: {
       type: Number,
     },
+    tier: {
+      type: Number,
+      default: 1,
+    },
     address_ref: {
       type: String,
     },

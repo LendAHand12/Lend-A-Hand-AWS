@@ -24,11 +24,12 @@ export const sendMailUpdateLayerForAdmin = async (listUser) => {
                 `<tr>
                 <td>${item.userId}</td>
                 <td>${item.email}</td>
-                <td>${item.oldLayer}</td>
-                <td>${item.currentLayer}</td>
+                <td>${item.oldLayer[item.oldLayer.length - 1]}</td>
+                <td>${item.currentLayer[item.currentLayer.length - 1]}</td>
                 <td>
                   ${
-                    item.currentLayer > item.oldLayer
+                    item.currentLayer[item.currentLayer.length - 1] >
+                    item.oldLayer[item.oldLayer.length - 1]
                       ? "Tăng"
                       : item.currentLayer < item.oldLayer
                       ? "Giảm"

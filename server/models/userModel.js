@@ -22,7 +22,7 @@ const userSchema = mongoose.Schema(
     },
     tier: {
       type: Number,
-      default: 0,
+      default: 1,
     },
     children: [{ type: mongoose.Schema.Types.ObjectId, ref: "children" }],
     parentId: {
@@ -73,14 +73,18 @@ const userSchema = mongoose.Schema(
       type: String,
       default: "",
     },
-    currentLayer: {
-      type: Number,
-      default: 0,
-    },
-    oldLayer: {
-      type: Number,
-      default: 0,
-    },
+    currentLayer: [
+      {
+        type: Number,
+        default: 0,
+      },
+    ],
+    oldLayer: [
+      {
+        type: Number,
+        default: 0,
+      },
+    ],
     idCode: {
       type: String,
       default: "",

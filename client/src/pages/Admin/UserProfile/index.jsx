@@ -27,11 +27,7 @@ const UserProfile = (match) => {
 
   const handleToggler = () => setToggler(!toggler);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  const { register, handleSubmit } = useForm();
 
   useEffect(() => {
     (async () => {
@@ -261,7 +257,20 @@ const UserProfile = (match) => {
                         {t("isRegistered")}
                       </div>
                       <div className="px-4 py-2">
-                        {data.countPay >= 1 ? t("finished") : t("unfinished")}
+                        {isEditting && data.countPay === 0 && (
+                          <div className="flex gap-4">
+                            <input
+                              type="radio"
+                              {...register("isRegistered")}
+                            ></input>
+                            <p>Đã hoàn thành</p>
+                          </div>
+                        )}
+                        {!isEditting || data.countPay >= 1
+                          ? data.countPay >= 1
+                            ? t("finished")
+                            : t("unfinished")
+                          : ""}
                       </div>
                     </div>
                     <div className="grid lg:grid-cols-2 grid-cols-1">

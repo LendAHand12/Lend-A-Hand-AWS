@@ -89,6 +89,7 @@ const registerUser = asyncHandler(async (req, res) => {
       });
 
       const tree = await Tree.create({
+        userName: user.userId,
         userId: user._id,
         parentId: receiveId,
         refId: ref,

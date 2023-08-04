@@ -23,7 +23,7 @@ import {
   deleteUserNotPay,
   countLayerToData,
 } from "./cronJob/index.js";
-// import { transferUserToTree, addTreeToUser } from "./common.js";
+import { transferUserToTree, transferLayerToArray } from "./common.js";
 
 const app = express();
 
@@ -66,8 +66,8 @@ const cron2 = new CronJob("00 19 * * *", () => {
 });
 
 const cron3 = new CronJob("00 20 * * *", () => {
-  console.log("Check increase tier");
-  checkIncreaseTier();
+  console.log("Delete user not pay");
+  deleteUserNotPay();
 });
 
 const cron4 = new CronJob("00 21 * * *", () => {
@@ -75,15 +75,15 @@ const cron4 = new CronJob("00 21 * * *", () => {
   countChildToData();
 });
 
-const cron5 = new CronJob("00 23 * * *", () => {
-  console.log("Delete user not pay");
-  deleteUserNotPay();
-});
+// const cron5 = new CronJob("00 23 * * *", () => {
+// console.log("Refresh layer");
+// countLayerToData();
+// });
 
-const cron6 = new CronJob("30 23 * * *", () => {
-  console.log("Refresh layer");
-  countLayerToData();
-});
+// const cron6 = new CronJob("30 23 * * *", () => {
+// console.log("Check increase tier");
+// checkIncreaseTier();
+// });
 
 // TRANSFER
 // transferUserToTree();
@@ -96,8 +96,17 @@ const cron6 = new CronJob("30 23 * * *", () => {
 //   { $unset: { children: "", parentId: "", refId: "" } }
 // )
 
-// ADD TREE TO USER
-// addTreeToUser();
+// db.users.updateMany(
+//   { },
+//   { $set: { tier: 1 } }
+// )
+
+// db.transactions.updateMany(
+//   { },
+//   { $set: { tier: 1 } }
+// )
+
+// transferLayerToArray()
 
 // cron1.start();
 // cron2.start();

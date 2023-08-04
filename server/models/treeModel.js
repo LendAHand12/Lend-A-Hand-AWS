@@ -3,20 +3,27 @@ import mongoose from "mongoose";
 // store the refresh tokens in the db
 const treeSchema = mongoose.Schema(
   {
+    userName: {
+      type: String,
+      required: true,
+    },
     userId: {
       type: String,
       required: true,
     },
     tier: {
       type: Number,
-      default: 0,
+      default: 1,
+      required: true,
     },
-    children: [{ type: mongoose.Schema.Types.ObjectId, ref: "children" }],
+    children: [{ type: String }],
     parentId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
+      required: true,
     },
     refId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
+      required: true,
     },
   },
   { timestamps: true }

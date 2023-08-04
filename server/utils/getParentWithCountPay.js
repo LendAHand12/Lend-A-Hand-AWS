@@ -1,20 +1,21 @@
+import Tree from "../models/treeModel.js";
 import User from "../models/userModel.js";
 
-const getParentWithCountPay = async (userId, countPay) => {
-  let user = await User.findById(userId);
-  let countPayReal = countPay % 13;
+const getParentWithCountPay = async (userId, countPay, tier) => {
+  let tree = await Tree.findOne({ userId, tier });
+  let countPayReal = countPay;
   let currentLevel = 0;
 
-  while (user && currentLevel < countPayReal + 1) {
-    if (user.parentId) {
-      user = await User.findById(user.parentId);
+  while (tree && currentLevel < countPayReal + 1) {
+    if (tree.parentId) {
+      tree = await Tree.findOne({ userId: tree.parentId, tier });
     } else {
       break;
     }
     currentLevel++;
   }
-
-  return user;
+  const parent = await User.findById(tree.userId);
+  return parent;
 };
 
 export default getParentWithCountPay;

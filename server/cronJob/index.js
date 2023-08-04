@@ -6,6 +6,8 @@ import User from "../models/userModel.js";
 import sendMail from "../utils/sendMail.js";
 import { sendMailUpdateLayerForAdmin } from "../utils/sendMailCustom.js";
 import { getCountAllChildren } from "../controllers/userControllers.js";
+import { findNextUser } from "../utils/methods.js";
+import Tree from "../models/treeModel.js";
 
 export const checkUnpayUser = asyncHandler(async () => {
   const listUser = await User.find({
@@ -37,41 +39,81 @@ export const checkUnpayUser = asyncHandler(async () => {
   }
 });
 
-export const checkIncreaseTier = asyncHandler(async () => {
+export const checkIncreaseTier = asyncHandler(async (id) => {
   const listUser = await User.find({
-    $and: [{ isAdmin: false }, { status: "APPROVED" }],
-  }).select("createdAt countPay fine status email");
+    $and: [
+      { isAdmin: false },
+      { status: "APPROVED" },
+      {
+        $or: [
+          { userId: { $ne: "Admin2" } },
+          { userId: { $ne: "Admin3" } },
+          { userId: { $ne: "Admin4" } },
+        ],
+      },
+    ],
+  })
+    .select("createdAt countPay fine status email currentLayer tier")
+    .sort({ createdAt: -1 });
   for (let u of listUser) {
-    let nextTier = Math.floor(u.countPay / 12);
+    console.log({ u: u._id });
+    let nextTier = u.tier + 1;
 
-    if (nextTier > 0 && u.tier !== nextTier) {
-      const canIncreaseTier = await checkCanIncreaseNextTier(u);
-      if (canIncreaseTier) {
-        u.tier = nextTier;
-        await u.save();
-      }
+    const canIncreaseTier = await checkCanIncreaseNextTier(u);
+    if (canIncreaseTier) {
+      const newParentId = await findNextUser(nextTier);
+      const newParent = await Tree.findOne({
+        userId: newParentId,
+        tier: nextTier,
+      });
+      let childs = newParent.children;
+      newParent.children = [...childs, u._id];
+      await newParent.save();
+
+      const tree = await Tree.create({
+        userName: u.userId,
+        userId: u._id,
+        parentId: newParentId,
+        refId: newParentId,
+        tier: nextTier,
+        children: [],
+      });
+
+      u.tier = nextTier;
+      u.countPay = 0;
+      // u.oldLayer = u.currentLayer;
+      // u.currentLayer = [...u.currentLayer, 0];
+      await u.save();
     }
   }
 });
 
-export const checkCanIncreaseNextTier = async (u) => {
-  let nextTier = Math.floor(u.countPay / 12);
+// export const checkCanIncreaseNextTier = async (u) => {
+//   let nextTier = Math.floor(u.countPay / 12);
 
-  if (nextTier > 0 && u.tier !== nextTier) {
-    const currentDay = moment(new Date());
-    const userCreatedDay = moment(u.createdAt);
-    const diffDays = currentDay.diff(userCreatedDay, "days") + 1;
-    if (diffDays > nextTier * 84) {
-      const countTotalChild = await getCountAllChildren(u._id);
-      if (countTotalChild > 30000 * nextTier) {
-        return true;
-      }
-    } else {
-      const countTotalChild = await getCountAllChildren(u._id);
-      if (countTotalChild > 797161 * nextTier) {
-        return true;
-      }
-    }
+//   if (nextTier > 0 && u.tier !== nextTier) {
+//     const currentDay = moment(new Date());
+//     const userCreatedDay = moment(u.createdAt);
+//     const diffDays = currentDay.diff(userCreatedDay, "days") + 1;
+//     if (diffDays > nextTier * 84) {
+//       const countTotalChild = await getCountAllChildren(u._id, u.tier);
+//       if (countTotalChild > 30000 * nextTier) {
+//         return true;
+//       }
+//     } else {
+//       const countTotalChild = await getCountAllChildren(u._id, u.tier);
+//       if (countTotalChild > 797161 * nextTier) {
+//         return true;
+//       }
+//     }
+//   }
+
+//   return false;
+// };
+
+export const checkCanIncreaseNextTier = async (u) => {
+  if (u.currentLayer[u.tier - 1] >= 5 && u.countPay === 13) {
+    return true;
   }
 
   return false;
@@ -109,7 +151,7 @@ export const deleteUserNotKYC = asyncHandler(async () => {
 });
 
 export const deleteUserNotPay = asyncHandler(async () => {
-  const currentDay = new Date(Date.now() - 48 * 3600 * 1000);
+  const currentDay = new Date(Date.now() - 24 * 3600 * 1000);
   const listUser = await User.find({
     $and: [
       { status: "APPROVED" },
@@ -150,10 +192,10 @@ export const deleteUserNotPay = asyncHandler(async () => {
 export const countChildToData = asyncHandler(async () => {
   const listUser = await User.find({
     $and: [{ isAdmin: false }, { status: "APPROVED" }],
-  }).select("children");
+  }).select("tier");
 
   for (let u of listUser) {
-    const countChild = await getCountAllChildren(u._id);
+    const countChild = await getCountAllChildren(u._id, u.tier);
     u.countChild = countChild;
     await u.save();
   }
@@ -161,10 +203,10 @@ export const countChildToData = asyncHandler(async () => {
   console.log("updated count Child");
 });
 
-async function countDescendants(userId, layer) {
-  const user = await User.findById(userId);
+async function countDescendants(userId, layer, tier) {
+  const tree = await Tree.findOne({ userId, tier });
 
-  if (!user) {
+  if (!tree) {
     return 0;
   }
 
@@ -174,17 +216,17 @@ async function countDescendants(userId, layer) {
 
   let count = 0;
 
-  for (const childId of user.children) {
+  for (const childId of tree.children) {
     const child = await User.findById(childId);
     if (child.countPay !== 0) {
-      count += await countDescendants(childId, layer - 1);
+      count += await countDescendants(childId, layer - 1, tier);
     }
   }
 
   return count;
 }
 
-export const findRootLayer = asyncHandler(async (id) => {
+export const findRootLayer = asyncHandler(async (id, tier) => {
   // Tìm người dùng root đầu tiên (có parentId null)
   const root = await User.findById(id);
   if (!root) {
@@ -196,7 +238,7 @@ export const findRootLayer = asyncHandler(async (id) => {
 
   while (true) {
     const nextLayerCount = currentLayerCount * 3; // Số lượng node hoàn chỉnh trong tầng tiếp theo
-    const totalDescendants = await countDescendants(root._id, layer); // Tính tổng số con (bao gồm cả node hoàn chỉnh và node chưa đủ 3 cấp dưới)
+    const totalDescendants = await countDescendants(root._id, layer, tier); // Tính tổng số con (bao gồm cả node hoàn chỉnh và node chưa đủ 3 cấp dưới)
 
     if (totalDescendants < nextLayerCount) {
       break;
@@ -211,23 +253,39 @@ export const findRootLayer = asyncHandler(async (id) => {
 
 export const countLayerToData = asyncHandler(async () => {
   const listUser = await User.find({
-    $and: [{ isAdmin: false }, { status: "APPROVED" }],
-  }).select("children userId email oldLayer currentLayer");
+    isAdmin: false,
+  });
 
   const result = [];
 
   for (let u of listUser) {
-    const layer = await findRootLayer(u._id);
-    if (layer !== u.currentLayer) {
-      u.oldLayer = u.currentLayer;
-      u.currentLayer = layer;
-      let updatedUser = await u.save();
-      result.push(updatedUser);
-    } else {
+    let newLayer = [];
+    for (let i = 1; i <= u.tier; i++) {
+      const layer = await findRootLayer(u._id, i);
+      newLayer.push(layer);
+    }
+
+    if (areArraysEqual(newLayer, u.currentLayer)) {
       u.oldLayer = u.currentLayer;
       await u.save();
+    } else {
+      let isChange = false;
+      if (u.oldLayer.length === newLayer.length) {
+        isChange = true;
+      }
+      u.oldLayer = u.currentLayer;
+      u.currentLayer = newLayer;
+      let updatedUser = await u.save();
+      if (isChange) {
+        result.push(updatedUser);
+      }
     }
   }
+  console.log({ result });
   await sendMailUpdateLayerForAdmin(result);
   console.log("updated layer");
 });
+
+const areArraysEqual = (arr1, arr2) => {
+  return JSON.stringify(arr1) === JSON.stringify(arr2);
+};

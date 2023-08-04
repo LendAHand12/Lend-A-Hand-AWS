@@ -230,12 +230,15 @@ const updateUser = asyncHandler(async (req, res) => {
 });
 
 const adminUpdateUser = asyncHandler(async (req, res) => {
-  const { newStatus, newFine } = req.body;
+  const { newStatus, newFine, isRegistered } = req.body;
   const user = await User.findOne({ _id: req.params.id }).select("-password");
 
   if (user) {
     user.status = newStatus || user.status;
     user.fine = newFine || user.fine;
+    if (isRegistered && isRegistered === "on" && user.countPay === 0) {
+      user.countPay = 1;
+    }
     const updatedUser = await user.save();
     if (updatedUser) {
       res.status(200).json({
@@ -304,19 +307,21 @@ const getTreeOfUser = asyncHandler(async (req, res) => {
 });
 
 const getChildsOfUserForTree = asyncHandler(async (req, res) => {
-  const { id } = req.body;
-  const user = await User.findOne({ _id: id }).select(
-    "userId children countChild"
-  );
+  const { id, currentTier } = req.body;
+  const user = await User.findOne({ _id: id }).select("userId countChild");
+  const treeOfUser = await Tree.findOne({
+    userId: id,
+    tier: currentTier,
+  }).select("userId children");
   if (user) {
-    if (user.children.length === 0) {
+    if (treeOfUser.children.length === 0) {
       res.status(404);
       throw new Error("User not have child");
     } else {
       const tree = { key: user._id, label: user.userId, nodes: [] };
-      for (const childId of user.children) {
+      for (const childId of treeOfUser.children) {
         const child = await User.findById(childId).select(
-          "userId children countChild countPay"
+          "userId countChild countPay fine status"
         );
         tree.nodes.push({
           key: child._id,
@@ -327,6 +332,10 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
               ? "Hoàn thành"
               : child.countPay - 1
           })`,
+          isRed:
+            child.countPay === 0 || child.fine > 0 || child.status === "LOCKED"
+              ? true
+              : false,
         });
       }
       res.status(200).json(tree);
@@ -366,16 +375,16 @@ const getAllChildren = async (userId) => {
   return [user.userId, ...children];
 };
 
-const getCountAllChildren = async (userId) => {
-  const user = await User.findById(userId).select("userId children");
+const getCountAllChildren = async (userId, tier) => {
+  const tree = await Tree.findOne({ userId, tier }).select("userId children");
 
-  if (!user) {
+  if (!tree) {
     return 0;
   }
 
-  let result = user.children.length;
-  for (const childId of user.children) {
-    const count = await getCountAllChildren(childId);
+  let result = tree.children.length;
+  for (const childId of tree.children) {
+    const count = await getCountAllChildren(childId, tier);
     result += count;
   }
 
@@ -426,33 +435,30 @@ const getUserProfile = asyncHandler(async (req, res) => {
 
 const getListChildOfUser = asyncHandler(async (req, res) => {
   const result = await getAllDescendants(req.user.id);
-  console.log({ result: result.length });
   res.json(result);
 });
 
 async function getAllDescendants(targetUserId) {
   try {
-    const descendants = await User.aggregate([
+    const descendants = await Tree.aggregate([
       {
-        $match: { _id: new mongoose.Types.ObjectId(targetUserId) },
+        $match: { userId: targetUserId, tier: 1 },
       },
       {
         $graphLookup: {
-          from: "users", // Collection name
-          startWith: "$children", // Trường con trong mảng children
+          from: "trees",
+          startWith: "$children",
           connectFromField: "children",
-          connectToField: "_id",
+          connectToField: "userId",
           as: "descendants",
-          maxDepth: 100, // Số tầng cấp dưới tối đa (có thể điều chỉnh tùy ý)
+          maxDepth: 100,
         },
       },
     ]);
 
-    // Lấy danh sách các node con
     const descendantsList = descendants[0].descendants.map((descendant) => ({
-      id: descendant._id,
-      userId: descendant.userId,
-      // Các trường khác của người dùng...
+      id: descendant.userId,
+      userId: descendant.userName,
     }));
 
     return descendantsList;
