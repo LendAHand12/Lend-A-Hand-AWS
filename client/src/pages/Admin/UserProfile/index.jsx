@@ -284,7 +284,7 @@ const UserProfile = (match) => {
                     </div>
                     <div className="grid lg:grid-cols-2 grid-cols-1">
                       <div className="px-4 py-2 font-semibold">Tier</div>
-                      <div className="px-4 py-2">{data.tier + 1}</div>
+                      <div className="px-4 py-2">{data.tier}</div>
                     </div>
                     <div className="grid lg:grid-cols-2 grid-cols-1">
                       <div className="px-4 py-2 font-semibold">{t("fine")}</div>

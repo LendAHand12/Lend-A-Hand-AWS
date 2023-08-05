@@ -26,7 +26,7 @@ const PaymentPage = () => {
   const [payStep, setPayStep] = useState(0);
   const { userInfo } = useSelector((state) => state.auth);
   const [total, setTotal] = useState(0);
-  const registrationFee = userInfo.countPay === 0 ? 7 : 0;
+  const registrationFee = userInfo.countPay === 0 ? 7 * userInfo.tier : 0;
   const [weeks, setWeeks] = useState(1);
   const [yourBalance, setYourBalance] = useState(0);
   const { address, isConnected } = useAccount();
@@ -155,7 +155,7 @@ const PaymentPage = () => {
   );
 
   useEffect(() => {
-    setTotal(registrationFee + weeks * 15 * Math.pow(2, userInfo.tier));
+    setTotal(registrationFee + weeks * 15 * userInfo.tier);
   }, [weeks, userInfo, registrationFee]);
 
   useEffect(() => {

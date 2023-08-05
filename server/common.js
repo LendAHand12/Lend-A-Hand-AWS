@@ -42,3 +42,21 @@ export const transferLayerToArray = async () => {
 
   console.log("transfer layer to array done");
 };
+
+export const getUnknowChild = async () => {
+  const listTrees = await Tree.find();
+
+  const result = [];
+  for (let tree of listTrees) {
+    if (tree.children.length !== 0) {
+      for (let childId of tree.children) {
+        const u = await User.findById(childId);
+        if (!u) {
+          result.push({ treeId: tree._id, childIdß });
+        }
+      }
+    }
+  }
+
+  console.log({ result });
+};
