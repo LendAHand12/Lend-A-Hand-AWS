@@ -569,19 +569,35 @@ const getAllDeletedUsers = asyncHandler(async (req, res) => {
 const getAllUsersForExport = asyncHandler(async (req, res) => {
   const users = await User.aggregate([
     {
-      $match: {
-        $and: [{ isAdmin: false }, { refId: { $ne: "" } }],
+      $lookup: {
+        from: "trees",
+        let: { userId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$userId", { $toString: "$$userId" }], // Chuyển đổi userId từ ObjectId sang String
+              },
+            },
+          },
+        ],
+        as: "treeData",
       },
     },
     {
+      $unwind: "$treeData",
+    },
+    {
       $lookup: {
-        from: "users",
-        localField: "refId",
-        foreignField: "_id",
+        from: "trees",
+        localField: "treeData.refId",
+        foreignField: "userId",
         as: "parent",
       },
     },
-    { $unwind: "$parent" },
+    {
+      $unwind: "$parent",
+    },
     {
       $project: {
         _id: 1,
@@ -608,7 +624,7 @@ const getAllUsersForExport = asyncHandler(async (req, res) => {
       walletAddress: u.walletAddress[0],
       memberSince: u.createdAt,
       countChild: u.countChild,
-      refUserName: u.parent ? u.parent.userId : "",
+      refUserName: u.parent ? u.parent.userName : "",
       "count pay": u.countPay,
       fine: u.fine,
       status: u.status,
@@ -671,13 +687,14 @@ const changeWallet = asyncHandler(async (req, res) => {
 
 const adminDeleteUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
-  const parent = await User.findById(user.parentId);
-  if (!user || !parent) {
+  const treeUser = await Tree.findOne({ userId: user._id, tier: 1 });
+  const parentTree = await Tree.findOne({ userId: treeUser.parentId });
+  if (!user || !parentTree) {
     res.status(404);
     throw new Error("User not found");
   } else {
-    if (user.children.length === 0) {
-      await removeIdFromChildrenOfParent(user, parent);
+    if (treeUser.children.length === 0) {
+      await removeIdFromChildrenOfParent(user, parentTree);
       await deleteTransactions(user._id);
       await addDeleteUserToData(user);
       res.json({
@@ -828,15 +845,16 @@ const addDeleteUserToData = async (user) => {
     refId: user.refId,
   });
   await User.deleteOne({ _id: user._id });
+  await Tree.deleteOne({ userId: user._id, tier: 1 });
 };
 
-const removeIdFromChildrenOfParent = async (user, parent) => {
-  let childs = parent.children;
+const removeIdFromChildrenOfParent = async (user, parentTree) => {
+  let childs = parentTree.children;
   let newChilds = childs.filter((item) => {
     if (item.toString() !== user._id.toString()) return item;
   });
-  parent.children = [...newChilds];
-  await parent.save();
+  parentTree.children = [...newChilds];
+  await parentTree.save();
 };
 
 export {
