@@ -687,45 +687,43 @@ const changeWallet = asyncHandler(async (req, res) => {
 
 const adminDeleteUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
-  const treeUser = await Tree.findOne({ userId: user._id, tier: 1 });
-  const parentTree = await Tree.findOne({ userId: treeUser.parentId });
-  if (!user || !parentTree) {
+  if (!user) {
     res.status(404);
     throw new Error("User not found");
   } else {
-    if (treeUser.children.length === 0) {
-      await removeIdFromChildrenOfParent(user, parentTree);
-      await deleteTransactions(user._id);
-      await addDeleteUserToData(user);
-      res.json({
-        message: "Delete user successfull",
+    for (let tierIndex = 1; tierIndex <= user.tier; tierIndex++) {
+      const treeUser = await Tree.findOne({
+        userId: user._id,
+        tier: tierIndex,
       });
-    } else {
-      res.status(404);
-      throw new Error("This account have child");
+      if (treeUser.children.length > 1) {
+        res.status(404);
+        throw new Error("This account have child");
+      }
     }
-    // } else if (user.children.length === 1) {
-    //   // User có 1 con, xoá user và cập nhật parent
-    //   const child = await User.findById(user.children[0]);
-    //   child.parentId = user.parentId;
-    //   child.refId = child.refId === user._id ? user.parentId : child.refId;
-    //   parent.children = parent.children
-    //     .filter((childId) => childId !== user._id)
-    //     .concat(child._id);
-    //   await child.save();
-    //   await parent.save();
-    //   await DeleteUser.create({
-    //     userId: user.userId,
-    //     oldId: user._id,
-    //     phone: user.phone,
-    //     email: user.email,
-    //     password: user.password,
-    //     walletAddress: user.walletAddress,
-    //     parentId: user.parentId,
-    //     refId: user.refId,
-    //   });
-    //   await User.deleteOne({ _id: user._id });
-    // } else if (user.children.length > 1) {
+    for (let tierIndex = 1; tierIndex <= user.tier; tierIndex++) {
+      const treeUser = await Tree.findOne({
+        userId: user._id,
+        tier: tierIndex,
+      });
+      const parentTree = await Tree.findOne({ userId: treeUser.parentId });
+      if (treeUser.children.length === 0) {
+        await removeIdFromChildrenOfParent(user, parentTree);
+        await deleteTreeOfUserWithTier(user, tierIndex);
+      } else if (treeUser.children.length === 1) {
+        // User có 1 con, xoá user và cập nhật parent
+        await removeIdFromChildrenOfParent(user, parentTree);
+        await deleteTreeOfUserWithTier(user, tierIndex);
+        await pushChildrent1ToUp(treeUser, parentTree, tierIndex);
+      }
+    }
+    await replaceRefId(user._id);
+    await deleteTransactions(user._id);
+    await addDeleteUserToData(user);
+    res.json({
+      message: "Delete user successfull",
+    });
+    // else if (user.children.length > 1) {
     //   // User có nhiều hơn 1 con
     //   const child1 = await User.findById(user.children[0]);
     //   const child1Children = child1.children;
@@ -848,6 +846,10 @@ const addDeleteUserToData = async (user) => {
   await Tree.deleteOne({ userId: user._id, tier: 1 });
 };
 
+const deleteTreeOfUserWithTier = async (user, tier) => {
+  await Tree.deleteOne({ userId: user._id, tier });
+};
+
 const removeIdFromChildrenOfParent = async (user, parentTree) => {
   let childs = parentTree.children;
   let newChilds = childs.filter((item) => {
@@ -855,6 +857,28 @@ const removeIdFromChildrenOfParent = async (user, parentTree) => {
   });
   parentTree.children = [...newChilds];
   await parentTree.save();
+};
+
+const pushChildrent1ToUp = async (userTree, parentTree, tierIndex) => {
+  const childTree = await Tree.findOne({
+    userId: userTree.children[0],
+    tier: tierIndex,
+  });
+  childTree.parentId = parentTree.userId;
+  childTree.refId =
+    childTree.refId === userTree.userId ? parentTree.userId : childTree.refId;
+  await childTree.save();
+  parentTree.children.push(childTree.userId);
+  await parentTree.save();
+};
+
+const replaceRefId = async (deleteUserId) => {
+  const listTreeHaveRefId = await Tree.find({ refId: deleteUserId });
+
+  for (let treeUser of listTreeHaveRefId) {
+    treeUser.refId = treeUser.parentId;
+    await treeUser.save();
+  }
 };
 
 export {

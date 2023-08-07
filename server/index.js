@@ -89,29 +89,6 @@ const cron6 = new CronJob("30 23 * * *", () => {
   checkIncreaseTier();
 });
 
-// TRANSFER
-// transferUserToTree();
-
-// Chuyển refId parentId của các admin
-
-// UPDATE DATA
-// db.users.updateMany(
-//   { },
-//   { $unset: { children: "", parentId: "", refId: "" } }
-// )
-
-// db.users.updateMany(
-//   { },
-//   { $set: { tier: 1 } }
-// )
-
-// db.transactions.updateMany(
-//   { },
-//   { $set: { tier: 1 } }
-// )
-
-// transferLayerToArray()
-
 cron1.start();
 cron2.start();
 cron3.start();
