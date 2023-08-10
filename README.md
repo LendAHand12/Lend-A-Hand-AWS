@@ -71,6 +71,13 @@ Ràng buộc không trùng username 1tr => done
 - chuyển từ chưa hoàn thành thanh toán thành hoàn thành done -> 500
 - Thêm hiển thị màu đỏ trên cây hệ thống khi user : chưa thanh toán, bị phạt, bị lock, xuống cấp => 2tr
 
+- thông báo chi tiết trùng thông tin gì khi đăng ký -> 1tr
+- nâng số lần đóng góp lên 6 thì mới hoàn thành -> 1tr500
+- trên hệ thống hiển thị đỏ user khi chưa đóng góp trên 6 lần -> 500
+- update logic qua tier mới (full tầng 4 và tất cả con đóng LAH 6 lần trở lên) -> 2tr
+- thêm trang terms -> 1tr
+- cms -> 8tr
+
 // update parent
 db.users.update({
 $and: [

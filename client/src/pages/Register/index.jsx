@@ -226,7 +226,7 @@ const Register = () => {
                           required: t("Confirm password is required"),
                           validate: (val) => {
                             if (watch("password") != val) {
-                              return "Your passwords do no match";
+                              return t("Your passwords do no match");
                             }
                           },
                           pattern: {

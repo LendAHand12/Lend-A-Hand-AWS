@@ -225,5 +225,9 @@
   "Couldn't find any superior information": "Không tìm thấy thông tin cấp trên",
   "No referrer information found": "Không tìm thấy thông tin người giới thiệu",
   "congrateTier": "Chúc mừng Bạn đã hoàn thành tier ",
-  "transactionsList": "Danh sách giao dịch"
+  "transactionsList": "Danh sách giao dịch",
+
+  "duplicateInfoEmail": "Thông tin Email bị trùng",
+  "duplicateInfoUserId": "User name bị trùng",
+  "duplicateInfoIdCode": "Thông tin CCCD bị trùng"
 }

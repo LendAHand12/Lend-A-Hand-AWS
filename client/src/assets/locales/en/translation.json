@@ -219,5 +219,9 @@
   "Couldn't find any superior information": "Couldn't find any superior information",
   "No referrer information found": "No referrer information found",
   "congrateTier": "Congratulations on completing tier ",
-  "transactionsList": "Transactions"
+  "transactionsList": "Transactions",
+
+  "duplicateInfoEmail": "Duplicate Email",
+  "duplicateInfoUserId": "Duplicate user name",
+  "duplicateInfoIdCode": "Duplicate ID/DL/Passport number"
 }
