@@ -236,8 +236,8 @@ const adminUpdateUser = asyncHandler(async (req, res) => {
   if (user) {
     user.status = newStatus || user.status;
     user.fine = newFine || user.fine;
-    if (isRegistered && isRegistered === "on" && user.countPay < 7) {
-      user.countPay = 7;
+    if (isRegistered && isRegistered === "on" && user.countPay === 0) {
+      user.countPay = 1;
     }
     const updatedUser = await user.save();
     if (updatedUser) {
@@ -326,15 +326,15 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
         tree.nodes.push({
           key: child._id,
           label: `${child.userId} (${child.countChild} - ${
-            // child.countPay < 7
-            //   ? "Chưa hoàn thành"
-            //   : child.countPay >= 7
-            //   ? "Hoàn thành"
-            //   : child.countPay - 1
-            child.countPay <= 1 ? 0 : child.countPay - 1
+            child.countPay === 0
+              ? "Chưa hoàn thành"
+              : child.countPay === 1
+              ? "Hoàn thành"
+              : child.countPay - 1
+            // child.countPay <= 1 ? 0 : child.countPay - 1
           })`,
           isRed:
-            child.countPay < 7 || child.fine > 0 || child.status === "LOCKED"
+            child.countPay === 0 || child.fine > 0 || child.status === "LOCKED"
               ? true
               : false,
         });

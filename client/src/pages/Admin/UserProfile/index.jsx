@@ -257,7 +257,7 @@ const UserProfile = (match) => {
                         {t("isRegistered")}
                       </div>
                       <div className="px-4 py-2">
-                        {isEditting && data.countPay < 7 && (
+                        {isEditting && data.countPay === 0 && (
                           <div className="flex gap-4">
                             <input
                               type="radio"
@@ -267,7 +267,7 @@ const UserProfile = (match) => {
                           </div>
                         )}
                         {!isEditting || data.countPay >= 1
-                          ? data.countPay >= 7
+                          ? data.countPay >= 1
                             ? t("finished")
                             : t("unfinished")
                           : ""}

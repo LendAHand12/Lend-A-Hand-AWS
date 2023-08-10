@@ -302,7 +302,7 @@ const Profile = () => {
                       {t("isRegistered")}
                     </div>
                     <div className="px-4 py-2">
-                      {countPay >= 7 ? t("finished") : t("unfinished")}
+                      {countPay >= 1 ? t("finished") : t("unfinished")}
                     </div>
                   </div>
                   <div className="grid lg:grid-cols-2 grid-cols-1">
