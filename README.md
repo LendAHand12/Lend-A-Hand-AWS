@@ -71,11 +71,14 @@ Ràng buộc không trùng username 1tr => done
 - chuyển từ chưa hoàn thành thanh toán thành hoàn thành done -> 500
 - Thêm hiển thị màu đỏ trên cây hệ thống khi user : chưa thanh toán, bị phạt, bị lock, xuống cấp => 2tr
 
-- thông báo chi tiết trùng thông tin gì khi đăng ký -> 1tr
-- nâng số lần đóng góp lên 6 thì mới hoàn thành -> 1tr500
-- trên hệ thống hiển thị đỏ user khi chưa đóng góp trên 6 lần -> 500
-- update logic qua tier mới (full tầng 4 và tất cả con đóng LAH 6 lần trở lên) -> 2tr
-- thêm trang terms -> 1tr
+- thông báo chi tiết trùng thông tin gì khi đăng ký 1tr -> done
+- nâng số lần đóng góp lên 6 thì mới hoàn thành 1tr500 (update lại thành 1) => done
+- trên hệ thống hiển thị đỏ user khi chưa đóng góp trên 6 lần (update lại thành 1) 500 -> done
+- thêm phương thức thanh toán theo các gói A,B,C -> 4tr
+- A va B full tầng 4 hoặc doanh số 300 Tk, chia ra 3 nhanh . Nhanh cao nhất là 40% thấp nhất 20%
+  C- full tầng 5 hoac hoac doanh 680 Tk, chia ra 3 nhanh . Nhanh cao nhất là 40% thấp nhất 20% -> 3tr
+- thêm trang terms 1tr -> done
+
 - cms -> 8tr
 
 // update parent

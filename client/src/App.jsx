@@ -12,6 +12,7 @@ const Register = lazy(() => import("@/pages/Register"));
 const ConfirmPage = lazy(() => import("@/pages/ConfirmPage"));
 const ForgotPassword = lazy(() => import("@/pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
+const TermsPage = lazy(() => import("@/pages/Terms"));
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
       <Switch>
         <PublicRoute path="/" component={HomePage} exact />
         <PublicRoute path="/login" component={Login} exact />
+        <PublicRoute path="/terms" component={TermsPage} exact />
         <PublicRoute path="/register" component={Register} exact />
         <PublicRoute path="/confirm" component={ConfirmPage} exact />
         <PublicRoute path="/forgot-password" component={ForgotPassword} exact />
