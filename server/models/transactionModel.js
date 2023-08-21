@@ -44,6 +44,11 @@ const transactionSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    buyPackage: {
+      type: String,
+      enum: ["A", "B", "C", ""],
+      default: "C",
+    },
   },
   { timestamps: true }
 );

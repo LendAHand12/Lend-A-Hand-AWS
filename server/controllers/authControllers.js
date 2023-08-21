@@ -243,6 +243,7 @@ const authUser = asyncHandler(async (req, res) => {
         oldLayer: user.oldLayer,
         currentLayer: user.currentLayer,
         idCode: user.idCode,
+        buyPackage: user.buyPackage,
         listDirectUser: listDirectUser,
       },
       accessToken,

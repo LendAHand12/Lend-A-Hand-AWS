@@ -79,6 +79,11 @@ Ràng buộc không trùng username 1tr => done
   C- full tầng 5 hoac hoac doanh 680 Tk, chia ra 3 nhanh . Nhanh cao nhất là 40% thấp nhất 20% -> 3tr
 - thêm trang terms 1tr -> done
 
+- Giảm gói B xuống 6 lần -> 500
+- Tăng số lần thanh toán theo đóng góp LAH (tránh bị xoá trong ngày) -> 500
+- Thêm option thanh toán C hoặc B trong lần đóng góp 7 của gói B -> 1tr
+- Ràng buộc điều kiện thay đổi gói thanh toán của user trên admin -> 1tr
+
 - cms -> 8tr
 
 // update parent

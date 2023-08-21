@@ -39,7 +39,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       throw new Error("Parent not found");
     }
 
-    let registerFee = 7 * user.tier;
+    let registerFee = user.countPay === 0 ? 7 * user.tier : 0;
     let directCommissionWallet = "";
     let directCommissionFee = 5 * user.tier;
     let referralCommissionWallet = "";
@@ -51,17 +51,78 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       user.tier
     );
 
+    if (user.tier === 1) {
+      if (user.buyPackage === "A") {
+        if (user.countPay === 0) {
+          directCommissionFee = 65;
+          if (
+            refUser.fine > 0 ||
+            refUser.status === "LOCKED" ||
+            refUser.tier < user.tier ||
+            (refUser.tier === user.tier && refUser.countPay < 13)
+          ) {
+            directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
+            haveRefNotPayEnough = true;
+          } else {
+            directCommissionWallet = refUser.walletAddress[0];
+          }
+        }
+      } else if (user.buyPackage === "B") {
+        if (user.countPay === 0) {
+          directCommissionFee = 35;
+          if (
+            refUser.fine > 0 ||
+            refUser.status === "LOCKED" ||
+            refUser.tier < user.tier ||
+            (refUser.tier === user.tier && refUser.countPay < 7)
+          ) {
+            directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
+            haveRefNotPayEnough = true;
+          } else {
+            directCommissionWallet = refUser.walletAddress[0];
+          }
+        } else if (user.countPay === 7) {
+          directCommissionFee = 30;
+          if (
+            refUser.fine > 0 ||
+            refUser.status === "LOCKED" ||
+            refUser.tier < user.tier ||
+            (refUser.tier === user.tier && refUser.countPay < 13)
+          ) {
+            directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
+            haveRefNotPayEnough = true;
+          } else {
+            directCommissionWallet = refUser.walletAddress[0];
+          }
+        }
+      } else if (user.buyPackage === "C") {
+        if (
+          refUser.fine > 0 ||
+          refUser.status === "LOCKED" ||
+          refUser.tier < user.tier ||
+          (refUser.tier === user.tier && refUser.countPay < user.countPay + 1)
+        ) {
+          directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
+          haveRefNotPayEnough = true;
+        } else {
+          directCommissionWallet = refUser.walletAddress[0];
+        }
+      }
+    }
+
     if (user.countPay === 0) {
-      if (
-        refUser.fine > 0 ||
-        refUser.status === "LOCKED" ||
-        refUser.tier < user.tier ||
-        (refUser.tier === user.tier && refUser.countPay < user.countPay + 1)
-      ) {
-        directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
-        haveRefNotPayEnough = true;
-      } else {
-        directCommissionWallet = refUser.walletAddress[0];
+      if (user.tier >= 2) {
+        if (
+          refUser.fine > 0 ||
+          refUser.status === "LOCKED" ||
+          refUser.tier < user.tier ||
+          (refUser.tier === user.tier && refUser.countPay < user.countPay + 1)
+        ) {
+          directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
+          haveRefNotPayEnough = true;
+        } else {
+          directCommissionWallet = refUser.walletAddress[0];
+        }
       }
       if (
         parentUser.fine > 0 ||
@@ -139,6 +200,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           address_from: user.walletAddress[0],
           address_to: process.env.MAIN_WALLET_ADDRESS,
           tier: user.tier,
+          buyPackage: user.buyPackage,
           hash: "",
           type: "REGISTER",
           status: "PENDING",
@@ -156,11 +218,51 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         address_from: user.walletAddress[0],
         address_to: directCommissionWallet,
         tier: user.tier,
+        buyPackage: user.buyPackage,
         hash: "",
         type: haveRefNotPayEnough ? "DIRECTHOLD" : "DIRECT",
         status: "PENDING",
       });
       transIds.direct = transactionDirect._id;
+
+      if (user.tier === 1 && user.buyPackage === "A") {
+        for (let i = 1; i <= 12; i++) {
+          transactionDirect = await Transaction.create({
+            userId: user.id,
+            amount: 0,
+            userCountPay: i,
+            address_ref: refUser.walletAddress[0],
+            address_from: user.walletAddress[0],
+            address_to: directCommissionWallet,
+            tier: user.tier,
+            buyPackage: user.buyPackage,
+            hash: "",
+            type: "PACKAGE",
+            status: "SUCCESS",
+          });
+        }
+      }
+      if (user.tier === 1 && user.buyPackage === "B") {
+        let count = 6;
+        if (user.countPay === 7) {
+          count = 12;
+        }
+        for (let i = 1; i <= count; i++) {
+          transactionDirect = await Transaction.create({
+            userId: user.id,
+            amount: 0,
+            userCountPay: i,
+            address_ref: refUser.walletAddress[0],
+            address_from: user.walletAddress[0],
+            address_to: directCommissionWallet,
+            tier: user.tier,
+            buyPackage: user.buyPackage,
+            hash: "",
+            type: "PACKAGE",
+            status: "SUCCESS",
+          });
+        }
+      }
 
       transactionReferral = await Transaction.create({
         userId: user.id,
@@ -170,6 +272,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         address_from: user.walletAddress[0],
         address_to: referralCommissionWallet,
         tier: user.tier,
+        buyPackage: user.buyPackage,
         hash: "",
         type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
         status: "PENDING",
@@ -188,11 +291,51 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           address_from: user.walletAddress[0],
           address_to: directCommissionWallet,
           tier: user.tier,
+          buyPackage: user.buyPackage,
           hash: "",
           type: haveRefNotPayEnough ? "DIRECTHOLD" : "DIRECT",
           status: "PENDING",
         });
         transIds.direct = transactionDirect._id;
+
+        if (user.tier === 1 && user.buyPackage === "A") {
+          for (let i = 1; i <= 12; i++) {
+            transactionDirect = await Transaction.create({
+              userId: user.id,
+              amount: 0,
+              userCountPay: i,
+              address_ref: refUser.walletAddress[0],
+              address_from: user.walletAddress[0],
+              address_to: directCommissionWallet,
+              tier: user.tier,
+              buyPackage: user.buyPackage,
+              hash: "",
+              type: "PACKAGE",
+              status: "SUCCESS",
+            });
+          }
+        }
+        if (user.tier === 1 && user.buyPackage === "B") {
+          let count = 6;
+          if (user.countPay === 7) {
+            count = 12;
+          }
+          for (let i = 1; i <= count; i++) {
+            transactionDirect = await Transaction.create({
+              userId: user.id,
+              amount: 0,
+              userCountPay: i,
+              address_ref: refUser.walletAddress[0],
+              address_from: user.walletAddress[0],
+              address_to: directCommissionWallet,
+              tier: user.tier,
+              buyPackage: user.buyPackage,
+              hash: "",
+              type: "PACKAGE",
+              status: "SUCCESS",
+            });
+          }
+        }
 
         transactionReferral = await Transaction.create({
           userId: user.id,
@@ -202,6 +345,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           address_from: user.walletAddress[0],
           address_to: referralCommissionWallet,
           tier: user.tier,
+          buyPackage: user.buyPackage,
           hash: "",
           type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
           status: "PENDING",
@@ -210,8 +354,14 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       } else {
         step = 3;
         const directTrans = listTransSuccess.find(
-          (ele) => ele.type === "DIRECT" || ele.type === "DIRECTHOLD"
+          (ele) =>
+            ele.type === "DIRECT" ||
+            ele.type === "DIRECTHOLD" ||
+            ele.type === "PACKAGE"
         );
+        if (directTrans.type === "PACKAGE") {
+          directCommissionFee = 0;
+        }
         transIds.direct = directTrans._id;
 
         transactionReferral = await Transaction.create({
@@ -222,6 +372,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           address_from: user.walletAddress[0],
           address_to: referralCommissionWallet,
           tier: user.tier,
+          buyPackage: user.buyPackage,
           hash: "",
           type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
           status: "PENDING",
@@ -238,8 +389,14 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         transIds.register = registerTrans._id;
 
         const directTrans = listTransSuccess.find(
-          (ele) => ele.type === "DIRECT" || ele.type === "DIRECTHOLD"
+          (ele) =>
+            ele.type === "DIRECT" ||
+            ele.type === "DIRECTHOLD" ||
+            ele.type === "PACKAGE"
         );
+        if (directTrans.type === "PACKAGE") {
+          directCommissionFee = 0;
+        }
         transIds.direct = directTrans._id;
 
         transactionReferral = await Transaction.create({
@@ -250,6 +407,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           address_from: user.walletAddress[0],
           address_to: referralCommissionWallet,
           tier: user.tier,
+          buyPackage: user.buyPackage,
           hash: "",
           type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
           status: "PENDING",
@@ -258,8 +416,14 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       } else {
         step = 4;
         const directTrans = listTransSuccess.find(
-          (ele) => ele.type === "DIRECT" || ele.type === "DIRECTHOLD"
+          (ele) =>
+            ele.type === "DIRECT" ||
+            ele.type === "DIRECTHOLD" ||
+            ele.buyPackage === "PACKAGE"
         );
+        if (directTrans.type === "PACKAGE") {
+          directCommissionFee = 0;
+        }
         transIds.direct = directTrans._id;
 
         const referral = listTransSuccess.find(
@@ -276,8 +440,14 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       transIds.register = registerTrans._id;
 
       const directTrans = listTransSuccess.find(
-        (ele) => ele.type === "DIRECT" || ele.type === "DIRECTHOLD"
+        (ele) =>
+          ele.type === "DIRECT" ||
+          ele.type === "DIRECTHOLD" ||
+          ele.type === "PACKAGE"
       );
+      if (directTrans.type === "PACKAGE") {
+        directCommissionFee = 0;
+      }
       transIds.direct = directTrans._id;
 
       const referral = listTransSuccess.find(
@@ -295,6 +465,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         address_from: user.walletAddress[0],
         address_to: process.env.MAIN_WALLET_ADDRESS,
         tier: user.tier,
+        buyPackage: user.buyPackage,
         hash: "",
         type: "FINE",
         status: "PENDING",
@@ -302,6 +473,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
     }
 
     res.json({
+      countPay: user.countPay,
       step,
       registerFee,
       directCommissionWallet,
@@ -364,6 +536,7 @@ const onDonePayment = asyncHandler(async (req, res) => {
         await sendActiveLink(user.email, links[0]);
       }
     }
+
     user.countPay = user.countPay + 1;
 
     const updatedUser = await user.save();

@@ -89,6 +89,11 @@ const userSchema = mongoose.Schema(
       type: String,
       default: "",
     },
+    buyPackage: {
+      type: String,
+      enum: ["A", "B", "C", ""],
+      default: "",
+    },
   },
   {
     timestamps: true,

@@ -27,6 +27,7 @@ import {
   transferUserToTree,
   transferLayerToArray,
   getUnknowChild,
+  addBuyPackage,
 } from "./common.js";
 
 const app = express();

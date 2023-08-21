@@ -60,3 +60,22 @@ export const getUnknowChild = async () => {
 
   console.log({ result });
 };
+
+export const addBuyPackage = async () => {
+  const listUser = await User.find({ isAdmin: false });
+
+  for (let user of listUser) {
+    if (user.countPay === 0) {
+      user.buyPackage = "";
+    } else if (user.countPay >= 13) {
+      user.buyPackage = "A";
+    } else if (user.countPay < 13 && user.countPay >= 6) {
+      user.buyPackage = "B";
+    } else {
+      user.buyPackage = "C";
+    }
+    await user.save();
+  }
+
+  console.log("addBuyPackage done");
+};

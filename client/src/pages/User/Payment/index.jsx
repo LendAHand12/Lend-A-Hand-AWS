@@ -27,23 +27,25 @@ const PaymentPage = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const [total, setTotal] = useState(0);
   const registrationFee = userInfo.countPay === 0 ? 7 * userInfo.tier : 0;
-  const [weeks, setWeeks] = useState(1);
   const [yourBalance, setYourBalance] = useState(0);
   const { address, isConnected } = useAccount();
   const [canPay, setCanPay] = useState(true);
+  const [refresh, setRefresh] = useState(false);
+  const [nextPay, setNextPay] = useState();
 
   const paymentRegisterFee = useCallback(async () => {
     if (paymentInfo && paymentInfo.registerFee !== 0) {
       setLoadingAddRegister(true);
       try {
-        const registerTransaction = await transfer(
-          import.meta.env.VITE_MAIN_WALLET_ADDRESS,
-          paymentInfo.registerFee
-        );
-        const { transactionHash } = registerTransaction;
+        // const registerTransaction = await transfer(
+        //   import.meta.env.VITE_MAIN_WALLET_ADDRESS,
+        //   paymentInfo.registerFee
+        // );
+        // const { transactionHash } = registerTransaction;
         await addPayment(
           paymentInfo.transIds.register,
-          transactionHash,
+          // transactionHash,
+          "hash",
           "REGISTER"
         );
         setPayStep(2);
@@ -81,12 +83,17 @@ const PaymentPage = () => {
   const paymentDirectionCommission = useCallback(async () => {
     setLoadingAddDirectCommission(true);
     try {
-      const registerTransaction = await transfer(
-        paymentInfo.directCommissionWallet,
-        paymentInfo.directCommissionFee
+      // const registerTransaction = await transfer(
+      //   paymentInfo.directCommissionWallet,
+      //   paymentInfo.directCommissionFee
+      // );
+      // const { transactionHash } = registerTransaction;
+      await addPayment(
+        paymentInfo.transIds.direct,
+        // transactionHash,
+        "hash",
+        "DIRECT"
       );
-      const { transactionHash } = registerTransaction;
-      await addPayment(paymentInfo.transIds.direct, transactionHash, "DIRECT");
       setPayStep(3);
       setLoadingAddDirectCommission(false);
     } catch (error) {
@@ -98,14 +105,15 @@ const PaymentPage = () => {
   const paymentReferralCommission = async () => {
     setLoadingAddReferralCommission(true);
     try {
-      const registerTransaction = await transfer(
-        paymentInfo.referralCommissionWallet,
-        paymentInfo.referralCommissionFee
-      );
-      const { transactionHash } = registerTransaction;
+      // const referralTransaction = await transfer(
+      //   paymentInfo.referralCommissionWallet,
+      //   paymentInfo.referralCommissionFee
+      // );
+      // const { transactionHash } = referralTransaction;
       await addPayment(
         paymentInfo.transIds.referral,
-        transactionHash,
+        // transactionHash,
+        "hash",
         "REFERRAL"
       );
       setPayStep(4);
@@ -140,7 +148,7 @@ const PaymentPage = () => {
           toast.success(t(message));
           setLoadingDonePayment(false);
           onClose();
-          history.push("/");
+          setRefresh(!refresh);
         })
         .catch((error) => {
           let message =
@@ -151,12 +159,8 @@ const PaymentPage = () => {
           setLoadingDonePayment(false);
         });
     },
-    [paymentInfo]
+    [paymentInfo, refresh]
   );
-
-  useEffect(() => {
-    setTotal(registrationFee + weeks * 15 * userInfo.tier);
-  }, [weeks, userInfo, registrationFee]);
 
   useEffect(() => {
     (async () => {
@@ -171,8 +175,16 @@ const PaymentPage = () => {
       .then((response) => {
         setLoadingPaymentInfo(true);
         setPaymentInfo(response.data);
-        const { step } = response.data;
+        const {
+          step,
+          registerFee,
+          directCommissionFee,
+          referralCommissionFee,
+          countPay,
+        } = response.data;
+        setTotal(registerFee + directCommissionFee + referralCommissionFee);
         setPayStep(step);
+        setNextPay(countPay);
         setLoadingPaymentInfo(false);
       })
       .catch((error) => {
@@ -186,7 +198,7 @@ const PaymentPage = () => {
 
   useEffect(() => {
     onGetPaymentInfo();
-  }, []);
+  }, [refresh]);
 
   useEffect(() => {
     if (isConnected && address !== userInfo.walletAddress) {
@@ -253,52 +265,29 @@ const PaymentPage = () => {
         {canPay && (
           <>
             {userInfo.countPay === 0 && (
-              <>
-                <div className="mb-3">
-                  <label className="font-bold text-sm mb-2 ml-1">
-                    {t("registerFee")} (USDT)
-                  </label>
-                  <div>
-                    <input
-                      className="w-full px-3 py-2 mb-1 border-2 border-gray-200 rounded-md focus:outline-none focus:border-indigo-500 transition-colors"
-                      type="text"
-                      value={registrationFee}
-                      readOnly
-                    />
-                  </div>
-                </div>
-              </>
+              <div className="mb-3">
+                <p className="text-lg mb-2 ml-1">
+                  <span className="font-bold">{t("registerFee")}</span> :{" "}
+                  {registrationFee} USDT
+                </p>
+              </div>
             )}
-
-            {/* <div className="mb-3">
-          <label className="font-bold text-sm mb-2 ml-1">{t("weeks")}</label>
-          <div>
-            <select
-              disabled={true}
-              onChange={(e) => setWeeks(e.target.value)}
-              value={weeks}
-              className="form-select w-full px-3 py-2 mb-1 border-2 border-gray-200 rounded-md focus:outline-none focus:border-indigo-500 transition-colors cursor-pointer"
-            >
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-              <option value="10">10</option>
-              <option value="11">11</option>
-              <option value="12">12</option>
-            </select>
-          </div>
-        </div> */}
-            {!loadingPaymentInfo && userInfo.countPay !== 0 && (
+            {!loadingPaymentInfo && nextPay !== 0 && (
               <div className="mb-3">
                 <p className="text-lg mb-2 ml-1">
                   <span className="font-bold">{t("the next pay count")}</span> :{" "}
-                  {userInfo.countPay}
+                  {nextPay}
+                </p>
+              </div>
+            )}
+            {userInfo.buyPackage !== "C" && (
+              <div className="mb-3">
+                <p className="text-lg mb-2 ml-1">
+                  <span className="font-bold">{t("buyPackage")}</span> :{" "}
+                  {userInfo.buyPackage}{" "}
+                  {userInfo.buyPackage === "A"
+                    ? t("buyPackageA")
+                    : t("buyPackageB")}
                 </p>
               </div>
             )}

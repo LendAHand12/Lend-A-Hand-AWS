@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useDisconnect } from "wagmi";
 import axios from "axios";
@@ -11,6 +11,8 @@ import { useTranslation } from "react-i18next";
 import { ToastContainer, toast } from "react-toastify";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 import "./index.css";
 
 const Profile = () => {
@@ -36,6 +38,7 @@ const Profile = () => {
     oldLayer,
     currentLayer,
     idCode,
+    buyPackage,
   } = userInfo;
   const [imgFront, setImgFront] = useState("");
   const [imgBack, setImgBack] = useState("");
@@ -48,7 +51,6 @@ const Profile = () => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      // walletAddress: walletAddress,
       idCode,
       phone,
       imgBackData: "",
@@ -135,11 +137,9 @@ const Profile = () => {
   );
 
   const handleChangeWallet = async () => {
-    // const { walletAddress } = data;
     setLoadingChangeWallet(true);
     await User.getMailChangeWallet()
       .then((response) => {
-        console.log(response.data);
         setLoadingChangeWallet(false);
         toast.success(t(response.data.message));
       })
@@ -152,6 +152,74 @@ const Profile = () => {
         setLoadingChangeWallet(false);
       });
   };
+
+  const handleChoosePaymentMethod = async (buyPackage, onClose) => {
+    await User.update(id, {
+      buyPackage,
+    })
+      .then((response) => {
+        toast.success(t(response.data.message));
+        dispatch(UPDATE_USER_INFO(response.data.data));
+        onClose();
+      })
+      .catch((error) => {
+        let message =
+          error.response && error.response.data.error
+            ? error.response.data.error
+            : error.message;
+        toast.error(t(message));
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    if (countPay === 0 && status === "APPROVED" && buyPackage === "") {
+      confirmAlert({
+        closeOnClickOutside: false,
+        customUI: ({ onClose }) => {
+          return (
+            <div className="custom-ui">
+              <div className="bg-gray-50 p-6 md:mx-auto">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="text-gray-600 w-16 h-16 mx-auto my-6"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" />
+                </svg>
+                <div className="text-center">
+                  <p className="text-gray-600 text-xl my-4">
+                    {t("choosePaymentMethod")}
+                  </p>
+                  <div className="text-center mt-10 flex gap-10">
+                    <button
+                      onClick={() => handleChoosePaymentMethod("A", onClose)}
+                      className="w-48 flex justify-center items-center hover:underline gradient text-white font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                    >
+                      {t("buyPackage")} A
+                    </button>
+                    <button
+                      onClick={() => handleChoosePaymentMethod("B", onClose)}
+                      className="w-48 flex justify-center items-center hover:underline gradient text-white font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                    >
+                      {t("buyPackage")} B
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => handleChoosePaymentMethod("C", onClose)}
+                    className="mt-10 w-full flex justify-center items-center hover:underline bg-red-500 text-white font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                  >
+                    {t("skip")}
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        },
+      });
+    }
+  }, []);
 
   return (
     <div>
@@ -316,6 +384,12 @@ const Profile = () => {
                   <div className="grid lg:grid-cols-2 grid-cols-1">
                     <div className="px-4 py-2 font-semibold">Tier</div>
                     <div className="px-4 py-2">{tier}</div>
+                  </div>
+                  <div className="grid lg:grid-cols-2 grid-cols-1">
+                    <div className="px-4 py-2 font-semibold">
+                      {t("buyPackage")}
+                    </div>
+                    <div className="px-4 py-2">{buyPackage}</div>
                   </div>
                   <div className="grid lg:grid-cols-2 grid-cols-1">
                     <div className="px-4 py-2 font-semibold">{t("fine")}</div>

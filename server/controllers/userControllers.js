@@ -158,6 +158,7 @@ const getUserById = asyncHandler(async (req, res) => {
       countPay: user.countPay,
       phone: user.phone,
       idCode: user.idCode,
+      buyPackage: user.buyPackage,
       oldLayer: user.oldLayer,
       currentLayer: user.currentLayer,
       listDirectUser: listDirectUser,
@@ -169,13 +170,13 @@ const getUserById = asyncHandler(async (req, res) => {
 });
 
 const updateUser = asyncHandler(async (req, res) => {
-  const { phone, imgFront, imgBack, idCode } = req.body;
+  const { phone, imgFront, imgBack, idCode, buyPackage } = req.body;
   const user = await User.findOne({ _id: req.params.id }).select("-password");
   const userHavePhone = await User.find({
-    $and: [{ phone }, { email: { $ne: user.email } }],
+    $and: [{ phone }, { email: { $ne: user.email } }, { isAdmin: false }],
   });
   const userHaveIdCode = await User.find({
-    $and: [{ idCode }, { email: { $ne: user.email } }],
+    $and: [{ idCode }, { email: { $ne: user.email } }, { isAdmin: false }],
   });
 
   if (userHavePhone.length >= 1 || userHaveIdCode.length >= 1) {
@@ -184,7 +185,8 @@ const updateUser = asyncHandler(async (req, res) => {
   if (user) {
     user.phone = phone || user.phone;
     user.idCode = idCode || user.idCode;
-    if (imgFront !== "" && imgBack !== "") {
+    user.buyPackage = buyPackage || user.buyPackage;
+    if (imgFront && imgBack && imgFront !== "" && imgBack !== "") {
       if (
         imgFront.includes("https://res.cloudinary.com/dhqggkmto") &&
         imgFront.includes("https://res.cloudinary.com/dhqggkmto")
@@ -220,6 +222,7 @@ const updateUser = asyncHandler(async (req, res) => {
           idCode: updatedUser.idCode,
           oldLayer: updatedUser.oldLayer,
           currentLayer: updatedUser.currentLayer,
+          buyPackage: updatedUser.buyPackage,
           listDirectUser,
         },
       });
@@ -424,6 +427,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
       countPay: user.countPay,
       phone: user.phone,
       idCode: user.idCode,
+      buyPackage: user.buyPackage,
       oldLayer: user.oldLayer,
       currentLayer: user.currentLayer,
       listDirectUser: listDirectUser,
