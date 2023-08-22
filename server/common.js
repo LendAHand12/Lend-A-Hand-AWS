@@ -66,10 +66,10 @@ export const addBuyPackage = async () => {
 
   for (let user of listUser) {
     if (user.countPay === 0) {
-      user.buyPackage = "";
+      user.buyPackage = "C";
     } else if (user.countPay >= 13) {
       user.buyPackage = "A";
-    } else if (user.countPay < 13 && user.countPay >= 6) {
+    } else if (user.countPay < 13 && user.countPay >= 7) {
       user.buyPackage = "B";
     } else {
       user.buyPackage = "C";

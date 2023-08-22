@@ -231,7 +231,7 @@ const PaymentPage = () => {
         {paymentInfo &&
           userInfo.buyPackage === "B" &&
           userInfo.countPay === 7 &&
-          paymentInfo.step < 3 && (
+          payStep < 3 && (
             <>
               <p className="text-lg mb-2">{t("contineWithPackageB")}</p>
               <div className="w-full justify-between mb-3">
@@ -275,7 +275,7 @@ const PaymentPage = () => {
                 </p>
               </div>
             )}
-            {userInfo.buyPackage !== "C" && (
+            {(userInfo.buyPackage === "A" || userInfo.buyPackage === "B") && (
               <div className="mb-3">
                 <p className="text-lg mb-2 ml-1">
                   <span className="font-bold">{t("buyPackage")}</span> :{" "}

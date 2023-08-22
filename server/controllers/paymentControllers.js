@@ -77,6 +77,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         }
       } else {
         const pendingTransPackage = await Transaction.findOne({
+          userId: user._id,
           tier: user.tier,
           type: "PACKAGE",
           userCountPay: user.countPay,
@@ -89,7 +90,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       }
     } else if (user.tier === 1 && user.buyPackage === "B") {
       if (user.countPay === 0) {
-        directCommissionFee = 35 * u.tier;
+        directCommissionFee = 35 * user.tier;
         if (
           refUser.fine > 0 ||
           refUser.status === "LOCKED" ||
@@ -116,6 +117,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         }
       }
       const pendingTransPackage = await Transaction.findOne({
+        userId: user._id,
         tier: user.tier,
         type: "PACKAGE",
         userCountPay: user.countPay,
@@ -533,7 +535,8 @@ const generatePackageTrans = async (
     ],
   });
 
-  const startIndexPackageTrans = listPendingDirect.length + 1;
+  const startIndexPackageTrans = listPendingDirect.length;
+  console.log({ startIndexPackageTrans });
 
   if (user.buyPackage === "A" || user.tier >= 2) {
     for (let i = startIndexPackageTrans; i <= 12; i++) {
@@ -557,7 +560,14 @@ const generatePackageTrans = async (
     if (user.countPay >= 7 && continueWithBuyPackageB) {
       count = 12;
     }
-    for (let i = startIndexPackageTrans; i <= count; i++) {
+    for (
+      let i =
+        user.countPay === 7
+          ? startIndexPackageTrans + 1
+          : startIndexPackageTrans;
+      i <= count;
+      i++
+    ) {
       await Transaction.create({
         userId: user.id,
         amount: 0,
