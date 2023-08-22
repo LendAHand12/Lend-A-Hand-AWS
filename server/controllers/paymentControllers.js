@@ -499,7 +499,17 @@ const generatePackageTrans = async (
   continueWithBuyPackageB
 ) => {
   const listPendingDirect = await Transaction.find({
-    $and: [{ tier: user.tier, type: "PACKAGE", status: "SUCCESS" }],
+    $or: [
+      {
+        $and: [{ tier: user.tier, type: "PACKAGE", status: "SUCCESS" }],
+      },
+      {
+        $and: [{ tier: user.tier, type: "DIRECT", status: "SUCCESS" }],
+      },
+      {
+        $and: [{ tier: user.tier, type: "DIRECTHOLD", status: "SUCCESS" }],
+      },
+    ],
   });
 
   const startIndexPackageTrans = listPendingDirect.length + 1;
