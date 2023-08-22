@@ -22,6 +22,7 @@ import {
   countChildToData,
   deleteUserNotPay,
   countLayerToData,
+  checkCanIncreaseNextTier,
 } from "./cronJob/index.js";
 import {
   transferUserToTree,
@@ -29,6 +30,7 @@ import {
   getUnknowChild,
   addBuyPackage,
 } from "./common.js";
+import { findNextUser } from "./utils/methods.js";
 
 const app = express();
 
@@ -61,31 +63,37 @@ app.use(notFound);
 app.use(errorHandler);
 
 const cron1 = new CronJob("00 18 * * *", () => {
+  // 1h
   console.log("Check unpay user");
   checkUnpayUser();
 });
 
-const cron2 = new CronJob("00 19 * * *", () => {
+const cron2 = new CronJob("30 18 * * *", () => {
+  // 1h30
   console.log("Delete un KYC user");
   deleteUserNotKYC();
 });
 
-const cron3 = new CronJob("00 20 * * *", () => {
+const cron3 = new CronJob("00 19 * * *", () => {
+  // 2h
   console.log("Delete user not pay");
   deleteUserNotPay();
 });
 
-const cron4 = new CronJob("00 21 * * *", () => {
+const cron4 = new CronJob("30 19 * * *", () => {
+  // 2h30
   console.log("Count child");
   countChildToData();
 });
 
-const cron5 = new CronJob("00 23 * * *", () => {
+const cron5 = new CronJob("00 21 * * *", () => {
+  // 4h
   console.log("Refresh layer");
   countLayerToData();
 });
 
-const cron6 = new CronJob("30 23 * * *", () => {
+const cron6 = new CronJob("30 21 * * *", () => {
+  // 4h30
   console.log("Check increase tier");
   checkIncreaseTier();
 });

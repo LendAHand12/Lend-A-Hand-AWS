@@ -159,6 +159,7 @@ const getUserById = asyncHandler(async (req, res) => {
       phone: user.phone,
       idCode: user.idCode,
       buyPackage: user.buyPackage,
+      continueWithBuyPackageB: user.continueWithBuyPackageB,
       oldLayer: user.oldLayer,
       currentLayer: user.currentLayer,
       listDirectUser: listDirectUser,
@@ -223,6 +224,7 @@ const updateUser = asyncHandler(async (req, res) => {
           oldLayer: updatedUser.oldLayer,
           currentLayer: updatedUser.currentLayer,
           buyPackage: updatedUser.buyPackage,
+          continueWithBuyPackageB: updatedUser.continueWithBuyPackageB,
           listDirectUser,
         },
       });
@@ -233,12 +235,24 @@ const updateUser = asyncHandler(async (req, res) => {
 });
 
 const adminUpdateUser = asyncHandler(async (req, res) => {
-  const { newStatus, newFine, isRegistered } = req.body;
+  const { newStatus, newFine, isRegistered, buyPackage } = req.body;
   const user = await User.findOne({ _id: req.params.id }).select("-password");
 
   if (user) {
     user.status = newStatus || user.status;
     user.fine = newFine || user.fine;
+    const listTransSuccess = await Transaction.find({
+      $and: [
+        { userId: user._id },
+        { status: "SUCCESS" },
+        { type: { $ne: "REGISTER" } },
+      ],
+    });
+    if (listTransSuccess.length === 0) {
+      user.buyPackage = buyPackage || user.buyPackage;
+    } else {
+      res.status(400).json({ error: "User has generated a transaction" });
+    }
     if (isRegistered && isRegistered === "on" && user.countPay === 0) {
       user.countPay = 1;
     }
@@ -428,6 +442,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
       phone: user.phone,
       idCode: user.idCode,
       buyPackage: user.buyPackage,
+      continueWithBuyPackageB: user.continueWithBuyPackageB,
       oldLayer: user.oldLayer,
       currentLayer: user.currentLayer,
       listDirectUser: listDirectUser,

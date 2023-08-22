@@ -251,5 +251,18 @@
   "term6": "Modifications to Terms and Conditions",
   "term61": "WeUnity may modify these terms and conditions at any time, and such modifications shall be effective upon posting on www.lah12.com.",
   "term7": "Governing Law",
-  "term71": "These terms and conditions shall be governed by and construed in accordance with the terms and conditions of WeUnity."
+  "term71": "These terms and conditions shall be governed by and construed in accordance with the terms and conditions of WeUnity.",
+
+  "choosePaymentMethod": "Select payment package",
+  "skip": "Skip",
+  "buyPackage": "Package",
+  "buyPackageA": "(LAH 12 times)",
+  "buyPackageB": "(LAH 6 times)",
+
+  "contineWithPackageB": "Continue with package B",
+  "yes": "Yes",
+  "no": "No",
+  "User has generated a transaction": "User generated a transaction",
+  "payment error": "payment error",
+  "You have refused to pay": "You have refused to pay"
 }

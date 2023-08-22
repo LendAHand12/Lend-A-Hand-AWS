@@ -2,8 +2,10 @@ import API from "./API";
 import { URL_API_PAYMENT } from "./URL";
 
 const Payment = {
-  getPaymentInfo: () => {
-    return API.get(`${URL_API_PAYMENT}/info`);
+  getPaymentInfo: (continueWithBuyPackageB) => {
+    return API.get(
+      `${URL_API_PAYMENT}/info?continueWithBuyPackageB=${continueWithBuyPackageB}`
+    );
   },
   addPayment: (body) => {
     return API.post(`${URL_API_PAYMENT}`, body);

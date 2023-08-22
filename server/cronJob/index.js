@@ -56,7 +56,6 @@ export const checkIncreaseTier = asyncHandler(async (id) => {
     .select("createdAt countPay fine status email currentLayer tier")
     .sort({ createdAt: -1 });
   for (let u of listUser) {
-    console.log({ u: u._id });
     let nextTier = u.tier + 1;
 
     const canIncreaseTier = await checkCanIncreaseNextTier(u);
@@ -88,35 +87,91 @@ export const checkIncreaseTier = asyncHandler(async (id) => {
   }
 });
 
-// export const checkCanIncreaseNextTier = async (u) => {
-//   let nextTier = Math.floor(u.countPay / 12);
-
-//   if (nextTier > 0 && u.tier !== nextTier) {
-//     const currentDay = moment(new Date());
-//     const userCreatedDay = moment(u.createdAt);
-//     const diffDays = currentDay.diff(userCreatedDay, "days") + 1;
-//     if (diffDays > nextTier * 84) {
-//       const countTotalChild = await getCountAllChildren(u._id, u.tier);
-//       if (countTotalChild > 30000 * nextTier) {
-//         return true;
-//       }
-//     } else {
-//       const countTotalChild = await getCountAllChildren(u._id, u.tier);
-//       if (countTotalChild > 797161 * nextTier) {
-//         return true;
-//       }
-//     }
-//   }
-
-//   return false;
-// };
-
 export const checkCanIncreaseNextTier = async (u) => {
-  if (u.currentLayer[u.tier - 1] >= 5 && u.countPay === 13) {
-    return true;
-  }
+  // const u = await User.findById(id);
+  // console.log({ u });
+  try {
+    // Kiểm tra điều kiện cho việc nâng cấp tier
+    if (u.fine > 0) {
+      return false;
+    }
+    if (u.tier === 1) {
+      if (u.buyPackage === "A" || u.buyPackage === "B") {
+        if (u.countPay === 13) {
+          if (u.currentLayer.slice(-1) >= 4) {
+            return true;
+          } else if (u.countChild >= 300) {
+            const listChildId = await Tree.find({
+              parentId: u._id,
+              tier: u.tier,
+            }).select("userId");
 
-  return false;
+            let highestChildSales = 0;
+            let lowestChildSales = Infinity;
+
+            for (const childId of listChildId) {
+              const child = await User.findById(childId.userId);
+
+              if (child.countChild > highestChildSales) {
+                highestChildSales = child.countChild;
+              }
+
+              if (child.countChild < lowestChildSales) {
+                lowestChildSales = childSales;
+              }
+            }
+
+            if (
+              highestChildSales >= 0.4 * u.countChild &&
+              lowestChildSales >= 0.2 * u.countChild
+            ) {
+              return true;
+            }
+          }
+        }
+      } else if (u.buyPackage === "C") {
+        if (u.countPay === 13) {
+          if (u.currentLayer.slice(-1) >= 5) {
+            return true;
+          } else if (u.countChild >= 680) {
+            const listChildId = await Tree.find({
+              parentId: u._id,
+              tier: u.tier,
+            }).select("userId");
+
+            let highestChildSales = 0;
+            let lowestChildSales = Infinity;
+
+            for (const childId of listChildId) {
+              const child = await User.findById(childId.userId);
+
+              if (child.countChild > highestChildSales) {
+                highestChildSales = child.countChild;
+              }
+
+              if (child.countChild < lowestChildSales) {
+                lowestChildSales = child.countChild;
+              }
+            }
+
+            if (
+              highestChildSales >= 0.4 * u.countChild &&
+              lowestChildSales >= 0.2 * u.countChild
+            ) {
+              return true;
+            }
+          }
+        }
+      }
+    } else if (u.tier >= 2) {
+      if (u.currentLayer.slice(-1) === 4) {
+        return true;
+      }
+    }
+    return false;
+  } catch (error) {
+    throw new Error("Internal server error");
+  }
 };
 
 export const deleteUserNotKYC = asyncHandler(async () => {

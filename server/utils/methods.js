@@ -35,7 +35,7 @@ export const getRefParentUser = async (userId, tier) => {
 
 // Hàm tìm người sẽ được lắp tiếp theo
 export const findNextUser = async (tier) => {
-  const allTrees = await Tree.find({ tier }).sort({ createdAt: 1 });
+  const allTrees = await Tree.find({ tier }).sort({ createdAt: -1 });
 
   // Tạo một mảng để theo dõi số lượng con của mỗi người dùng
   const userChildrenCount = new Map();
@@ -50,7 +50,9 @@ export const findNextUser = async (tier) => {
   let minChildren = Infinity;
   let nextUser = null;
   userChildrenCount.forEach((count, userId) => {
-    if (count < minChildren) {
+    if (count < 3) {
+      nextUser = allTrees.find((tree) => tree.userId === userId).userId;
+    } else if (count < minChildren) {
       minChildren = count;
       nextUser = allTrees.find((tree) => tree.userId === userId).userId;
     }

@@ -24,6 +24,7 @@ const UserProfile = (match) => {
   const [toggler, setToggler] = useState(false);
   const [isEditting, setEditting] = useState(false);
   const [refresh, setRefresh] = useState(false);
+  const [packageOptions, setPackageOptions] = useState([]);
 
   const handleToggler = () => setToggler(!toggler);
 
@@ -154,6 +155,25 @@ const UserProfile = (match) => {
       },
     });
   }, [loadingDelete]);
+
+  useEffect(() => {
+    if (data.countPay === 0) {
+      setPackageOptions(["A", "B", "C"]);
+    } else {
+      // if (data.buyPackage === "A") {
+      //   setPackageOptions([]);
+      // } else if (data.buyPackage === "B") {
+      //   if (data.countPay === 7) {
+      //     setPackageOptions(["B", "C"]);
+      //   }
+      // } else if (data.buyPackage === "C") {
+      //   if (data.countPay === 7) {
+      //     setPackageOptions(["B", "C"]);
+      //   }
+      // }
+      setPackageOptions([data.buyPackage]);
+    }
+  }, [data]);
 
   return (
     <div>
@@ -290,7 +310,24 @@ const UserProfile = (match) => {
                       <div className="px-4 py-2 font-semibold">
                         {t("buyPackage")}
                       </div>
-                      <div className="px-4 py-2">{data.buyPackage}</div>
+                      <div className="px-4 py-2">
+                        {!isEditting ? (
+                          data.buyPackage
+                        ) : (
+                          <select
+                            {...register("buyPackage")}
+                            defaultValue={data.buyPackage}
+                            disabled={loadingUpdate}
+                            className="block p-2 pr-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none active:outline-none"
+                          >
+                            {packageOptions.map((item) => (
+                              <option key={item} value={item}>
+                                {item}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                      </div>
                     </div>
                     <div className="grid lg:grid-cols-2 grid-cols-1">
                       <div className="px-4 py-2 font-semibold">{t("fine")}</div>

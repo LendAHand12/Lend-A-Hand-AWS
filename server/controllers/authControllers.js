@@ -244,6 +244,7 @@ const authUser = asyncHandler(async (req, res) => {
         currentLayer: user.currentLayer,
         idCode: user.idCode,
         buyPackage: user.buyPackage,
+        continueWithBuyPackageB: user.continueWithBuyPackageB,
         listDirectUser: listDirectUser,
       },
       accessToken,

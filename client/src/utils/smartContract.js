@@ -91,7 +91,14 @@ export const transfer = async (address, amount) => {
         return transactionHash;
       })
       .catch((error) => {
-        toast.error(error.message);
+        if (
+          error.message ===
+          "Returned error: MetaMask Tx Signature: User denied transaction signature."
+        ) {
+          toast.error("You have refused to pay");
+        } else {
+          toast.error(error.message);
+        }
       });
   }
 };

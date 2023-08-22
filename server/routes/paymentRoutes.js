@@ -2,7 +2,6 @@ import express from "express";
 import {
   getPaymentInfo,
   addPayment,
-  onDonePayment,
   getAllPayments,
   getPaymentsOfUser,
   getPaymentDetail,
@@ -27,7 +26,6 @@ router
   .route("/")
   .get(protectRoute, getPaymentsOfUser)
   .post(protectRoute, addPayment);
-router.route("/done").post(protectRoute, onDonePayment);
 
 router.route("/:id").get(protectRoute, isAdmin, getPaymentDetail);
 router

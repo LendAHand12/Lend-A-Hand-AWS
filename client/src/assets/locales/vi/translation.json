@@ -263,5 +263,12 @@
   "skip": "Bỏ qua",
   "buyPackage": "Gói",
   "buyPackageA": "(đóng góp 12 lần)",
-  "buyPackageB": "(đóng góp 6 lần)"
+  "buyPackageB": "(đóng góp 6 lần)",
+
+  "contineWithPackageB": "Tiếp tục gói B",
+  "yes": "Có",
+  "no": "Không",
+  "User has generated a transaction": "User đã phát sinh giao dịch",
+  "payment error": "Thanh toán lỗi",
+  "You have refused to pay": "Bạn đã từ chối thanh toán"
 }

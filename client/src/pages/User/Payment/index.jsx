@@ -6,13 +6,9 @@ import Loading from "@/components/Loading";
 import { ToastContainer, toast } from "react-toastify";
 import Payment from "@/api/Payment";
 import { transfer, getBalance, getAccount } from "@/utils/smartContract.js";
-import { useHistory } from "react-router-dom";
 import { useAccount } from "wagmi";
-import { confirmAlert } from "react-confirm-alert";
-import "react-confirm-alert/src/react-confirm-alert.css";
 
 const PaymentPage = () => {
-  const history = useHistory();
   const { t } = useTranslation();
   const [loadingPaymentInfo, setLoadingPaymentInfo] = useState(true);
   const [paymentInfo, setPaymentInfo] = useState(null);
@@ -22,7 +18,6 @@ const PaymentPage = () => {
     useState(false);
   const [loadingAddReferralCommission, setLoadingAddReferralCommission] =
     useState(false);
-  const [loadingDonePayment, setLoadingDonePayment] = useState(false);
   const [payStep, setPayStep] = useState(0);
   const { userInfo } = useSelector((state) => state.auth);
   const [total, setTotal] = useState(0);
@@ -30,26 +25,34 @@ const PaymentPage = () => {
   const [yourBalance, setYourBalance] = useState(0);
   const { address, isConnected } = useAccount();
   const [canPay, setCanPay] = useState(true);
-  const [refresh, setRefresh] = useState(false);
   const [nextPay, setNextPay] = useState();
+  const [continueWithBuyPackageB, setContinueWithBuyPackageB] = useState(
+    userInfo.continueWithBuyPackageB
+  );
 
   const paymentRegisterFee = useCallback(async () => {
     if (paymentInfo && paymentInfo.registerFee !== 0) {
       setLoadingAddRegister(true);
       try {
-        // const registerTransaction = await transfer(
-        //   import.meta.env.VITE_MAIN_WALLET_ADDRESS,
-        //   paymentInfo.registerFee
-        // );
-        // const { transactionHash } = registerTransaction;
-        await addPayment(
-          paymentInfo.transIds.register,
-          // transactionHash,
-          "hash",
-          "REGISTER"
+        const registerTransaction = await transfer(
+          import.meta.env.VITE_MAIN_WALLET_ADDRESS,
+          paymentInfo.registerFee
         );
-        setPayStep(2);
-        setLoadingAddRegister(false);
+        if (registerTransaction) {
+          const { transactionHash } = registerTransaction;
+          await addPayment(
+            paymentInfo.transIds.register,
+            transactionHash,
+            // "hash",
+            "REGISTER",
+            paymentInfo.transIds
+          );
+          setPayStep(2);
+          setLoadingAddRegister(false);
+        } else {
+          setLoadingAddRegister(false);
+          throw new Error(t("payment error"));
+        }
       } catch (error) {
         toast.error(t(error.message));
         setLoadingAddRegister(false);
@@ -65,14 +68,21 @@ const PaymentPage = () => {
           import.meta.env.VITE_MAIN_WALLET_ADDRESS,
           paymentInfo.transactionFine.amount
         );
-        const { transactionHash } = fineTransaction;
-        await addPayment(
-          paymentInfo.transactionFine._id,
-          transactionHash,
-          "FINE"
-        );
-        setLoadingAddFine(false);
-        window.location.reload(false);
+        if (fineTransaction) {
+          const { transactionHash } = fineTransaction;
+          await addPayment(
+            paymentInfo.transactionFine._id,
+            transactionHash,
+            // "hash",
+            "FINE",
+            paymentInfo.transIds
+          );
+          setLoadingAddFine(false);
+          window.location.reload(false);
+        } else {
+          setLoadingAddFine(false);
+          throw new Error(t("payment error"));
+        }
       } catch (error) {
         toast.error(t(error.message));
         setLoadingAddFine(false);
@@ -83,84 +93,78 @@ const PaymentPage = () => {
   const paymentDirectionCommission = useCallback(async () => {
     setLoadingAddDirectCommission(true);
     try {
-      // const registerTransaction = await transfer(
-      //   paymentInfo.directCommissionWallet,
-      //   paymentInfo.directCommissionFee
-      // );
-      // const { transactionHash } = registerTransaction;
-      await addPayment(
-        paymentInfo.transIds.direct,
-        // transactionHash,
-        "hash",
-        "DIRECT"
+      const registerTransaction = await transfer(
+        paymentInfo.directCommissionWallet,
+        paymentInfo.directCommissionFee
       );
-      setPayStep(3);
-      setLoadingAddDirectCommission(false);
+      if (registerTransaction) {
+        const { transactionHash } = registerTransaction;
+        await addPayment(
+          paymentInfo.transIds.direct,
+          transactionHash,
+          // "hash",
+          "DIRECT",
+          paymentInfo.transIds
+        );
+        setPayStep(3);
+        setLoadingAddDirectCommission(false);
+      } else {
+        setLoadingAddDirectCommission(false);
+        throw new Error(t("payment error"));
+      }
     } catch (error) {
       toast.error(t(error.message));
       setLoadingAddDirectCommission(false);
     }
   }, [paymentInfo]);
 
-  const paymentReferralCommission = async () => {
+  const paymentReferralCommission = useCallback(async () => {
     setLoadingAddReferralCommission(true);
     try {
-      // const referralTransaction = await transfer(
-      //   paymentInfo.referralCommissionWallet,
-      //   paymentInfo.referralCommissionFee
-      // );
-      // const { transactionHash } = referralTransaction;
-      await addPayment(
-        paymentInfo.transIds.referral,
-        // transactionHash,
-        "hash",
-        "REFERRAL"
+      const referralTransaction = await transfer(
+        paymentInfo.referralCommissionWallet,
+        paymentInfo.referralCommissionFee
       );
-      setPayStep(4);
-      setLoadingAddReferralCommission(false);
+      if (referralTransaction) {
+        const { transactionHash } = referralTransaction;
+        await addPayment(
+          paymentInfo.transIds.referral,
+          transactionHash,
+          // "hash",
+          "REFERRAL",
+          paymentInfo.transIds
+        );
+        setPayStep(0);
+        setLoadingAddReferralCommission(false);
+        window.location.reload();
+      } else {
+        setLoadingAddReferralCommission(false);
+        throw new Error(t("payment error"));
+      }
     } catch (error) {
       toast.error(t(error.message));
       setLoadingAddReferralCommission(false);
     }
-  };
+  }, [paymentInfo]);
 
-  const addPayment = async (id, hash) => {
+  const addPayment = async (id, hash, type, transIds) => {
     await Payment.addPayment({
       id,
       hash,
+      type,
+      transIds,
     })
       .then((response) => {
         toast.success(t(response.data.message));
       })
-      .catch((err) => {
-        console.log(err);
+      .catch((error) => {
+        let message =
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message;
+        throw new Error(message);
       });
   };
-
-  const onDonePay = useCallback(
-    async (onClose) => {
-      setLoadingDonePayment(true);
-      await Payment.onDonePayment({
-        transIds: paymentInfo.transIds,
-      })
-        .then((response) => {
-          const { message } = response.data;
-          toast.success(t(message));
-          setLoadingDonePayment(false);
-          onClose();
-          setRefresh(!refresh);
-        })
-        .catch((error) => {
-          let message =
-            error.response && error.response.data.message
-              ? error.response.data.message
-              : error.message;
-          toast.error(t(message));
-          setLoadingDonePayment(false);
-        });
-    },
-    [paymentInfo, refresh]
-  );
 
   useEffect(() => {
     (async () => {
@@ -170,8 +174,8 @@ const PaymentPage = () => {
     })();
   }, [payStep]);
 
-  const onGetPaymentInfo = async () => {
-    await Payment.getPaymentInfo()
+  const onGetPaymentInfo = async (continueWithBuyPackageB) => {
+    await Payment.getPaymentInfo(continueWithBuyPackageB)
       .then((response) => {
         setLoadingPaymentInfo(true);
         setPaymentInfo(response.data);
@@ -197,8 +201,8 @@ const PaymentPage = () => {
   };
 
   useEffect(() => {
-    onGetPaymentInfo();
-  }, [refresh]);
+    onGetPaymentInfo(continueWithBuyPackageB);
+  }, [continueWithBuyPackageB]);
 
   useEffect(() => {
     if (isConnected && address !== userInfo.walletAddress) {
@@ -207,47 +211,9 @@ const PaymentPage = () => {
     }
   }, [address, isConnected]);
 
-  useEffect(() => {
-    if (payStep === 4) {
-      confirmAlert({
-        closeOnClickOutside: false,
-        customUI: ({ onClose }) => {
-          return (
-            <div className="custom-ui">
-              <div className="bg-gray-50 p-6 md:mx-auto">
-                <svg
-                  viewBox="0 0 24 24"
-                  className="text-green-600 w-16 h-16 mx-auto my-6"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M12,0A12,12,0,1,0,24,12,12.014,12.014,0,0,0,12,0Zm6.927,8.2-6.845,9.289a1.011,1.011,0,0,1-1.43.188L5.764,13.769a1,1,0,1,1,1.25-1.562l4.076,3.261,6.227-8.451A1,1,0,1,1,18.927,8.2Z"
-                  ></path>
-                </svg>
-                <div className="text-center">
-                  {/* <h3 className="md:text-2xl text-base text-gray-900 font-semibold text-center">
-                    Payment Done!
-                  </h3> */}
-                  <p className="text-gray-600 my-4">
-                    {t("Please click complete payment below")}
-                  </p>
-                  <div className="text-center mt-10">
-                    <button
-                      onClick={() => onDonePay(onClose)}
-                      className=" w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-                    >
-                      {loadingDonePayment && <Loading />}
-                      {t("donePayment")}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        },
-      });
-    }
-  }, [payStep, loadingDonePayment]);
+  const handleChangeContinueWithB = async () => {
+    setContinueWithBuyPackageB(!continueWithBuyPackageB);
+  };
 
   return (
     <>
@@ -262,6 +228,35 @@ const PaymentPage = () => {
             {t("paymentTitle")}
           </h1>
         </div>
+        {paymentInfo &&
+          userInfo.buyPackage === "B" &&
+          userInfo.countPay === 7 &&
+          paymentInfo.step < 3 && (
+            <>
+              <p className="text-lg mb-2">{t("contineWithPackageB")}</p>
+              <div className="w-full justify-between mb-3">
+                <div className="flex gap-2 text-lg">
+                  <input
+                    type="radio"
+                    id="continue1"
+                    checked={!continueWithBuyPackageB}
+                    onChange={handleChangeContinueWithB}
+                  />
+                  <label htmlFor="continue1">{t("no")}</label>
+                </div>
+                <div className="flex gap-2 text-lg">
+                  <input
+                    type="radio"
+                    id="continue2"
+                    onChange={handleChangeContinueWithB}
+                    checked={continueWithBuyPackageB}
+                  />
+                  <label htmlFor="continue2">{t("yes")}</label>
+                </div>
+              </div>
+              <hr className="mb-3"></hr>
+            </>
+          )}
         {canPay && (
           <>
             {userInfo.countPay === 0 && (
@@ -372,7 +367,7 @@ const PaymentPage = () => {
                             <span className="font-medium">
                               {t("registerFee")}!
                             </span>{" "}
-                            {t("pleasePay")}. (7 USDT)
+                            {t("pleasePay")}. ({paymentInfo.registerFee} USDT)
                           </div>
                         </div>
                         <div>
@@ -413,7 +408,8 @@ const PaymentPage = () => {
                               <span className="font-medium">
                                 {t("registerFee")}!
                               </span>{" "}
-                              {t("Payment successful")}. (7 USDT)
+                              {t("Payment successful")}. (
+                              {paymentInfo.registerFee} USDT)
                             </div>
                           </div>
                         )}
@@ -481,7 +477,8 @@ const PaymentPage = () => {
                               <span className="font-medium">
                                 {t("registerFee")}!
                               </span>{" "}
-                              {t("Payment successful")}. (7 USDT)
+                              {t("Payment successful")}. (
+                              {paymentInfo.registerFee} USDT)
                             </div>
                           </div>
                         )}
@@ -573,7 +570,8 @@ const PaymentPage = () => {
                               <span className="font-medium">
                                 {t("registerFee")}!
                               </span>{" "}
-                              {t("Payment successful")}. (7 USDT)
+                              {t("Payment successful")}. (
+                              {paymentInfo.registerFee} USDT)
                             </div>
                           </div>
                         )}
