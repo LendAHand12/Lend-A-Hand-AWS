@@ -175,9 +175,9 @@ const PaymentPage = () => {
   }, [payStep]);
 
   const onGetPaymentInfo = async (continueWithBuyPackageB) => {
+    setLoadingPaymentInfo(true);
     await Payment.getPaymentInfo(continueWithBuyPackageB)
       .then((response) => {
-        setLoadingPaymentInfo(true);
         setPaymentInfo(response.data);
         const {
           step,

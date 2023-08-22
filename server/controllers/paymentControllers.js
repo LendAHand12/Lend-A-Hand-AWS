@@ -501,13 +501,34 @@ const generatePackageTrans = async (
   const listPendingDirect = await Transaction.find({
     $or: [
       {
-        $and: [{ tier: user.tier, type: "PACKAGE", status: "SUCCESS" }],
+        $and: [
+          {
+            userId: user._id,
+            tier: user.tier,
+            type: "PACKAGE",
+            status: "SUCCESS",
+          },
+        ],
       },
       {
-        $and: [{ tier: user.tier, type: "DIRECT", status: "SUCCESS" }],
+        $and: [
+          {
+            userId: user._id,
+            tier: user.tier,
+            type: "DIRECT",
+            status: "SUCCESS",
+          },
+        ],
       },
       {
-        $and: [{ tier: user.tier, type: "DIRECTHOLD", status: "SUCCESS" }],
+        $and: [
+          {
+            userId: user._id,
+            tier: user.tier,
+            type: "DIRECTHOLD",
+            status: "SUCCESS",
+          },
+        ],
       },
     ],
   });
@@ -536,11 +557,7 @@ const generatePackageTrans = async (
     if (user.countPay >= 7 && continueWithBuyPackageB) {
       count = 12;
     }
-    for (
-      let i = count === 6 ? startIndexPackageTrans : startIndexPackageTrans + 1;
-      i <= count;
-      i++
-    ) {
+    for (let i = startIndexPackageTrans; i <= count; i++) {
       await Transaction.create({
         userId: user.id,
         amount: 0,
