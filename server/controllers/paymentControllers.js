@@ -220,6 +220,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
 
     const listTransSuccess = await Transaction.find({
       $and: [
+        { tier: user.tier },
         { userId: user.id },
         { userCountPay: user.countPay },
         { status: "SUCCESS" },
@@ -536,7 +537,6 @@ const generatePackageTrans = async (
   });
 
   const startIndexPackageTrans = listPendingDirect.length;
-  console.log({ startIndexPackageTrans });
 
   if (user.buyPackage === "A" || user.tier >= 2) {
     for (let i = startIndexPackageTrans; i <= 12; i++) {
