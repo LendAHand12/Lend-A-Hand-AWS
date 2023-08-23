@@ -539,7 +539,14 @@ const generatePackageTrans = async (
   const startIndexPackageTrans = listPendingDirect.length;
 
   if (user.buyPackage === "A" || user.tier >= 2) {
-    for (let i = startIndexPackageTrans; i <= 12; i++) {
+    for (
+      let i =
+        user.countPay === 0
+          ? startIndexPackageTrans + 1
+          : startIndexPackageTrans;
+      i <= 12;
+      i++
+    ) {
       await Transaction.create({
         userId: user.id,
         amount: 0,
