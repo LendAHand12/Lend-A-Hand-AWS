@@ -91,8 +91,8 @@ const userSchema = mongoose.Schema(
     },
     buyPackage: {
       type: String,
-      enum: ["A", "B", "C"],
-      default: "C",
+      enum: ["A", "B", "C", ""],
+      default: "",
     },
     continueWithBuyPackageB: {
       type: Boolean,

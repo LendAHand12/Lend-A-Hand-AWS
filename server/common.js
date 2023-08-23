@@ -62,6 +62,7 @@ export const getUnknowChild = async () => {
 };
 
 export const addBuyPackage = async () => {
+  console.log("starting");
   const listUser = await User.find({ isAdmin: false });
 
   for (let user of listUser) {
