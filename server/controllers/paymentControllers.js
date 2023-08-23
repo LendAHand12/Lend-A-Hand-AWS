@@ -115,6 +115,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         } else {
           directCommissionWallet = refUser.walletAddress[0];
         }
+      } else {
         const pendingTransPackage = await Transaction.findOne({
           userId: user._id,
           tier: user.tier,
