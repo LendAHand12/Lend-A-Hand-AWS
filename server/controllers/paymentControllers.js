@@ -115,17 +115,17 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         } else {
           directCommissionWallet = refUser.walletAddress[0];
         }
-      }
-      const pendingTransPackage = await Transaction.findOne({
-        userId: user._id,
-        tier: user.tier,
-        type: "PACKAGE",
-        userCountPay: user.countPay,
-      });
+        const pendingTransPackage = await Transaction.findOne({
+          userId: user._id,
+          tier: user.tier,
+          type: "PACKAGE",
+          userCountPay: user.countPay,
+        });
 
-      if (pendingTransPackage) {
-        pendingTransPackage.status = "SUCCESS";
-        await pendingTransPackage.save();
+        if (pendingTransPackage) {
+          pendingTransPackage.status = "SUCCESS";
+          await pendingTransPackage.save();
+        }
       }
     } else if (user.tier === 1 && user.buyPackage === "C") {
       if (
