@@ -562,7 +562,7 @@ const generatePackageTrans = async (
     }
     for (
       let i =
-        user.countPay === 7
+        user.countPay === 7 || user.countPay === 0
           ? startIndexPackageTrans + 1
           : startIndexPackageTrans;
       i <= count;
