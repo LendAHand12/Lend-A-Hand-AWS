@@ -233,26 +233,31 @@ const PaymentPage = () => {
           userInfo.countPay === 7 &&
           payStep < 3 && (
             <>
-              <p className="text-lg mb-2">{t("contineWithPackageB")}</p>
-              <div className="w-full justify-between mb-3">
-                <div className="flex gap-2 text-lg">
-                  <input
-                    type="radio"
-                    id="continue1"
-                    checked={!continueWithBuyPackageB}
-                    onChange={handleChangeContinueWithB}
-                  />
-                  <label htmlFor="continue1">{t("no")}</label>
-                </div>
-                <div className="flex gap-2 text-lg">
-                  <input
-                    type="radio"
-                    id="continue2"
-                    onChange={handleChangeContinueWithB}
-                    checked={continueWithBuyPackageB}
-                  />
-                  <label htmlFor="continue2">{t("yes")}</label>
-                </div>
+              <div className="w-full flex flex-col mb-3">
+                <button
+                  onClick={handleChangeContinueWithB}
+                  disabled={continueWithBuyPackageB}
+                  className={`${
+                    continueWithBuyPackageB
+                      ? "border hover:shadow-md focus:outline-none focus:ring-4 focus:ring-black-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
+                      : "text-white gradient hover:shadow-md focus:outline-none focus:ring-4 focus:ring-blue-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
+                  }`}
+                >
+                  {t("contineWithPackageB")}{" "}
+                  {continueWithBuyPackageB && t("applying")}
+                </button>
+                <button
+                  onClick={handleChangeContinueWithB}
+                  disabled={!continueWithBuyPackageB}
+                  className={`${
+                    !continueWithBuyPackageB
+                      ? "border hover:shadow-md focus:outline-none focus:ring-4 focus:ring-black-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
+                      : "text-white gradient hover:shadow-md focus:outline-none focus:ring-4 focus:ring-blue-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
+                  }`}
+                >
+                  {t("contineWithPackageC")}{" "}
+                  {!continueWithBuyPackageB && t("applying")}
+                </button>
               </div>
               <hr className="mb-3"></hr>
             </>
@@ -275,7 +280,8 @@ const PaymentPage = () => {
                 </p>
               </div>
             )}
-            {(userInfo.buyPackage === "A" || userInfo.buyPackage === "B") && (
+            {(userInfo.buyPackage === "A" ||
+              (userInfo.buyPackage === "B" && continueWithBuyPackageB)) && (
               <div className="mb-3">
                 <p className="text-lg mb-2 ml-1">
                   <span className="font-bold">{t("buyPackage")}</span> :{" "}

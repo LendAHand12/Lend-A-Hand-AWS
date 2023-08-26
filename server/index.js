@@ -29,6 +29,7 @@ import {
   transferLayerToArray,
   getUnknowChild,
   addBuyPackage,
+  changeDefaultContinue,
 } from "./common.js";
 import { findNextUser } from "./utils/methods.js";
 

@@ -641,6 +641,14 @@ const onDonePayment = async (user, transIds) => {
       }
     }
 
+    if (user.countPay === 12 && user.buyPackage === "B") {
+      if (user.continueWithBuyPackageB === true) {
+        user.buyPackage = "A";
+      } else {
+        user.buyPackage = "C";
+      }
+    }
+
     user.countPay = user.countPay + 1;
 
     const updatedUser = await user.save();

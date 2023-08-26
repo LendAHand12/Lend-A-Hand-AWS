@@ -39,11 +39,12 @@ export const checkUnpayUser = asyncHandler(async () => {
   }
 });
 
-export const checkIncreaseTier = asyncHandler(async (id) => {
+export const checkIncreaseTier = asyncHandler(async () => {
   const listUser = await User.find({
     $and: [
       { isAdmin: false },
       { status: "APPROVED" },
+      { fine: 0 },
       {
         $or: [
           { userId: { $ne: "Admin2" } },
@@ -52,12 +53,9 @@ export const checkIncreaseTier = asyncHandler(async (id) => {
         ],
       },
     ],
-  })
-    .select("createdAt countPay fine status email currentLayer tier")
-    .sort({ createdAt: -1 });
+  }).sort({ createdAt: -1 });
   for (let u of listUser) {
     let nextTier = u.tier + 1;
-
     const canIncreaseTier = await checkCanIncreaseNextTier(u);
     if (canIncreaseTier) {
       const newParentId = await findNextUser(nextTier);
@@ -88,8 +86,6 @@ export const checkIncreaseTier = asyncHandler(async (id) => {
 });
 
 export const checkCanIncreaseNextTier = async (u) => {
-  // const u = await User.findById(id);
-  // console.log({ u });
   try {
     // Kiểm tra điều kiện cho việc nâng cấp tier
     if (u.fine > 0) {
@@ -117,7 +113,7 @@ export const checkCanIncreaseNextTier = async (u) => {
               }
 
               if (child.countChild < lowestChildSales) {
-                lowestChildSales = childSales;
+                lowestChildSales = child.countChild;
               }
             }
 

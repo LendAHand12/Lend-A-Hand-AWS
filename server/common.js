@@ -80,3 +80,27 @@ export const addBuyPackage = async () => {
 
   console.log("addBuyPackage done");
 };
+
+export const changeDefaultContinue = async () => {
+  console.log("starting");
+  const listUser = await User.find({ isAdmin: false });
+
+  for (let user of listUser) {
+    if (user.buyPackage === "B") {
+      if (user.countPay === 7) {
+        user.continueWithBuyPackageB = true;
+      }
+      if (user.countPay === 13 && user.continueWithBuyPackageB === true) {
+        user.buyPackage = "A";
+      }
+      if (user.countPay === 13 && user.continueWithBuyPackageB === false) {
+        user.buyPackage = "C";
+      }
+    } else {
+      user.continueWithBuyPackageB = true;
+    }
+    await user.save();
+  }
+
+  console.log("changeDefaultContinue done");
+};

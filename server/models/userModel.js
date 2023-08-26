@@ -96,7 +96,7 @@ const userSchema = mongoose.Schema(
     },
     continueWithBuyPackageB: {
       type: Boolean,
-      default: false,
+      default: true,
     },
   },
   {

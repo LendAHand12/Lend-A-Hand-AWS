@@ -259,10 +259,12 @@
   "buyPackageA": "(LAH 12 times)",
   "buyPackageB": "(LAH 6 times)",
 
-  "contineWithPackageB": "Continue with package B",
+  "continueWithPackageB": "Continue with package B",
+  "contineWithPackageC": "Continue with package C",
   "yes": "Yes",
   "no": "No",
   "User has generated a transaction": "User generated a transaction",
   "payment error": "payment error",
-  "You have refused to pay": "You have refused to pay"
+  "You have refused to pay": "You have refused to pay",
+  "applying": "(Applying)"
 }
