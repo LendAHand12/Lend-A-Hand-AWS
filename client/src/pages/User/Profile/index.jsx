@@ -249,7 +249,7 @@ const Profile = () => {
             role="alert"
           >
             <span className="block sm:inline">
-              {t("congrateTier")} {tier}
+              {t("congrateTier")} {tier - 1}
             </span>
           </div>
         )}

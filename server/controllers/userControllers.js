@@ -343,7 +343,7 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
         tree.nodes.push({
           key: child._id,
           label: `${child.userId} (${child.countChild} - ${
-            child.countPay === 0
+            child.tier === 1 && child.countPay === 0
               ? "Chưa hoàn thành"
               : child.countPay === 1
               ? "Hoàn thành"
@@ -351,7 +351,9 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
             // child.countPay <= 1 ? 0 : child.countPay - 1
           })`,
           isRed:
-            child.countPay === 0 || child.fine > 0 || child.status === "LOCKED"
+            (child.tier === 1 && child.countPay === 0) ||
+            child.fine > 0 ||
+            child.status === "LOCKED"
               ? true
               : false,
         });
