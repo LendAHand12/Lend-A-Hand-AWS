@@ -343,7 +343,9 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
         tree.nodes.push({
           key: child._id,
           label: `${child.userId} (${child.countChild} - ${
-            child.tier === 1 && child.countPay === 0
+            child.tier > 1
+              ? "Hoàn thành"
+              : child.tier === 1 && child.countPay === 0
               ? "Chưa hoàn thành"
               : child.countPay === 1
               ? "Hoàn thành"
