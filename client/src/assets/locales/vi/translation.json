@@ -272,5 +272,11 @@
   "User has generated a transaction": "User đã phát sinh giao dịch",
   "payment error": "Thanh toán lỗi",
   "You have refused to pay": "Bạn đã từ chối thanh toán",
-  "applying": "(Đang áp dụng)"
+  "applying": "(Đang áp dụng)",
+
+  "setting": "Cài đặt",
+  "settingPackage": "Cài đặt gói",
+  "buyPackageC": "(đóng góp 1 lần)",
+
+  "Package has been disabled": "Gói đã bị vô hiệu"
 }

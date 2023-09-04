@@ -1,12 +1,14 @@
 import asyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
 import Transaction from "../models/transactionModel.js";
+import Package from "../models/packageModel.js";
 import DeleteUser from "../models/deleteUserModel.js";
 import mongoose from "mongoose";
 import sendMail from "../utils/sendMail.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import Tree from "../models/treeModel.js";
+import { getActivePackages } from "./packageControllers.js";
 
 dotenv.config();
 
@@ -186,7 +188,14 @@ const updateUser = asyncHandler(async (req, res) => {
   if (user) {
     user.phone = phone || user.phone;
     user.idCode = idCode || user.idCode;
-    user.buyPackage = buyPackage || user.buyPackage;
+    if (buyPackage) {
+      const newBuyPackage = await Package.findOne({ name: buyPackage });
+      if (newBuyPackage.status === "active") {
+        user.buyPackage = buyPackage || user.buyPackage;
+      } else {
+        res.status(400).json({ error: "Package has been disabled" });
+      }
+    }
     if (imgFront && imgBack && imgFront !== "" && imgBack !== "") {
       if (
         imgFront.includes("https://res.cloudinary.com/dhqggkmto") &&
@@ -201,6 +210,7 @@ const updateUser = asyncHandler(async (req, res) => {
       const listDirectUser = await User.find({ refId: user._id }).select(
         "userId email walletAddress"
       );
+      const packages = await getActivePackages();
       res.status(200).json({
         message: "Update successful",
         data: {
@@ -226,6 +236,7 @@ const updateUser = asyncHandler(async (req, res) => {
           buyPackage: updatedUser.buyPackage,
           continueWithBuyPackageB: updatedUser.continueWithBuyPackageB,
           listDirectUser,
+          packages,
         },
       });
     }
@@ -426,6 +437,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
         listDirectUser.push(refedUser);
       }
     }
+    const packages = await getActivePackages();
 
     res.json({
       id: user._id,
@@ -446,10 +458,18 @@ const getUserProfile = asyncHandler(async (req, res) => {
       phone: user.phone,
       idCode: user.idCode,
       buyPackage: user.buyPackage,
-      continueWithBuyPackageB: user.continueWithBuyPackageB,
+      continueWithBuyPackageB:
+        packages.includes("B") && packages.includes("C")
+          ? user.continueWithBuyPackageB
+          : packages.includes("B")
+          ? true
+          : packages.includes("C")
+          ? false
+          : user.continueWithBuyPackageB,
       oldLayer: user.oldLayer,
       currentLayer: user.currentLayer,
       listDirectUser: listDirectUser,
+      packages,
     });
   } else {
     res.status(400);

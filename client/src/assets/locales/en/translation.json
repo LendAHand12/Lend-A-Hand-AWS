@@ -266,5 +266,11 @@
   "User has generated a transaction": "User generated a transaction",
   "payment error": "payment error",
   "You have refused to pay": "You have refused to pay",
-  "applying": "(Applying)"
+  "applying": "(Applying)",
+
+  "setting": "Settings",
+  "settingPackage": "Settings packages",
+  "buyPackageC": "(LAH 1 time)",
+
+  "Package has been disabled": "Package has been disabled"
 }

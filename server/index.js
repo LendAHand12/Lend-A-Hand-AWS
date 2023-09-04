@@ -14,6 +14,7 @@ import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
+import packageRoutes from "./routes/packageRoutes.js";
 
 import {
   checkUnpayUser,
@@ -57,6 +58,7 @@ app.use(
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/package", packageRoutes);
 
 app.use(notFound);
 

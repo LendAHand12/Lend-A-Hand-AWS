@@ -7,6 +7,7 @@ import generateGravatar from "../utils/generateGravatar.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import Tree from "../models/treeModel.js";
+import { getActivePackages } from "./packageControllers.js";
 
 const checkLinkRef = asyncHandler(async (req, res) => {
   const { ref, receiveId } = req.body;
@@ -222,6 +223,8 @@ const authUser = asyncHandler(async (req, res) => {
       }
     }
 
+    const packages = await getActivePackages();
+
     res.status(200).json({
       userInfo: {
         id: user._id,
@@ -246,6 +249,7 @@ const authUser = asyncHandler(async (req, res) => {
         buyPackage: user.buyPackage,
         continueWithBuyPackageB: user.continueWithBuyPackageB,
         listDirectUser: listDirectUser,
+        packages,
       },
       accessToken,
       refreshToken,

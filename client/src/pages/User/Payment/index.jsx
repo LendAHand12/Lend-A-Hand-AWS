@@ -234,30 +234,34 @@ const PaymentPage = () => {
           payStep < 3 && (
             <>
               <div className="w-full flex flex-col mb-3">
-                <button
-                  onClick={handleChangeContinueWithB}
-                  disabled={continueWithBuyPackageB}
-                  className={`${
-                    continueWithBuyPackageB
-                      ? "border hover:shadow-md focus:outline-none focus:ring-4 focus:ring-black-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
-                      : "text-white gradient hover:shadow-md focus:outline-none focus:ring-4 focus:ring-blue-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
-                  }`}
-                >
-                  {t("contineWithPackageB")}{" "}
-                  {continueWithBuyPackageB && t("applying")}
-                </button>
-                <button
-                  onClick={handleChangeContinueWithB}
-                  disabled={!continueWithBuyPackageB}
-                  className={`${
-                    !continueWithBuyPackageB
-                      ? "border hover:shadow-md focus:outline-none focus:ring-4 focus:ring-black-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
-                      : "text-white gradient hover:shadow-md focus:outline-none focus:ring-4 focus:ring-blue-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
-                  }`}
-                >
-                  {t("contineWithPackageC")}{" "}
-                  {!continueWithBuyPackageB && t("applying")}
-                </button>
+                {userInfo.packages.includes("B") && (
+                  <button
+                    onClick={handleChangeContinueWithB}
+                    disabled={continueWithBuyPackageB}
+                    className={`${
+                      continueWithBuyPackageB
+                        ? "border hover:shadow-md focus:outline-none focus:ring-4 focus:ring-black-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
+                        : "text-white gradient hover:shadow-md focus:outline-none focus:ring-4 focus:ring-blue-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
+                    }`}
+                  >
+                    {t("contineWithPackageB")}{" "}
+                    {continueWithBuyPackageB && t("applying")}
+                  </button>
+                )}
+                {userInfo.packages.includes("C") && (
+                  <button
+                    onClick={handleChangeContinueWithB}
+                    disabled={!continueWithBuyPackageB}
+                    className={`${
+                      !continueWithBuyPackageB
+                        ? "border hover:shadow-md focus:outline-none focus:ring-4 focus:ring-black-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
+                        : "text-white gradient hover:shadow-md focus:outline-none focus:ring-4 focus:ring-blue-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
+                    }`}
+                  >
+                    {t("contineWithPackageC")}{" "}
+                    {!continueWithBuyPackageB && t("applying")}
+                  </button>
+                )}
               </div>
               <hr className="mb-3"></hr>
             </>

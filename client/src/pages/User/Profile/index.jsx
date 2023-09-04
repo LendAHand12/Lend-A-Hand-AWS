@@ -39,6 +39,7 @@ const Profile = () => {
     currentLayer,
     idCode,
     buyPackage,
+    packages,
   } = userInfo;
   const [imgFront, setImgFront] = useState("");
   const [imgBack, setImgBack] = useState("");
@@ -193,25 +194,31 @@ const Profile = () => {
                     {t("choosePaymentMethod")}
                   </p>
                   <div className="text-center mt-10 flex gap-10">
-                    <button
-                      onClick={() => handleChoosePaymentMethod("A", onClose)}
-                      className="w-48 flex justify-center items-center hover:underline gradient text-white font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-                    >
-                      {t("buyPackage")} A
-                    </button>
-                    <button
-                      onClick={() => handleChoosePaymentMethod("B", onClose)}
-                      className="w-48 flex justify-center items-center hover:underline gradient text-white font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-                    >
-                      {t("buyPackage")} B
-                    </button>
+                    {packages.find((ele) => ele === "A") && (
+                      <button
+                        onClick={() => handleChoosePaymentMethod("A", onClose)}
+                        className="w-48 flex justify-center items-center hover:underline gradient text-white font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                      >
+                        {t("buyPackage")} A
+                      </button>
+                    )}
+                    {packages.find((ele) => ele === "B") && (
+                      <button
+                        onClick={() => handleChoosePaymentMethod("B", onClose)}
+                        className="w-48 flex justify-center items-center hover:underline gradient text-white font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                      >
+                        {t("buyPackage")} B
+                      </button>
+                    )}
                   </div>
-                  <button
-                    onClick={() => handleChoosePaymentMethod("C", onClose)}
-                    className="mt-10 w-full flex justify-center items-center hover:underline bg-red-500 text-white font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-                  >
-                    {t("skip")}
-                  </button>
+                  {packages.find((ele) => ele === "C") && (
+                    <button
+                      onClick={() => handleChoosePaymentMethod("C", onClose)}
+                      className="mt-10 w-full flex justify-center items-center hover:underline bg-red-500 text-white font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                    >
+                      {t("skip")}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -219,7 +226,7 @@ const Profile = () => {
         },
       });
     }
-  }, []);
+  }, [packages]);
 
   return (
     <div>

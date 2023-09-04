@@ -11,6 +11,7 @@ const TransactionDetail = lazy(() => import("@/pages/Admin/TransactionDetail"));
 const System = lazy(() => import("@/pages/Admin/System"));
 const Trash = lazy(() => import("@/pages/Admin/Trash"));
 const Export = lazy(() => import("@/pages/Admin/Export"));
+const SettingPage = lazy(() => import("@/pages/Admin/Setting"));
 
 const routes = [
   {
@@ -54,6 +55,11 @@ const routes = [
     path: "/linkVerify",
     // title: "linkVerify",
     component: GetVerifyLink,
+  },
+  {
+    path: "/setting",
+    // title: "linkVerify",
+    component: SettingPage,
   },
   {
     path: "/export",

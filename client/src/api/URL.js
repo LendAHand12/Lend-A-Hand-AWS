@@ -9,3 +9,4 @@ export const URL_API_AUTH_GET_VERIFY = "/api/auth/getLinkVerify";
 
 export const URL_API_USER = "/api/user";
 export const URL_API_PAYMENT = "/api/payment";
+export const URL_API_PACKAGE = "/api/package";
