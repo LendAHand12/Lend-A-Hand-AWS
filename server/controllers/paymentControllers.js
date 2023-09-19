@@ -567,7 +567,9 @@ const generatePackageTrans = async (
     }
     for (
       let i =
-        user.countPay === 7 || user.countPay === 0
+        user.countPay === 0
+          ? 1
+          : user.countPay === 7
           ? startIndexPackageTrans + 1
           : startIndexPackageTrans;
       i <= count;
@@ -631,12 +633,12 @@ const onDonePayment = async (user, transIds) => {
       }
     }
 
-    // if (user.countPay === 0) {
-    //   const links = await getActiveLink(user.email, user.userId, user.phone);
-    //   if (links.length === 1) {
-    //     await sendActiveLink(user.email, links[0]);
-    //   }
-    // }
+    if (user.countPay === 0) {
+      const links = await getActiveLink(user.email, user.userId, user.phone);
+      if (links.length === 1) {
+        await sendActiveLink(user.email, links[0]);
+      }
+    }
 
     if (user.countPay === 12 && user.buyPackage === "B") {
       if (user.continueWithBuyPackageB === true) {
