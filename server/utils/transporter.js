@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
   // port: 587,
   // secure: false,
 
-  host: "mail92211.maychuemail.com",
+  // host: "mail92211.maychuemail.com",
   port: 465,
   secure: true,
   auth: {

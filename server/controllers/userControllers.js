@@ -925,6 +925,129 @@ const replaceRefId = async (deleteUserId) => {
   }
 };
 
+const countChildOfUserById = async (user) => {
+  if (user) {
+    const newCountChild = [...user.countChild];
+    for (let i = 1; i <= user.tier; i++) {
+      const countChild = await getCountAllChildren(user._id, i);
+      newCountChild[i - 1] = countChild;
+    }
+    user.countChild = newCountChild;
+    const updatedUser = await user.save();
+    return updatedUser;
+  } else {
+    throw new Error("User not found");
+  }
+};
+
+const countLayerOfUserByIdForTier = async (u) => {
+  let newLayer = [];
+  for (let i = 1; i <= u.tier; i++) {
+    const layer = await findRootLayer(u._id, i);
+    newLayer.push(layer);
+  }
+
+  if (areArraysEqual(newLayer, u.currentLayer)) {
+    u.oldLayer = u.currentLayer;
+    await u.save();
+  } else {
+    u.oldLayer = u.currentLayer;
+    u.currentLayer = newLayer;
+    let updatedUser = await u.save();
+    return updatedUser;
+  }
+};
+
+const onAcceptIncreaseTier = asyncHandler(async () => {
+  const listUser = await User.find({
+    $and: [
+      { isAdmin: false },
+      { status: "APPROVED" },
+      { fine: 0 },
+      {
+        $or: [
+          { userId: { $ne: "Admin2" } },
+          { userId: { $ne: "Admin3" } },
+          { userId: { $ne: "Admin4" } },
+        ],
+      },
+    ],
+  }).sort({ createdAt: -1 });
+  for (let u of listUser) {
+    let nextTier = u.tier + 1;
+    const canIncreaseTier = await checkCanIncreaseNextTier(u);
+    if (canIncreaseTier) {
+      const newParentId = await findNextUser(nextTier);
+      const newParent = await Tree.findOne({
+        userId: newParentId,
+        tier: nextTier,
+      });
+      let childs = newParent.children;
+      newParent.children = [...childs, u._id];
+      await newParent.save();
+
+      const tree = await Tree.create({
+        userName: u.userId,
+        userId: u._id,
+        parentId: newParentId,
+        refId: newParentId,
+        tier: nextTier,
+        children: [],
+      });
+
+      u.tier = nextTier;
+      u.countPay = 0;
+      // u.oldLayer = u.currentLayer;
+      // u.currentLayer = [...u.currentLayer, 0];
+      await u.save();
+    }
+  }
+});
+
+const checkCanIncreaseNextTier = async (u) => {
+  try {
+    // Kiểm tra điều kiện cho việc nâng cấp tier
+    if (u.fine > 0) {
+      return false;
+    }
+    if (u.buyPackage === "A" && u.countPay === 13) {
+      if (u.currentLayer.slice(-1) >= 3) {
+        return true;
+      } else if (u.countChild >= 300) {
+        const listChildId = await Tree.find({
+          parentId: u._id,
+          tier: u.tier,
+        }).select("userId");
+
+        let highestChildSales = 0;
+        let lowestChildSales = Infinity;
+
+        for (const childId of listChildId) {
+          const child = await User.findById(childId.userId);
+
+          if (child.countChild > highestChildSales) {
+            highestChildSales = child.countChild;
+          }
+
+          if (child.countChild < lowestChildSales) {
+            lowestChildSales = child.countChild;
+          }
+        }
+
+        if (
+          highestChildSales >= 0.4 * u.countChild &&
+          lowestChildSales >= 0.2 * u.countChild
+        ) {
+          return true;
+        }
+      }
+    }
+    return false;
+  } catch (error) {
+    throw new Error("Internal server error");
+  }
+};
+
 export {
   getUserProfile,
   getAllUsers,
@@ -946,4 +1069,5 @@ export {
   changeWallet,
   adminUpdateUser,
   adminDeleteUser,
+  countChildOfUserById,
 };

@@ -19,11 +19,9 @@ import packageRoutes from "./routes/packageRoutes.js";
 import {
   checkUnpayUser,
   deleteUserNotKYC,
-  checkIncreaseTier,
   countChildToData,
   deleteUserNotPay,
   countLayerToData,
-  checkCanIncreaseNextTier,
 } from "./cronJob/index.js";
 import {
   transferUserToTree,
@@ -31,6 +29,7 @@ import {
   getUnknowChild,
   addBuyPackage,
   changeDefaultContinue,
+  transferCountChildToArray,
 } from "./common.js";
 import { findNextUser } from "./utils/methods.js";
 
@@ -41,6 +40,8 @@ if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 
 // connect to the mongoDB database
 connectDB();
+
+// await transferCountChildToArray();
 
 app.use(express.json()); // middleware to use req.body
 app.use(cors()); // to avoid CORS errors
@@ -95,18 +96,12 @@ const cron5 = new CronJob("00 21 * * *", () => {
   countLayerToData();
 });
 
-const cron6 = new CronJob("30 21 * * *", () => {
-  // 4h30
-  console.log("Check increase tier");
-  checkIncreaseTier();
-});
-
-cron1.start();
-cron2.start();
-cron3.start();
-cron4.start();
-cron5.start();
-cron6.start();
+// cron1.start();
+// cron2.start();
+// cron3.start();
+// cron4.start();
+// cron5.start();
+// cron6.start();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>

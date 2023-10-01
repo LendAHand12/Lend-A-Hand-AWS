@@ -104,3 +104,14 @@ export const changeDefaultContinue = async () => {
 
   console.log("changeDefaultContinue done");
 };
+
+export const transferCountChildToArray = async () => {
+  const listUser = await User.find({ isAdmin: false });
+
+  for (let user of listUser) {
+    user.countChild = [...user.countChild[0]];
+    await user.save();
+  }
+
+  console.log("transfer layer to array done");
+};

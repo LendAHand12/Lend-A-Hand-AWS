@@ -3,7 +3,7 @@ import User from "../models/userModel.js";
 import Transaction from "../models/transactionModel.js";
 import getParentWithCountPay from "../utils/getParentWithCountPay.js";
 import Refund from "../models/refundModel.js";
-import { checkCanIncreaseNextTier } from "../cronJob/index.js";
+// import { checkCanIncreaseNextTier } from "../cronJob/index.js";
 import { getActiveLink } from "../utils/getLinksActive.js";
 import { sendActiveLink } from "../utils/sendMailCustom.js";
 import { getParentUser, getRefParentUser } from "../utils/methods.js";
@@ -35,11 +35,11 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
 
   if (user) {
     if (user.countPay === 13) {
-      const canIncreaseTier = await checkCanIncreaseNextTier(user);
-      if (!canIncreaseTier) {
-        res.status(404);
-        throw new Error("You are not eligible for next step payment");
-      }
+      // const canIncreaseTier = await checkCanIncreaseNextTier(user);
+      // if (!canIncreaseTier) {
+      //   res.status(404);
+      //   throw new Error("You are not eligible for next step payment");
+      // }
     }
     const parentUser = await getParentUser(user._id, user.tier);
     const refUser = await getRefParentUser(user._id, user.tier);
