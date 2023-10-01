@@ -11,7 +11,11 @@ import Tree from "../models/treeModel.js";
 
 export const checkUnpayUser = asyncHandler(async () => {
   const listUser = await User.find({
-    $and: [{ isAdmin: false }, { status: "APPROVED" }],
+    $and: [
+      { isAdmin: false },
+      { status: "APPROVED" },
+      { countPay: { lt: 13 } },
+    ],
   }).select("createdAt countPay fine status email");
   for (let u of listUser) {
     const currentDay = moment(new Date());
