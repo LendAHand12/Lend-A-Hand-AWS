@@ -29,9 +29,26 @@ const HomePageContent = () => {
             <p className="leading-normal text-2xl mb-8">
               {t("Đầu tư vào Tương lai của bạn cùng với Lend A Hand")}
             </p>
-            <button className="mx-auto lg:mx-0 hover:underline bg-white text-gray-800 font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
+            {/* <button className="mx-auto lg:mx-0 hover:underline bg-white text-gray-800 font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
               Subscribe
-            </button>
+            </button> */}
+            <p>
+              {t(
+                "Chào mừng bạn đến với Lend a Hand, Hệ thống đột phá để tích lũy tài sản thông qua sự hỗ trợ đồng lòng."
+              )}
+            </p>
+            <br></br>
+            <p>
+              {t(
+                "Với Lend a Hand, bạn có thể tham gia vào thành viên Land A Hand, một cộng đồng của những thành viên có chung mục tiêu giúp đỡ nhau phát triển tài chính. Là thành viên chủ động trên nền tảng của chúng tôi, bạn có thể tham gia vào một mạng lưới những người hào phóng, hỗ trợ lẫn nhau trong những thời điểm cần thiết."
+              )}
+            </p>
+            <br></br>
+            <p>
+              {t(
+                "Cho dù bạn đang đối mặt với một khoản chi không mong đợi, muốn đầu tư vào dự án kinh doanh mới, hay đơn giản chỉ muốn tiết kiệm cho tương lai, Lend a Hand có thể giúp bạn. Các thành viên của chúng tôi cùng nhau góp vốn và cung cấp sự hỗ trợ tài chính cho nhau, tạo nên một vòng xoay tích luỹ tài sản."
+              )}
+            </p>
           </div>
           {/* <!--Right Col--> */}
           <div className="w-full md:w-3/5 py-6 text-center">
@@ -41,7 +58,7 @@ const HomePageContent = () => {
           </div>
         </div>
       </div>
-      <div className="relative -mt-12 lg:-mt-24">
+      <div className="relative -mt-12 lg:-mt-24" id="features">
         <svg
           viewBox="0 0 1428 174"
           version="1.1"

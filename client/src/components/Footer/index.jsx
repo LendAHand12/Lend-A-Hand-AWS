@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import LOGO from "@/assets/img/logo-vertical.png";
+import { useTranslation } from "react-i18next";
 
 const Footer = () => {
+  const { t } = useTranslation();
   return (
-    <footer className="bg-white border-t">
+    <footer id="contact" className="bg-white border-t">
       <div className="container mx-auto px-8">
         <div className="w-full flex flex-col md:flex-row py-6">
           <div className="flex-1 mb-6 text-black">
@@ -14,15 +16,18 @@ const Footer = () => {
               <img src={LOGO} alt="logo" className="lg:w-32 w-20" />
             </Link>
           </div>
-          <div className="flex-1">
-            <p className="uppercase text-gray-500 md:mb-6">Links</p>
+          <div className="flex-1 mr-10">
+            <p className="uppercase text-gray-500 md:mb-6">Contact</p>
             <ul className="list-reset mb-6">
               <li className="mt-2 inline-block mr-2 md:block md:mr-0">
                 <a
                   href="#"
                   className="no-underline hover:underline text-gray-800 hover:text-primary"
                 >
-                  FAQ
+                  <strong>{t("address")}</strong> :{" "}
+                  {t(
+                    "29 Võ Văn Tần, Phường Võ Thị Sáu, Quận 3, TP Hồ Chí Minh, Việt Nam"
+                  )}
                 </a>
               </li>
               <li className="mt-2 inline-block mr-2 md:block md:mr-0">
@@ -30,7 +35,7 @@ const Footer = () => {
                   href="#"
                   className="no-underline hover:underline text-gray-800 hover:text-primary"
                 >
-                  Help
+                  <strong>{t("phone")}</strong> : (+84-28) 2250.8166
                 </a>
               </li>
               <li className="mt-2 inline-block mr-2 md:block md:mr-0">
@@ -38,17 +43,17 @@ const Footer = () => {
                   href="#"
                   className="no-underline hover:underline text-gray-800 hover:text-primary"
                 >
-                  Support
+                  <strong>{t("email")}</strong> : support@lah12.com
                 </a>
               </li>
             </ul>
           </div>
-          <div className="flex-1">
+          <div className="flex-1 mr-10">
             <p className="uppercase text-gray-500 md:mb-6">Legal</p>
             <ul className="list-reset mb-6">
               <li className="mt-2 inline-block mr-2 md:block md:mr-0">
                 <a
-                  href="#"
+                  href="/terms"
                   className="no-underline hover:underline text-gray-800 hover:text-primary"
                 >
                   Terms
@@ -64,7 +69,7 @@ const Footer = () => {
               </li>
             </ul>
           </div>
-          <div className="flex-1">
+          <div className="flex-1 mr-10">
             <p className="uppercase text-gray-500 md:mb-6">Social</p>
             <ul className="list-reset mb-6">
               <li className="mt-2 inline-block mr-2 md:block md:mr-0">
@@ -89,35 +94,6 @@ const Footer = () => {
                   className="no-underline hover:underline text-gray-800 hover:text-primary"
                 >
                   Twitter
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div className="flex-1">
-            <p className="uppercase text-gray-500 md:mb-6">Company</p>
-            <ul className="list-reset mb-6">
-              <li className="mt-2 inline-block mr-2 md:block md:mr-0">
-                <a
-                  href="#"
-                  className="no-underline hover:underline text-gray-800 hover:text-primary"
-                >
-                  Official Blog
-                </a>
-              </li>
-              <li className="mt-2 inline-block mr-2 md:block md:mr-0">
-                <a
-                  href="#"
-                  className="no-underline hover:underline text-gray-800 hover:text-primary"
-                >
-                  About Us
-                </a>
-              </li>
-              <li className="mt-2 inline-block mr-2 md:block md:mr-0">
-                <a
-                  href="#"
-                  className="no-underline hover:underline text-gray-800 hover:text-primary"
-                >
-                  Contact
                 </a>
               </li>
             </ul>
