@@ -7,6 +7,7 @@ import { ToastContainer, toast } from "react-toastify";
 import Payment from "@/api/Payment";
 import { transfer, getBalance, getAccount } from "@/utils/smartContract.js";
 import { useAccount } from "wagmi";
+import User from "../../../api/User";
 
 const PaymentPage = () => {
   const { t } = useTranslation();
@@ -29,6 +30,9 @@ const PaymentPage = () => {
   const [continueWithBuyPackageB, setContinueWithBuyPackageB] = useState(
     userInfo.continueWithBuyPackageB
   );
+  const [loadingCheckIncrease, setLoadingCheckIncrease] = useState(false);
+  const [showCanIncrease, setShowCanIncrease] = useState(null);
+  const [loadingAcceptIncrease, setLoadingAcceptIncrease] = useState(null);
 
   const paymentRegisterFee = useCallback(async () => {
     if (paymentInfo && paymentInfo.registerFee !== 0) {
@@ -197,11 +201,16 @@ const PaymentPage = () => {
             ? error.response.data.message
             : error.message;
         toast.error(t(message));
+        setLoadingPaymentInfo(false);
       });
   };
 
   useEffect(() => {
-    onGetPaymentInfo(continueWithBuyPackageB);
+    if (userInfo.countPay < 13) {
+      onGetPaymentInfo(continueWithBuyPackageB);
+    } else {
+      handleCheckCanIncreaseTier();
+    }
   }, [continueWithBuyPackageB]);
 
   useEffect(() => {
@@ -215,103 +224,169 @@ const PaymentPage = () => {
     setContinueWithBuyPackageB(!continueWithBuyPackageB);
   };
 
+  const handleCheckCanIncreaseTier = async () => {
+    setLoadingCheckIncrease(true);
+    await User.checkIncreaseTier()
+      .then((response) => {
+        setShowCanIncrease(response.data.canIncrease);
+        setLoadingCheckIncrease(false);
+      })
+      .catch((error) => {
+        let message =
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message;
+        toast.error(t(message));
+        setLoadingCheckIncrease(false);
+      });
+  };
+
+  const handleAcceptIncreaseTier = async () => {
+    setLoadingAcceptIncrease(true);
+    await User.checkIncreaseTier({ type: "ACCEPT" })
+      .then(() => {
+        setLoadingAcceptIncrease(false);
+        window.location.reload();
+      })
+      .catch((error) => {
+        let message =
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message;
+        toast.error(t(message));
+        setLoadingAcceptIncrease(false);
+      });
+  };
+
   return (
     <>
       <ToastContainer />
-
-      <div
-        className="w-full mx-auto rounded-lg bg-white shadow-xl p-5 text-gray-700 mt-4"
-        style={{ maxWidth: "600px" }}
-      >
-        <div className="mb-10">
-          <h1 className="text-center font-bold text-xl uppercase">
-            {t("paymentTitle")}
-          </h1>
+      {userInfo.countPay === 13 ? (
+        !loadingCheckIncrease && showCanIncrease ? (
+          <div>
+            <div
+              className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-5"
+              role="alert"
+            >
+              <span className="block sm:inline">
+                {t("congraTier")} {userInfo.tier + 1}{" "}
+              </span>
+            </div>
+            <span>{t("pleaseEnterToIncreaseTier")} :</span>
+            <div>
+              <div>
+                <button
+                  onClick={handleAcceptIncreaseTier}
+                  disabled={loadingAcceptIncrease}
+                  className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                >
+                  {t("increaseNextTier")} {userInfo.tier + 1}
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div
+            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-5"
+            role="alert"
+          >
+            <span className="block sm:inline">{t("noTier")}</span>
+          </div>
+        )
+      ) : loadingPaymentInfo ? (
+        <div className="w-full flex justify-center">
+          <Loading />
         </div>
-        {paymentInfo &&
-          userInfo.buyPackage === "B" &&
-          userInfo.countPay === 7 &&
-          payStep < 3 && (
+      ) : (
+        <div
+          className="w-full mx-auto rounded-lg bg-white shadow-xl p-5 text-gray-700 mt-4"
+          style={{ maxWidth: "600px" }}
+        >
+          <div className="mb-10">
+            <h1 className="text-center font-bold text-xl uppercase">
+              {t("paymentTitle")}
+            </h1>
+          </div>
+          {paymentInfo &&
+            userInfo.buyPackage === "B" &&
+            userInfo.countPay === 7 &&
+            payStep < 3 && (
+              <>
+                <div className="w-full flex flex-col mb-3">
+                  {userInfo.packages.includes("B") && (
+                    <button
+                      onClick={handleChangeContinueWithB}
+                      disabled={continueWithBuyPackageB}
+                      className={`${
+                        continueWithBuyPackageB
+                          ? "border hover:shadow-md focus:outline-none focus:ring-4 focus:ring-black-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
+                          : "text-white gradient hover:shadow-md focus:outline-none focus:ring-4 focus:ring-blue-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
+                      }`}
+                    >
+                      {t("contineWithPackageB")}{" "}
+                      {continueWithBuyPackageB && t("applying")}
+                    </button>
+                  )}
+                  {userInfo.packages.includes("C") && (
+                    <button
+                      onClick={handleChangeContinueWithB}
+                      disabled={!continueWithBuyPackageB}
+                      className={`${
+                        !continueWithBuyPackageB
+                          ? "border hover:shadow-md focus:outline-none focus:ring-4 focus:ring-black-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
+                          : "text-white gradient hover:shadow-md focus:outline-none focus:ring-4 focus:ring-blue-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
+                      }`}
+                    >
+                      {t("contineWithPackageC")}{" "}
+                      {!continueWithBuyPackageB && t("applying")}
+                    </button>
+                  )}
+                </div>
+                <hr className="mb-3"></hr>
+              </>
+            )}
+          {canPay && (
             <>
-              <div className="w-full flex flex-col mb-3">
-                {userInfo.packages.includes("B") && (
-                  <button
-                    onClick={handleChangeContinueWithB}
-                    disabled={continueWithBuyPackageB}
-                    className={`${
-                      continueWithBuyPackageB
-                        ? "border hover:shadow-md focus:outline-none focus:ring-4 focus:ring-black-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
-                        : "text-white gradient hover:shadow-md focus:outline-none focus:ring-4 focus:ring-blue-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
-                    }`}
-                  >
-                    {t("contineWithPackageB")}{" "}
-                    {continueWithBuyPackageB && t("applying")}
-                  </button>
-                )}
-                {userInfo.packages.includes("C") && (
-                  <button
-                    onClick={handleChangeContinueWithB}
-                    disabled={!continueWithBuyPackageB}
-                    className={`${
-                      !continueWithBuyPackageB
-                        ? "border hover:shadow-md focus:outline-none focus:ring-4 focus:ring-black-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
-                        : "text-white gradient hover:shadow-md focus:outline-none focus:ring-4 focus:ring-blue-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
-                    }`}
-                  >
-                    {t("contineWithPackageC")}{" "}
-                    {!continueWithBuyPackageB && t("applying")}
-                  </button>
-                )}
-              </div>
-              <hr className="mb-3"></hr>
-            </>
-          )}
-        {canPay && (
-          <>
-            {userInfo.countPay === 0 && (
+              {userInfo.countPay === 0 && (
+                <div className="mb-3">
+                  <p className="text-lg mb-2 ml-1">
+                    <span className="font-bold">{t("registerFee")}</span> :{" "}
+                    {registrationFee} USDT
+                  </p>
+                </div>
+              )}
+              {nextPay !== 0 && (
+                <div className="mb-3">
+                  <p className="text-lg mb-2 ml-1">
+                    <span className="font-bold">{t("the next pay count")}</span>{" "}
+                    : {nextPay}
+                  </p>
+                </div>
+              )}
+              {(userInfo.buyPackage === "A" ||
+                (userInfo.buyPackage === "B" && continueWithBuyPackageB)) && (
+                <div className="mb-3">
+                  <p className="text-lg mb-2 ml-1">
+                    <span className="font-bold">{t("buyPackage")}</span> :{" "}
+                    {userInfo.buyPackage}{" "}
+                    {userInfo.buyPackage === "A"
+                      ? t("buyPackageA")
+                      : t("buyPackageB")}
+                  </p>
+                </div>
+              )}
               <div className="mb-3">
                 <p className="text-lg mb-2 ml-1">
-                  <span className="font-bold">{t("registerFee")}</span> :{" "}
-                  {registrationFee} USDT
+                  <span className="font-bold">Total</span> : {total} USDT
                 </p>
               </div>
-            )}
-            {!loadingPaymentInfo && nextPay !== 0 && (
               <div className="mb-3">
                 <p className="text-lg mb-2 ml-1">
-                  <span className="font-bold">{t("the next pay count")}</span> :{" "}
-                  {nextPay}
+                  <span className="font-bold">{t("yourBalance")}</span> :{" "}
+                  {yourBalance} USDT
                 </p>
               </div>
-            )}
-            {(userInfo.buyPackage === "A" ||
-              (userInfo.buyPackage === "B" && continueWithBuyPackageB)) && (
-              <div className="mb-3">
-                <p className="text-lg mb-2 ml-1">
-                  <span className="font-bold">{t("buyPackage")}</span> :{" "}
-                  {userInfo.buyPackage}{" "}
-                  {userInfo.buyPackage === "A"
-                    ? t("buyPackageA")
-                    : t("buyPackageB")}
-                </p>
-              </div>
-            )}
-            <div className="mb-3">
-              <p className="text-lg mb-2 ml-1">
-                <span className="font-bold">Total</span> : {total} USDT
-              </p>
-            </div>
-            <div className="mb-3">
-              <p className="text-lg mb-2 ml-1">
-                <span className="font-bold">{t("yourBalance")}</span> :{" "}
-                {yourBalance} USDT
-              </p>
-            </div>
-            {loadingPaymentInfo ? (
-              <div className="w-full flex justify-center">
-                <Loading />
-              </div>
-            ) : (
+
               <>
                 {paymentInfo.transactionFine ? (
                   <>
@@ -650,10 +725,10 @@ const PaymentPage = () => {
                   </>
                 )}
               </>
-            )}
-          </>
-        )}
-      </div>
+            </>
+          )}
+        </div>
+      )}
     </>
   );
 };

@@ -3,10 +3,10 @@ import User from "../models/userModel.js";
 import Transaction from "../models/transactionModel.js";
 import getParentWithCountPay from "../utils/getParentWithCountPay.js";
 import Refund from "../models/refundModel.js";
-import { checkCanIncreaseNextTier } from "../cronJob/index.js";
 import { getActiveLink } from "../utils/getLinksActive.js";
 import { sendActiveLink } from "../utils/sendMailCustom.js";
 import { getParentUser, getRefParentUser } from "../utils/methods.js";
+import { checkCanIncreaseNextTier } from "./userControllers.js";
 
 const getPaymentInfo = asyncHandler(async (req, res) => {
   const { user } = req;
@@ -64,16 +64,23 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
     if (user.tier >= 2 || user.buyPackage === "A") {
       if (user.countPay === 0) {
         directCommissionFee = 65 * user.tier;
-        if (
-          refUser.fine > 0 ||
-          refUser.status === "LOCKED" ||
-          refUser.tier < user.tier ||
-          (refUser.tier === user.tier && refUser.countPay < 13)
-        ) {
+        if (refUser.closeLah) {
           directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
           haveRefNotPayEnough = true;
-        } else {
+        } else if (refUser.openLah) {
           directCommissionWallet = refUser.walletAddress[0];
+        } else {
+          if (
+            refUser.fine > 0 ||
+            refUser.status === "LOCKED" ||
+            refUser.tier < user.tier ||
+            (refUser.tier === user.tier && refUser.countPay < 13)
+          ) {
+            directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
+            haveRefNotPayEnough = true;
+          } else {
+            directCommissionWallet = refUser.walletAddress[0];
+          }
         }
       } else {
         const pendingTransPackage = await Transaction.findOne({
@@ -91,29 +98,43 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
     } else if (user.tier === 1 && user.buyPackage === "B") {
       if (user.countPay === 0) {
         directCommissionFee = 35 * user.tier;
-        if (
-          refUser.fine > 0 ||
-          refUser.status === "LOCKED" ||
-          refUser.tier < user.tier ||
-          (refUser.tier === user.tier && refUser.countPay < 7)
-        ) {
+        if (refUser.closeLah) {
           directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
           haveRefNotPayEnough = true;
-        } else {
+        } else if (refUser.openLah) {
           directCommissionWallet = refUser.walletAddress[0];
+        } else {
+          if (
+            refUser.fine > 0 ||
+            refUser.status === "LOCKED" ||
+            refUser.tier < user.tier ||
+            (refUser.tier === user.tier && refUser.countPay < 7)
+          ) {
+            directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
+            haveRefNotPayEnough = true;
+          } else {
+            directCommissionWallet = refUser.walletAddress[0];
+          }
         }
       } else if (user.countPay === 7 && user.continueWithBuyPackageB) {
         directCommissionFee = 30 * user.tier;
-        if (
-          refUser.fine > 0 ||
-          refUser.status === "LOCKED" ||
-          refUser.tier < user.tier ||
-          (refUser.tier === user.tier && refUser.countPay < 13)
-        ) {
+        if (refUser.closeLah) {
           directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
           haveRefNotPayEnough = true;
-        } else {
+        } else if (refUser.openLah) {
           directCommissionWallet = refUser.walletAddress[0];
+        } else {
+          if (
+            refUser.fine > 0 ||
+            refUser.status === "LOCKED" ||
+            refUser.tier < user.tier ||
+            (refUser.tier === user.tier && refUser.countPay < 13)
+          ) {
+            directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
+            haveRefNotPayEnough = true;
+          } else {
+            directCommissionWallet = refUser.walletAddress[0];
+          }
         }
       } else {
         const pendingTransPackage = await Transaction.findOne({
@@ -129,16 +150,23 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         }
       }
     } else if (user.tier === 1 && user.buyPackage === "C") {
-      if (
-        refUser.fine > 0 ||
-        refUser.status === "LOCKED" ||
-        refUser.tier < user.tier ||
-        (refUser.tier === user.tier && refUser.countPay < user.countPay + 1)
-      ) {
+      if (refUser.closeLah) {
         directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
         haveRefNotPayEnough = true;
-      } else {
+      } else if (refUser.openLah) {
         directCommissionWallet = refUser.walletAddress[0];
+      } else {
+        if (
+          refUser.fine > 0 ||
+          refUser.status === "LOCKED" ||
+          refUser.tier < user.tier ||
+          (refUser.tier === user.tier && refUser.countPay < user.countPay + 1)
+        ) {
+          directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
+          haveRefNotPayEnough = true;
+        } else {
+          directCommissionWallet = refUser.walletAddress[0];
+        }
       }
     }
 
@@ -154,6 +182,51 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
 
     if (user.countPay === 0) {
       if (user.tier >= 2) {
+        if (refUser.closeLah) {
+          directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
+          haveRefNotPayEnough = true;
+        } else if (refUser.openLah) {
+          directCommissionWallet = refUser.walletAddress[0];
+        } else {
+          if (
+            refUser.fine > 0 ||
+            refUser.status === "LOCKED" ||
+            refUser.tier < user.tier ||
+            (refUser.tier === user.tier && refUser.countPay < user.countPay + 1)
+          ) {
+            directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
+            haveRefNotPayEnough = true;
+          } else {
+            directCommissionWallet = refUser.walletAddress[0];
+          }
+        }
+      }
+      if (parentUser.closeLah) {
+        referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
+        haveParentNotPayEnough = true;
+      } else if (parentUser.openLah) {
+        referralCommissionWallet = parentUser.walletAddress[0];
+      } else {
+        if (
+          parentUser.fine > 0 ||
+          parentUser.status === "LOCKED" ||
+          parentUser.tier < user.tier ||
+          (parentUser.tier === user.tier &&
+            parentUser.countPay < user.countPay + 1)
+        ) {
+          referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
+          haveParentNotPayEnough = true;
+        } else {
+          referralCommissionWallet = parentUser.walletAddress[0];
+        }
+      }
+    } else {
+      if (refUser.closeLah) {
+        directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
+        haveRefNotPayEnough = true;
+      } else if (refUser.openLah) {
+        directCommissionWallet = refUser.walletAddress[0];
+      } else {
         if (
           refUser.fine > 0 ||
           refUser.status === "LOCKED" ||
@@ -166,36 +239,17 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           directCommissionWallet = refUser.walletAddress[0];
         }
       }
-      if (
-        parentUser.fine > 0 ||
-        parentUser.status === "LOCKED" ||
-        parentUser.tier < user.tier ||
-        (parentUser.tier === user.tier &&
-          parentUser.countPay < user.countPay + 1)
-      ) {
-        referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
-        haveParentNotPayEnough = true;
-      } else {
-        referralCommissionWallet = parentUser.walletAddress[0];
-      }
-    } else {
-      if (
-        refUser.fine > 0 ||
-        refUser.status === "LOCKED" ||
-        refUser.tier < user.tier ||
-        (refUser.tier === user.tier && refUser.countPay < user.countPay + 1)
-      ) {
-        directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
-        haveRefNotPayEnough = true;
-      } else {
-        directCommissionWallet = refUser.walletAddress[0];
-      }
 
       if (!parentWithCountPay) {
         referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
+      } else if (parentWithCountPay.closeLah) {
+        referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
+        haveParentNotPayEnough = true;
+      } else if (parentWithCountPay.openLah) {
+        referralCommissionWallet = parentWithCountPay.walletAddress[0];
       } else if (
-        parentUser.fine > 0 ||
-        parentUser.status === "LOCKED" ||
+        parentWithCountPay.fine > 0 ||
+        parentWithCountPay.status === "LOCKED" ||
         parentWithCountPay.tier < user.tier ||
         (parentWithCountPay.tier === user.tier &&
           parentWithCountPay.countPay < user.countPay + 1)
@@ -207,10 +261,10 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       }
     }
 
-    if (user.userId === "THOALOCPHAT668") {
-      haveParentNotPayEnough = true; // termp
-      referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS; // termp
-    }
+    // if (user.userId === "THOALOCPHAT668") {
+    haveParentNotPayEnough = true; // termp
+    referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS; // termp
+    // }
 
     let transactionRegister = null;
     let transactionDirect = null;
@@ -633,7 +687,7 @@ const onDonePayment = async (user, transIds) => {
       }
     }
 
-    if (user.countPay === 0) {
+    if (user.countPay === 0 && user.tier === 1) {
       const links = await getActiveLink(user.email, user.userId, user.phone);
       if (links.length === 1) {
         await sendActiveLink(user.email, links[0]);
@@ -884,6 +938,8 @@ const checkCanRefundPayment = asyncHandler(async (req, res) => {
       if (userReceive.status === "LOCKED") {
         res.status(404);
         throw new Error(`User parent locked`);
+      } else if (userReceive.closeLah) {
+        throw new Error(`User is being blocked from trading`);
       } else if (userReceive.countPay - 1 < userCountPay) {
         res.status(404);
         throw new Error(

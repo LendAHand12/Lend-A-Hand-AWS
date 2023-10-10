@@ -23,6 +23,11 @@ const treeSchema = mongoose.Schema(
     refId: {
       type: String,
     },
+    buyPackage: {
+      type: String,
+      enum: ["A", "B", "C", ""],
+      default: "",
+    },
   },
   { timestamps: true }
 );

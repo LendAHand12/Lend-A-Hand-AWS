@@ -24,7 +24,6 @@ const userSchema = mongoose.Schema(
       type: Number,
       default: 1,
     },
-    children: [{ type: mongoose.Schema.Types.ObjectId, ref: "children" }],
     parentId: {
       type: mongoose.Schema.Types.ObjectId,
     },
@@ -66,8 +65,8 @@ const userSchema = mongoose.Schema(
       default: 0,
     },
     countChild: {
-      type: Number,
-      default: 0,
+      type: Array,
+      default: [0],
     },
     phone: {
       type: String,
@@ -97,6 +96,26 @@ const userSchema = mongoose.Schema(
     continueWithBuyPackageB: {
       type: Boolean,
       default: true,
+    },
+    errLahCode: {
+      type: String,
+      default: "",
+      enum: ["", "TIER", "OVER180", "OVER60", "OVER30"],
+    },
+    tierDate: {
+      type: Date,
+    },
+    openLah: {
+      type: Boolean,
+      default: false,
+    },
+    closeLah: {
+      type: Boolean,
+      default: false,
+    },
+    adminChangeTier: {
+      type: Boolean,
+      default: false,
     },
   },
   {

@@ -279,5 +279,13 @@
   "Cho dù bạn đang đối mặt với một khoản chi không mong đợi, muốn đầu tư vào dự án kinh doanh mới, hay đơn giản chỉ muốn tiết kiệm cho tương lai, Lend a Hand có thể giúp bạn. Các thành viên của chúng tôi cùng nhau góp vốn và cung cấp sự hỗ trợ tài chính cho nhau, tạo nên một vòng xoay tích luỹ tài sản.": "Whether you're facing an unexpected expense, looking to invest in a new business venture, or simply want to save for the future, Lend a Hand can help. Our members pool their resources together and provide financial assistance to one another, creating a cycle of wealth accumulation.",
   "address": "Address",
   "email": "Email",
-  "29 Võ Văn Tần, Phường Võ Thị Sáu, Quận 3, TP Hồ Chí Minh, Việt Nam": "29 VO VAN TAN, Ward VO THI SAU, District 3 | Ho Chi Minh City, Viet Nam"
+  "29 Võ Văn Tần, Phường Võ Thị Sáu, Quận 3, TP Hồ Chí Minh, Việt Nam": "29 VO VAN TAN, Ward VO THI SAU, District 3 | Ho Chi Minh City, Viet Nam",
+
+  "openLah": "Unconditionally open",
+  "closeLah": "Unconditionally close",
+
+  "increaseNextTier": "Upgrade to tier ",
+  "congraTier": "CONGRATULATIONS YOU HAVE QUALIFIED TO PASS TIER",
+  "noTier": "YOU ARE NOT QUALIFIED TO PASS THE NEW TIER",
+  "pleaseEnterToIncreaseTier": "TO GO TO TIER PLEASE CLICK THE BUTTON BELOW"
 }

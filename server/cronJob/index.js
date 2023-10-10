@@ -6,7 +6,7 @@ import User from "../models/userModel.js";
 import sendMail from "../utils/sendMail.js";
 import { sendMailUpdateLayerForAdmin } from "../utils/sendMailCustom.js";
 import { getCountAllChildren } from "../controllers/userControllers.js";
-import { findNextUser } from "../utils/methods.js";
+import { findNextUser, findRootLayer } from "../utils/methods.js";
 import Tree from "../models/treeModel.js";
 
 export const checkUnpayUser = asyncHandler(async () => {
@@ -42,137 +42,6 @@ export const checkUnpayUser = asyncHandler(async () => {
     }
   }
 });
-
-export const checkIncreaseTier = asyncHandler(async () => {
-  const listUser = await User.find({
-    $and: [
-      { isAdmin: false },
-      { status: "APPROVED" },
-      { fine: 0 },
-      {
-        $or: [
-          { userId: { $ne: "Admin2" } },
-          { userId: { $ne: "Admin3" } },
-          { userId: { $ne: "Admin4" } },
-        ],
-      },
-    ],
-  }).sort({ createdAt: -1 });
-  for (let u of listUser) {
-    let nextTier = u.tier + 1;
-    const canIncreaseTier = await checkCanIncreaseNextTier(u);
-    if (canIncreaseTier) {
-      const newParentId = await findNextUser(nextTier);
-      const newParent = await Tree.findOne({
-        userId: newParentId,
-        tier: nextTier,
-      });
-      let childs = newParent.children;
-      newParent.children = [...childs, u._id];
-      await newParent.save();
-
-      const tree = await Tree.create({
-        userName: u.userId,
-        userId: u._id,
-        parentId: newParentId,
-        refId: newParentId,
-        tier: nextTier,
-        children: [],
-      });
-
-      u.tier = nextTier;
-      u.countPay = 0;
-      // u.oldLayer = u.currentLayer;
-      // u.currentLayer = [...u.currentLayer, 0];
-      await u.save();
-    }
-  }
-});
-
-export const checkCanIncreaseNextTier = async (u) => {
-  try {
-    // Kiểm tra điều kiện cho việc nâng cấp tier
-    if (u.fine > 0) {
-      return false;
-    }
-    if (u.tier === 1) {
-      if (u.buyPackage === "A" || u.buyPackage === "B") {
-        if (u.countPay === 13) {
-          if (u.currentLayer.slice(-1) >= 4) {
-            return true;
-          } else if (u.countChild >= 300) {
-            const listChildId = await Tree.find({
-              parentId: u._id,
-              tier: u.tier,
-            }).select("userId");
-
-            let highestChildSales = 0;
-            let lowestChildSales = Infinity;
-
-            for (const childId of listChildId) {
-              const child = await User.findById(childId.userId);
-
-              if (child.countChild > highestChildSales) {
-                highestChildSales = child.countChild;
-              }
-
-              if (child.countChild < lowestChildSales) {
-                lowestChildSales = child.countChild;
-              }
-            }
-
-            if (
-              highestChildSales >= 0.4 * u.countChild &&
-              lowestChildSales >= 0.2 * u.countChild
-            ) {
-              return true;
-            }
-          }
-        }
-      } else if (u.buyPackage === "C") {
-        if (u.countPay === 13) {
-          if (u.currentLayer.slice(-1) >= 5) {
-            return true;
-          } else if (u.countChild >= 680) {
-            const listChildId = await Tree.find({
-              parentId: u._id,
-              tier: u.tier,
-            }).select("userId");
-
-            let highestChildSales = 0;
-            let lowestChildSales = Infinity;
-
-            for (const childId of listChildId) {
-              const child = await User.findById(childId.userId);
-
-              if (child.countChild > highestChildSales) {
-                highestChildSales = child.countChild;
-              }
-
-              if (child.countChild < lowestChildSales) {
-                lowestChildSales = child.countChild;
-              }
-            }
-
-            if (
-              highestChildSales >= 0.4 * u.countChild &&
-              lowestChildSales >= 0.2 * u.countChild
-            ) {
-              return true;
-            }
-          }
-        }
-      }
-    } else if (u.tier >= 2) {
-      if (u.currentLayer.slice(-1) === 4) {
-        return true;
-      }
-    }
-    return false;
-  } catch (error) {
-    throw new Error("Internal server error");
-  }
-};
 
 export const deleteUserNotKYC = asyncHandler(async () => {
   const listUser = await User.find({ status: "UNVERIFY" });
@@ -212,32 +81,34 @@ export const deleteUserNotPay = asyncHandler(async () => {
       { status: "APPROVED" },
       { createdAt: { $lt: currentDay } },
       { countPay: 0 },
-      { children: { $size: 0 } },
     ],
   });
 
   for (let u of listUser) {
-    let parent = await User.findById(u.parentId);
-    if (parent) {
-      let childs = parent.children;
-      let newChilds = childs.filter((item) => {
-        if (item.toString() !== u._id.toString()) return item;
-      });
-      parent.children = [...newChilds];
-      await parent.save();
+    const treeOfUser = await Tree.findOne({ userId: u._id });
+    if (treeOfUser.length !== 0) {
+      let parent = await User.findById(u.parentId);
+      if (parent) {
+        let childs = parent.children;
+        let newChilds = childs.filter((item) => {
+          if (item.toString() !== u._id.toString()) return item;
+        });
+        parent.children = [...newChilds];
+        await parent.save();
 
-      const userDelete = await DeleteUser.create({
-        userId: u.userId,
-        oldId: u._id,
-        email: u.email,
-        phone: u.phone,
-        password: u.password,
-        walletAddress: u.walletAddress,
-        parentId: u.parentId,
-        refId: u.refId,
-      });
+        const userDelete = await DeleteUser.create({
+          userId: u.userId,
+          oldId: u._id,
+          email: u.email,
+          phone: u.phone,
+          password: u.password,
+          walletAddress: u.walletAddress,
+          parentId: u.parentId,
+          refId: u.refId,
+        });
 
-      await User.deleteOne({ _id: u._id });
+        await User.deleteOne({ _id: u._id });
+      }
     }
   }
 
@@ -247,63 +118,19 @@ export const deleteUserNotPay = asyncHandler(async () => {
 export const countChildToData = asyncHandler(async () => {
   const listUser = await User.find({
     $and: [{ isAdmin: false }, { status: "APPROVED" }],
-  }).select("tier");
+  }).select("tier countChild");
 
   for (let u of listUser) {
-    const countChild = await getCountAllChildren(u._id, u.tier);
-    u.countChild = countChild;
+    const newCountChild = [...u.countChild];
+    for (let i = 1; i <= u.tier; i++) {
+      const countChild = await getCountAllChildren(u._id, i);
+      newCountChild[i - 1] = countChild;
+    }
+    u.countChild = newCountChild;
     await u.save();
   }
 
   console.log("updated count Child");
-});
-
-async function countDescendants(userId, layer, tier) {
-  const tree = await Tree.findOne({ userId, tier });
-
-  if (!tree) {
-    return 0;
-  }
-
-  if (layer === 0) {
-    return 1; // Nếu đã đủ 3 cấp dưới thì tính là một node hoàn chỉnh
-  }
-
-  let count = 0;
-
-  for (const childId of tree.children) {
-    const child = await User.findById(childId);
-    if (child.countPay !== 0) {
-      count += await countDescendants(childId, layer - 1, tier);
-    }
-  }
-
-  return count;
-}
-
-export const findRootLayer = asyncHandler(async (id, tier) => {
-  // Tìm người dùng root đầu tiên (có parentId null)
-  const root = await User.findById(id);
-  if (!root) {
-    return 0; // Nếu không tìm thấy root, trả về 0
-  }
-
-  let layer = 1;
-  let currentLayerCount = 1; // Số lượng node hoàn chỉnh ở tầng hiện tại (ban đầu là 1)
-
-  while (true) {
-    const nextLayerCount = currentLayerCount * 3; // Số lượng node hoàn chỉnh trong tầng tiếp theo
-    const totalDescendants = await countDescendants(root._id, layer, tier); // Tính tổng số con (bao gồm cả node hoàn chỉnh và node chưa đủ 3 cấp dưới)
-
-    if (totalDescendants < nextLayerCount) {
-      break;
-    }
-
-    layer++;
-    currentLayerCount = nextLayerCount;
-  }
-
-  return layer - 1; // Trừ 1 vì layer hiện tại là layer chưa hoàn chỉnh
 });
 
 export const countLayerToData = asyncHandler(async () => {
@@ -336,7 +163,6 @@ export const countLayerToData = asyncHandler(async () => {
       }
     }
   }
-  console.log({ result });
   await sendMailUpdateLayerForAdmin(result);
   console.log("updated layer");
 });

@@ -285,5 +285,13 @@
   "Cho dù bạn đang đối mặt với một khoản chi không mong đợi, muốn đầu tư vào dự án kinh doanh mới, hay đơn giản chỉ muốn tiết kiệm cho tương lai, Lend a Hand có thể giúp bạn. Các thành viên của chúng tôi cùng nhau góp vốn và cung cấp sự hỗ trợ tài chính cho nhau, tạo nên một vòng xoay tích luỹ tài sản.": "Cho dù bạn đang đối mặt với một khoản chi không mong đợi, muốn đầu tư vào dự án kinh doanh mới, hay đơn giản chỉ muốn tiết kiệm cho tương lai, Lend a Hand có thể giúp bạn. Các thành viên của chúng tôi cùng nhau góp vốn và cung cấp sự hỗ trợ tài chính cho nhau, tạo nên một vòng xoay tích luỹ tài sản.",
   "address": "Địa chỉ",
   "email": "Email",
-  "29 Võ Văn Tần, Phường Võ Thị Sáu, Quận 3, TP Hồ Chí Minh, Việt Nam": "29 Võ Văn Tần, Phường Võ Thị Sáu, Quận 3, TP Hồ Chí Minh, Việt Nam"
+  "29 Võ Văn Tần, Phường Võ Thị Sáu, Quận 3, TP Hồ Chí Minh, Việt Nam": "29 Võ Văn Tần, Phường Võ Thị Sáu, Quận 3, TP Hồ Chí Minh, Việt Nam",
+
+  "openLah": "Mở không điều kiện",
+  "closeLah": "Tắt không điều kiện",
+
+  "increaseNextTier": "Nâng cấp lên tier ",
+  "congraTier": "CHÚC MỪNG BẠN ĐÃ ĐỦ ĐIỀU KIỆN ĐỂ QUA TIER ",
+  "noTier": "BẠN CHƯA ĐỦ ĐIỀU KIỆN ĐỂ QUA TIER MỚI",
+  "pleaseEnterToIncreaseTier": "ĐỂ QUA TIER VUI LÒNG BẠN NHẤP VÀO NÚT BÊN DƯỚI"
 }

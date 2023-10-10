@@ -9,6 +9,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import Tree from "../models/treeModel.js";
 import { getActivePackages } from "./packageControllers.js";
+import { findNextUser } from "../utils/methods.js";
 
 dotenv.config();
 
@@ -165,6 +166,9 @@ const getUserById = asyncHandler(async (req, res) => {
       oldLayer: user.oldLayer,
       currentLayer: user.currentLayer,
       listDirectUser: listDirectUser,
+      openLah: user.openLah,
+      closeLah: user.closeLah,
+      tierDate: user.tierDate,
     });
   } else {
     res.status(404);
@@ -246,12 +250,15 @@ const updateUser = asyncHandler(async (req, res) => {
 });
 
 const adminUpdateUser = asyncHandler(async (req, res) => {
-  const { newStatus, newFine, isRegistered, buyPackage } = req.body;
+  const { newStatus, newFine, isRegistered, buyPackage, openLah, closeLah } =
+    req.body;
   const user = await User.findOne({ _id: req.params.id }).select("-password");
 
   if (user) {
     user.status = newStatus || user.status;
     user.fine = newFine || user.fine;
+    user.openLah = openLah || user.openLah;
+    user.closeLah = closeLah || user.closeLah;
     const listTransSuccess = await Transaction.find({
       $and: [
         { userId: user._id },
@@ -259,10 +266,12 @@ const adminUpdateUser = asyncHandler(async (req, res) => {
         { type: { $ne: "REGISTER" } },
       ],
     });
-    if (listTransSuccess.length === 0) {
-      user.buyPackage = buyPackage || user.buyPackage;
-    } else {
-      res.status(400).json({ error: "User has generated a transaction" });
+    if (buyPackage !== user.buyPackage) {
+      if (listTransSuccess.length === 0) {
+        user.buyPackage = buyPackage || user.buyPackage;
+      } else {
+        res.status(400).json({ error: "User has generated a transaction" });
+      }
     }
     if (isRegistered && isRegistered === "on" && user.countPay === 0) {
       user.countPay = 1;
@@ -353,7 +362,7 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
         );
         tree.nodes.push({
           key: child._id,
-          label: `${child.userId} (${child.countChild} - ${
+          label: `${child.userId} (${child.countChild[child.tier - 1]} - ${
             child.tier > 1 && child.countPay === 0
               ? "Hoàn thành"
               : child.tier === 1 && child.countPay === 0
@@ -470,6 +479,9 @@ const getUserProfile = asyncHandler(async (req, res) => {
       currentLayer: user.currentLayer,
       listDirectUser: listDirectUser,
       packages,
+      openLah: user.openLah,
+      closeLah: user.closeLah,
+      tierDate: user.tierDate,
     });
   } else {
     res.status(400);
@@ -925,6 +937,136 @@ const replaceRefId = async (deleteUserId) => {
   }
 };
 
+const countChildOfUserById = async (user) => {
+  if (user) {
+    const newCountChild = [...user.countChild];
+    for (let i = 1; i <= user.tier; i++) {
+      const countChild = await getCountAllChildren(user._id, i);
+      newCountChild[i - 1] = countChild;
+    }
+    user.countChild = newCountChild;
+    const updatedUser = await user.save();
+    return updatedUser;
+  } else {
+    throw new Error("User not found");
+  }
+};
+
+const onAcceptIncreaseTier = asyncHandler(async (req, res) => {
+  const u = req.user;
+  const { type } = req.body;
+
+  let nextTier = u.tier + 1;
+  const canIncreaseTier = await checkCanIncreaseNextTier(u);
+  if (canIncreaseTier) {
+    if (type === "ACCEPT") {
+      const newParentId = await findNextUser(nextTier);
+      const newParent = await Tree.findOne({
+        userId: newParentId,
+        tier: nextTier,
+      });
+      let childs = [...newParent.children];
+      newParent.children = [...childs, u._id];
+      await newParent.save();
+
+      const tree = await Tree.create({
+        userName: u.userId,
+        userId: u._id,
+        parentId: newParentId,
+        refId: newParentId,
+        tier: nextTier,
+        children: [],
+      });
+
+      u.tier = nextTier;
+      u.countPay = 0;
+      u.countChild = [...u.countChild, 0];
+      u.currentLayer = [...u.currentLayer, 0];
+      u.tierDate = new Date();
+      await u.save();
+    }
+    res.json({ canIncrease: true });
+  } else {
+    res.json({ canIncrease: false });
+  }
+});
+
+const checkCanIncreaseNextTier = async (u) => {
+  try {
+    if (u.fine > 0) {
+      return false;
+    }
+    if (u.buyPackage === "A" && u.countPay === 13) {
+      if (u.currentLayer.slice(-1) >= 3) {
+        const haveC = await doesAnyUserInHierarchyHaveBuyPackageC(u.id);
+        return !haveC;
+      } else {
+        const countedUser = await countChildOfUserById(u);
+        if (countedUser.countChild.slice(-1) >= 300) {
+          const listChildId = await Tree.find({
+            parentId: u._id,
+            tier: u.tier,
+          }).select("userId");
+
+          let highestChildSales = 0;
+          let lowestChildSales = Infinity;
+
+          for (const childId of listChildId) {
+            const child = await User.findById(childId.userId);
+
+            if (child.countChild > highestChildSales) {
+              highestChildSales = child.countChild;
+            }
+
+            if (child.countChild < lowestChildSales) {
+              lowestChildSales = child.countChild;
+            }
+          }
+
+          if (
+            highestChildSales >= 0.4 * u.countChild &&
+            lowestChildSales >= 0.2 * u.countChild
+          ) {
+            const haveC = await doesAnyUserInHierarchyHaveBuyPackageC(u.id);
+            return !haveC;
+          }
+        }
+      }
+    }
+    return false;
+  } catch (error) {
+    throw new Error("Internal server error");
+  }
+};
+
+const doesAnyUserInHierarchyHaveBuyPackageC = async (userId) => {
+  const recursiveCheck = async (userId) => {
+    const tree = await Tree.findOne({ userId });
+
+    if (!tree) {
+      return false;
+    }
+
+    if (tree.buyPackage === "C") {
+      return true;
+    }
+
+    if (tree.children && tree.children.length > 0) {
+      for (const childId of tree.children) {
+        const childHasBuyPackageC = await recursiveCheck(childId);
+        if (childHasBuyPackageC) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  };
+
+  const hasBuyPackageC = await recursiveCheck(userId);
+  return hasBuyPackageC;
+};
+
 export {
   getUserProfile,
   getAllUsers,
@@ -946,4 +1088,7 @@ export {
   changeWallet,
   adminUpdateUser,
   adminDeleteUser,
+  countChildOfUserById,
+  onAcceptIncreaseTier,
+  checkCanIncreaseNextTier,
 };

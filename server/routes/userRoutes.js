@@ -19,6 +19,7 @@ import {
   changeWallet,
   adminUpdateUser,
   adminDeleteUser,
+  onAcceptIncreaseTier,
 } from "../controllers/userControllers.js";
 import { protectRoute, isAdmin } from "../middleware/authMiddleware.js";
 import uploadCloud from "../middleware/uploadCloud.js";
@@ -62,5 +63,7 @@ router
   );
 
 router.route("/update/:id").post(protectRoute, isAdmin, adminUpdateUser);
+
+router.route("/tier/increase").post(protectRoute, onAcceptIncreaseTier);
 
 export default router;
