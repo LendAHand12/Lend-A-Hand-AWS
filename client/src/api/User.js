@@ -60,6 +60,10 @@ const User = {
   adminUpdateUser: (id, body) => {
     return API.post(`${URL_API_USER}/update/${id}`, body);
   },
+
+  checkIncreaseTier: (body) => {
+    return API.post(`${URL_API_USER}/tier/increase`, body);
+  },
 };
 
 export default User;

@@ -12,6 +12,7 @@ import "react-confirm-alert/src/react-confirm-alert.css";
 import "react-phone-number-input/style.css";
 import "./index.css";
 import { useHistory } from "react-router-dom";
+import Switch from "react-switch";
 
 const UserProfile = (match) => {
   const { id } = match.match.params;
@@ -25,6 +26,8 @@ const UserProfile = (match) => {
   const [isEditting, setEditting] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [packageOptions, setPackageOptions] = useState([]);
+  const [currentOpenLah, setCurrentOpenLah] = useState(null);
+  const [currentCloseLah, setCurrentCloseLah] = useState(null);
 
   const handleToggler = () => setToggler(!toggler);
 
@@ -36,6 +39,8 @@ const UserProfile = (match) => {
         .then((response) => {
           setLoading(false);
           setData(response.data);
+          setCurrentOpenLah(response.data.openLah);
+          setCurrentCloseLah(response.data.closeLah);
         })
         .catch((error) => {
           let message =
@@ -47,25 +52,32 @@ const UserProfile = (match) => {
     })();
   }, [id, refresh]);
 
-  const onSubmit = async (data) => {
-    setLoadingUpdate(true);
-    await User.adminUpdateUser(id, data)
-      .then((response) => {
-        setLoadingUpdate(false);
-        toast.success(t(response.data.message));
-        setRefresh(!refresh);
-        setEditting(false);
+  const onSubmit = useCallback(
+    async (data) => {
+      setLoadingUpdate(true);
+      await User.adminUpdateUser(id, {
+        ...data,
+        openLah: currentOpenLah,
+        closeLah: currentCloseLah,
       })
-      .catch((error) => {
-        let message =
-          error.response && error.response.data.error
-            ? error.response.data.error
-            : error.message;
-        toast.error(t(message));
-        setLoadingUpdate(false);
-        setEditting(false);
-      });
-  };
+        .then((response) => {
+          setLoadingUpdate(false);
+          toast.success(t(response.data.message));
+          setRefresh(!refresh);
+          setEditting(false);
+        })
+        .catch((error) => {
+          let message =
+            error.response && error.response.data.error
+              ? error.response.data.error
+              : error.message;
+          toast.error(t(message));
+          setLoadingUpdate(false);
+          setEditting(false);
+        });
+    },
+    [currentCloseLah, currentOpenLah]
+  );
 
   const handleDeleteUser = async (onClose) => {
     setLoadingDelete(true);
@@ -175,6 +187,16 @@ const UserProfile = (match) => {
     }
   }, [data]);
 
+  const handleChangeOpenLah = useCallback(
+    () => setCurrentOpenLah(!currentOpenLah),
+    [currentOpenLah]
+  );
+
+  const handleChangeCloseLah = useCallback(
+    () => setCurrentCloseLah(!currentCloseLah),
+    [currentCloseLah]
+  );
+
   return (
     <div>
       <ToastContainer />
@@ -221,6 +243,28 @@ const UserProfile = (match) => {
                       )}
                     </span>
                   </li>
+                  {isEditting && (
+                    <>
+                      <li className="flex items-center py-3">
+                        <span>{t("openLah")}</span>
+                        <span className="ml-auto">
+                          <Switch
+                            checked={currentOpenLah}
+                            onChange={handleChangeOpenLah}
+                          />
+                        </span>
+                      </li>
+                      <li className="flex items-center py-3">
+                        <span>{t("closeLah")}</span>
+                        <span className="ml-auto">
+                          <Switch
+                            checked={currentCloseLah}
+                            onChange={handleChangeCloseLah}
+                          />
+                        </span>
+                      </li>
+                    </>
+                  )}
                   <li className="flex items-center py-3">
                     <span>{t("memberSince")}</span>
                     <span className="ml-auto">

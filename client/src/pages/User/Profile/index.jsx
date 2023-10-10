@@ -250,7 +250,7 @@ const Profile = () => {
           </div>
         )}
 
-        {oldLayer.length < currentLayer.length && (
+        {/* {oldLayer.length < currentLayer.length && (
           <div
             className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-5"
             role="alert"
@@ -271,7 +271,7 @@ const Profile = () => {
                 {t("congrateLayer")} {currentLayer}
               </span>
             </div>
-          )}
+          )} */}
 
         <div className="md:flex no-wrap md:-mx-2 ">
           <div className="w-full lg:w-3/12 lg:mx-2 mb-4 lg:mb-0">

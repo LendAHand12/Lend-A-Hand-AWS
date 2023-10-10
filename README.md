@@ -99,13 +99,13 @@ Ràng buộc không trùng username 1tr => done
 0. tại thêm field lý do chưa đủ điều kiện : errLahCode -> done
 1. Chuyển countChild thành array : Viết hàm chuyển, sửa model user -> done
 2. Viết lại cronJob countChild -> done
-3. Viết lại hàm checkCanIncreaseTier : trả đủ 13 lần, đầy tầng 3, tất cả con đều là gói A hoặc B
+3. Viết lại hàm checkCanIncreaseTier : trả đủ 13 lần, đầy tầng 3, tất cả con đều là gói A hoặc B -> done
 4. Thêm field ngày lên tier. -> done
-5. Làm nút đồng ý chuyển qua tier mới.Lúc này mới tạo cây mới bên tier mới và update ngày lên tier
-6. Làm lại phần thanh toán check xem ở tier cũ đã đạt trên 3 tầng và trên 300 tk con chưa hoặc quá 180 ngày mà chưa đủ : nếu chưa đủ sẽ không nhận quá lần 3 LAH
+5. Làm nút đồng ý chuyển qua tier mới.Lúc này mới tạo cây mới bên tier mới và update ngày lên tier -> done
+6. Làm lại phần thanh toán check xem ở tier cũ đã đạt trên 3 tầng và trên 300 tk con chưa hoặc quá 180 ngày mà chưa đủ : nếu chưa đủ sẽ không nhận quá lần 3 LAH -> done
 7. check ko đủ 3 con trong vòng 30 ngày hiển thị vàng và mất đi quyền nhận LAH gián tiếp
 8. check ko đủ con trong 60 ngày trở lên chuyển sang block
-9. Viết lại hàm trả lý do không được nhận LAH khi admin refunds
+9. Viết lại hàm trả lý do không được nhận LAH khi admin refunds -> done
 
 - Thêm field ghi chú trong chi tiết user : 500
 - Thêm setting Ví admin (Ví nhận phí đăng ký, Ví admin, Ví hold) : 1tr

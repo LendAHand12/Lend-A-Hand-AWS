@@ -272,5 +272,13 @@
   "settingPackage": "Settings packages",
   "buyPackageC": "(LAH 1 time)",
 
-  "Package has been disabled": "Package has been disabled"
+  "Package has been disabled": "Package has been disabled",
+
+  "openLah": "Unconditionally open",
+  "closeLah": "Unconditionally close",
+
+  "increaseNextTier": "Upgrade to tier ",
+  "congraTier": "CONGRATULATIONS YOU HAVE QUALIFIED TO PASS TIER",
+  "noTier": "YOU ARE NOT QUALIFIED TO PASS THE NEW TIER",
+  "pleaseEnterToIncreaseTier": "TO GO TO TIER PLEASE CLICK THE BUTTON BELOW"
 }

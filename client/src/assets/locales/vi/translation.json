@@ -278,5 +278,13 @@
   "settingPackage": "Cài đặt gói",
   "buyPackageC": "(đóng góp 1 lần)",
 
-  "Package has been disabled": "Gói đã bị vô hiệu"
+  "Package has been disabled": "Gói đã bị vô hiệu",
+
+  "openLah": "Mở không điều kiện",
+  "closeLah": "Tắt không điều kiện",
+
+  "increaseNextTier": "Nâng cấp lên tier ",
+  "congraTier": "CHÚC MỪNG BẠN ĐÃ ĐỦ ĐIỀU KIỆN ĐỂ QUA TIER ",
+  "noTier": "BẠN CHƯA ĐỦ ĐIỀU KIỆN ĐỂ QUA TIER MỚI",
+  "pleaseEnterToIncreaseTier": "ĐỂ QUA TIER VUI LÒNG BẠN NHẤP VÀO NÚT BÊN DƯỚI"
 }
