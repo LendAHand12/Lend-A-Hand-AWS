@@ -6,7 +6,7 @@ import User from "../models/userModel.js";
 import sendMail from "../utils/sendMail.js";
 import { sendMailUpdateLayerForAdmin } from "../utils/sendMailCustom.js";
 import { getCountAllChildren } from "../controllers/userControllers.js";
-import { findNextUser } from "../utils/methods.js";
+import { findNextUser, findRootLayer } from "../utils/methods.js";
 import Tree from "../models/treeModel.js";
 
 export const checkUnpayUser = asyncHandler(async () => {
@@ -77,32 +77,34 @@ export const deleteUserNotPay = asyncHandler(async () => {
       { status: "APPROVED" },
       { createdAt: { $lt: currentDay } },
       { countPay: 0 },
-      { children: { $size: 0 } },
     ],
   });
 
   for (let u of listUser) {
-    let parent = await User.findById(u.parentId);
-    if (parent) {
-      let childs = parent.children;
-      let newChilds = childs.filter((item) => {
-        if (item.toString() !== u._id.toString()) return item;
-      });
-      parent.children = [...newChilds];
-      await parent.save();
+    const treeOfUser = await Tree.findOne({ userId: u._id });
+    if (treeOfUser.length !== 0) {
+      let parent = await User.findById(u.parentId);
+      if (parent) {
+        let childs = parent.children;
+        let newChilds = childs.filter((item) => {
+          if (item.toString() !== u._id.toString()) return item;
+        });
+        parent.children = [...newChilds];
+        await parent.save();
 
-      const userDelete = await DeleteUser.create({
-        userId: u.userId,
-        oldId: u._id,
-        email: u.email,
-        phone: u.phone,
-        password: u.password,
-        walletAddress: u.walletAddress,
-        parentId: u.parentId,
-        refId: u.refId,
-      });
+        const userDelete = await DeleteUser.create({
+          userId: u.userId,
+          oldId: u._id,
+          email: u.email,
+          phone: u.phone,
+          password: u.password,
+          walletAddress: u.walletAddress,
+          parentId: u.parentId,
+          refId: u.refId,
+        });
 
-      await User.deleteOne({ _id: u._id });
+        await User.deleteOne({ _id: u._id });
+      }
     }
   }
 

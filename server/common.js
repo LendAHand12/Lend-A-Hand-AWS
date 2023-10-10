@@ -115,3 +115,16 @@ export const transferCountChildToArray = async () => {
 
   console.log("transfer layer to array done");
 };
+
+export const addBuyPackageToTree = async () => {
+  const listUser = await User.find({ isAdmin: false });
+
+  for (let user of listUser) {
+    await Tree.updateMany(
+      { userName: user.name },
+      { $set: { buyPackage: user.buyPackage } }
+    );
+  }
+
+  console.log("addBuyPackageToTree done");
+};

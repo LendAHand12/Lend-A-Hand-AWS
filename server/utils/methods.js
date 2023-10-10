@@ -35,29 +35,12 @@ export const getRefParentUser = async (userId, tier) => {
 
 // Hàm tìm người sẽ được lắp tiếp theo
 export const findNextUser = async (tier) => {
-  const allTrees = await Tree.find({ tier }).sort({ createdAt: -1 });
-
-  // Tạo một mảng để theo dõi số lượng con của mỗi người dùng
-  const userChildrenCount = new Map();
-  allTrees.forEach((tree) => {
-    const userId = tree.userId;
-    if (!userChildrenCount.has(userId)) {
-      userChildrenCount.set(userId, tree.children.length);
+  const allTrees = await Tree.find({ tier }).sort({ createdAt: 1 });
+  for (let tree of allTrees) {
+    if (tree.children.length < 3) {
+      return tree.userId;
     }
-  });
-
-  // Tìm người dùng có ít con nhất trong hệ thống
-  let minChildren = Infinity;
-  let nextUser = null;
-  userChildrenCount.forEach((count, userId) => {
-    if (count < 3) {
-      nextUser = allTrees.find((tree) => tree.userId === userId).userId;
-    } else if (count < minChildren) {
-      minChildren = count;
-      nextUser = allTrees.find((tree) => tree.userId === userId).userId;
-    }
-  });
-  return nextUser;
+  }
 };
 
 export const findRootLayer = async (id, tier) => {
@@ -100,7 +83,7 @@ export const countDescendants = async (userId, layer, tier) => {
 
   for (const childId of tree.children) {
     const child = await User.findById(childId);
-    if (child.countPay !== 0) {
+    if (child.countPay !== 0 && child.status !== "LOCKED" && child.fine === 0) {
       count += await countDescendants(childId, layer - 1, tier);
     }
   }

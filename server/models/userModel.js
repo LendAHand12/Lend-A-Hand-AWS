@@ -105,6 +105,18 @@ const userSchema = mongoose.Schema(
     tierDate: {
       type: Date,
     },
+    openLah: {
+      type: Boolean,
+      default: false,
+    },
+    closeLah: {
+      type: Boolean,
+      default: false,
+    },
+    adminChangeTier: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

@@ -7,6 +7,7 @@ import cors from "cors"; // allow cross origin requests
 import cookieSession from "cookie-session"; // for implementing cookie sessions for passport
 import helmet from "helmet";
 import { CronJob } from "cron";
+import { findNextUser } from "./utils/methods.js";
 
 // middleware
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
@@ -30,8 +31,8 @@ import {
   addBuyPackage,
   changeDefaultContinue,
   transferCountChildToArray,
+  addBuyPackageToTree,
 } from "./common.js";
-import { findNextUser } from "./utils/methods.js";
 
 const app = express();
 
@@ -42,6 +43,7 @@ if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 connectDB();
 
 // await transferCountChildToArray();
+// await addBuyPackageToTree();
 
 app.use(express.json()); // middleware to use req.body
 app.use(cors()); // to avoid CORS errors

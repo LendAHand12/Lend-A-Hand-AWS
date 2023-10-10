@@ -9,6 +9,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import Tree from "../models/treeModel.js";
 import { getActivePackages } from "./packageControllers.js";
+import { findNextUser } from "../utils/methods.js";
 
 dotenv.config();
 
@@ -165,6 +166,9 @@ const getUserById = asyncHandler(async (req, res) => {
       oldLayer: user.oldLayer,
       currentLayer: user.currentLayer,
       listDirectUser: listDirectUser,
+      openLah: user.openLah,
+      closeLah: user.closeLah,
+      tierDate: user.tierDate,
     });
   } else {
     res.status(404);
@@ -246,12 +250,15 @@ const updateUser = asyncHandler(async (req, res) => {
 });
 
 const adminUpdateUser = asyncHandler(async (req, res) => {
-  const { newStatus, newFine, isRegistered, buyPackage } = req.body;
+  const { newStatus, newFine, isRegistered, buyPackage, openLah, closeLah } =
+    req.body;
   const user = await User.findOne({ _id: req.params.id }).select("-password");
 
   if (user) {
     user.status = newStatus || user.status;
     user.fine = newFine || user.fine;
+    user.openLah = openLah || user.openLah;
+    user.closeLah = closeLah || user.closeLah;
     const listTransSuccess = await Transaction.find({
       $and: [
         { userId: user._id },
@@ -259,10 +266,12 @@ const adminUpdateUser = asyncHandler(async (req, res) => {
         { type: { $ne: "REGISTER" } },
       ],
     });
-    if (listTransSuccess.length === 0) {
-      user.buyPackage = buyPackage || user.buyPackage;
-    } else {
-      res.status(400).json({ error: "User has generated a transaction" });
+    if (buyPackage !== user.buyPackage) {
+      if (listTransSuccess.length === 0) {
+        user.buyPackage = buyPackage || user.buyPackage;
+      } else {
+        res.status(400).json({ error: "User has generated a transaction" });
+      }
     }
     if (isRegistered && isRegistered === "on" && user.countPay === 0) {
       user.countPay = 1;
@@ -470,6 +479,9 @@ const getUserProfile = asyncHandler(async (req, res) => {
       currentLayer: user.currentLayer,
       listDirectUser: listDirectUser,
       packages,
+      openLah: user.openLah,
+      closeLah: user.closeLah,
+      tierDate: user.tierDate,
     });
   } else {
     res.status(400);
@@ -940,49 +952,20 @@ const countChildOfUserById = async (user) => {
   }
 };
 
-const countLayerOfUserByIdForTier = async (u) => {
-  let newLayer = [];
-  for (let i = 1; i <= u.tier; i++) {
-    const layer = await findRootLayer(u._id, i);
-    newLayer.push(layer);
-  }
+const onAcceptIncreaseTier = asyncHandler(async (req, res) => {
+  const u = req.user;
+  const { type } = req.body;
 
-  if (areArraysEqual(newLayer, u.currentLayer)) {
-    u.oldLayer = u.currentLayer;
-    await u.save();
-  } else {
-    u.oldLayer = u.currentLayer;
-    u.currentLayer = newLayer;
-    let updatedUser = await u.save();
-    return updatedUser;
-  }
-};
-
-const onAcceptIncreaseTier = asyncHandler(async () => {
-  const listUser = await User.find({
-    $and: [
-      { isAdmin: false },
-      { status: "APPROVED" },
-      { fine: 0 },
-      {
-        $or: [
-          { userId: { $ne: "Admin2" } },
-          { userId: { $ne: "Admin3" } },
-          { userId: { $ne: "Admin4" } },
-        ],
-      },
-    ],
-  }).sort({ createdAt: -1 });
-  for (let u of listUser) {
-    let nextTier = u.tier + 1;
-    const canIncreaseTier = await checkCanIncreaseNextTier(u);
-    if (canIncreaseTier) {
+  let nextTier = u.tier + 1;
+  const canIncreaseTier = await checkCanIncreaseNextTier(u);
+  if (canIncreaseTier) {
+    if (type === "ACCEPT") {
       const newParentId = await findNextUser(nextTier);
       const newParent = await Tree.findOne({
         userId: newParentId,
         tier: nextTier,
       });
-      let childs = newParent.children;
+      let childs = [...newParent.children];
       newParent.children = [...childs, u._id];
       await newParent.save();
 
@@ -997,48 +980,55 @@ const onAcceptIncreaseTier = asyncHandler(async () => {
 
       u.tier = nextTier;
       u.countPay = 0;
-      // u.oldLayer = u.currentLayer;
-      // u.currentLayer = [...u.currentLayer, 0];
+      u.countChild = [...u.countChild, 0];
+      u.currentLayer = [...u.currentLayer, 0];
       await u.save();
     }
+    res.json({ canIncrease: true });
+  } else {
+    res.json({ canIncrease: false });
   }
 });
 
 const checkCanIncreaseNextTier = async (u) => {
   try {
-    // Kiểm tra điều kiện cho việc nâng cấp tier
     if (u.fine > 0) {
       return false;
     }
     if (u.buyPackage === "A" && u.countPay === 13) {
       if (u.currentLayer.slice(-1) >= 3) {
-        return true;
-      } else if (u.countChild >= 300) {
-        const listChildId = await Tree.find({
-          parentId: u._id,
-          tier: u.tier,
-        }).select("userId");
+        const haveC = await doesAnyUserInHierarchyHaveBuyPackageC(u.id);
+        return !haveC;
+      } else {
+        const countedUser = await countChildOfUserById(u);
+        if (countedUser.countChild.slice(-1) >= 300) {
+          const listChildId = await Tree.find({
+            parentId: u._id,
+            tier: u.tier,
+          }).select("userId");
 
-        let highestChildSales = 0;
-        let lowestChildSales = Infinity;
+          let highestChildSales = 0;
+          let lowestChildSales = Infinity;
 
-        for (const childId of listChildId) {
-          const child = await User.findById(childId.userId);
+          for (const childId of listChildId) {
+            const child = await User.findById(childId.userId);
 
-          if (child.countChild > highestChildSales) {
-            highestChildSales = child.countChild;
+            if (child.countChild > highestChildSales) {
+              highestChildSales = child.countChild;
+            }
+
+            if (child.countChild < lowestChildSales) {
+              lowestChildSales = child.countChild;
+            }
           }
 
-          if (child.countChild < lowestChildSales) {
-            lowestChildSales = child.countChild;
+          if (
+            highestChildSales >= 0.4 * u.countChild &&
+            lowestChildSales >= 0.2 * u.countChild
+          ) {
+            const haveC = await doesAnyUserInHierarchyHaveBuyPackageC(u.id);
+            return !haveC;
           }
-        }
-
-        if (
-          highestChildSales >= 0.4 * u.countChild &&
-          lowestChildSales >= 0.2 * u.countChild
-        ) {
-          return true;
         }
       }
     }
@@ -1046,6 +1036,34 @@ const checkCanIncreaseNextTier = async (u) => {
   } catch (error) {
     throw new Error("Internal server error");
   }
+};
+
+const doesAnyUserInHierarchyHaveBuyPackageC = async (userId) => {
+  const recursiveCheck = async (userId) => {
+    const tree = await Tree.findOne({ userId });
+
+    if (!tree) {
+      return false;
+    }
+
+    if (tree.buyPackage === "C") {
+      return true;
+    }
+
+    if (tree.children && tree.children.length > 0) {
+      for (const childId of tree.children) {
+        const childHasBuyPackageC = await recursiveCheck(childId);
+        if (childHasBuyPackageC) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  };
+
+  const hasBuyPackageC = await recursiveCheck(userId);
+  return hasBuyPackageC;
 };
 
 export {
@@ -1070,4 +1088,6 @@ export {
   adminUpdateUser,
   adminDeleteUser,
   countChildOfUserById,
+  onAcceptIncreaseTier,
+  checkCanIncreaseNextTier,
 };
