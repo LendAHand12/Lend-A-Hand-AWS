@@ -196,6 +196,10 @@ const updateUser = asyncHandler(async (req, res) => {
       const newBuyPackage = await Package.findOne({ name: buyPackage });
       if (newBuyPackage.status === "active") {
         user.buyPackage = buyPackage || user.buyPackage;
+        await Tree.findOneAndUpdate(
+          { userName: user.userId },
+          { buyPackage: buyPackage }
+        );
       } else {
         res.status(400).json({ error: "Package has been disabled" });
       }
@@ -1040,12 +1044,18 @@ const checkCanIncreaseNextTier = async (u) => {
 };
 
 const doesAnyUserInHierarchyHaveBuyPackageC = async (userId) => {
-  const recursiveCheck = async (userId) => {
+  const recursiveCheck = async (userId, count) => {
+    let cnt = count | 0;
+
     const tree = await Tree.findOne({ userId });
 
     if (!tree) {
       return false;
     }
+
+    // if (tree.buyPackage === "C" && cnt <= 3) {
+    //   return true;
+    // }
 
     if (tree.buyPackage === "C") {
       return true;
@@ -1053,11 +1063,14 @@ const doesAnyUserInHierarchyHaveBuyPackageC = async (userId) => {
 
     if (tree.children && tree.children.length > 0) {
       for (const childId of tree.children) {
-        const childHasBuyPackageC = await recursiveCheck(childId);
+        cnt += 1;
+        const childHasBuyPackageC = await recursiveCheck(childId, cnt);
         if (childHasBuyPackageC) {
           return true;
         }
       }
+    } else {
+      cnt = 0;
     }
 
     return false;
