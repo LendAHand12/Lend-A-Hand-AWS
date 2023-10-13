@@ -107,6 +107,9 @@ Ràng buộc không trùng username 1tr => done
 8. check ko đủ con trong 60 ngày trở lên chuyển sang block
 9. Viết lại hàm trả lý do không được nhận LAH khi admin refunds -> done
 
+- Admin update full thông tin User => 1tr
+- Admin tạo mới user => 2tr
+
 - Thêm field ghi chú trong chi tiết user : 500
 - Thêm setting Ví admin (Ví nhận phí đăng ký, Ví admin, Ví hold) : 1tr
 - Setting web : 1tr

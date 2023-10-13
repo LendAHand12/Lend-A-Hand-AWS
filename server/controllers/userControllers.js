@@ -254,15 +254,94 @@ const updateUser = asyncHandler(async (req, res) => {
 });
 
 const adminUpdateUser = asyncHandler(async (req, res) => {
-  const { newStatus, newFine, isRegistered, buyPackage, openLah, closeLah } =
-    req.body;
+  const {
+    newStatus,
+    newFine,
+    isRegistered,
+    buyPackage,
+    openLah,
+    closeLah,
+    idCode,
+    userId,
+    phone,
+    email,
+    imgBack,
+    imgFront,
+    tier,
+    walletAddress,
+  } = req.body;
+
+  if (userId) {
+    const userExistsUserId = await User.findOne({
+      userId: { $regex: userId, $options: "i" },
+    });
+    if (userExistsUserId) {
+      let message = "duplicateInfoUserId";
+      res.status(400);
+      throw new Error(message);
+    }
+  }
+
+  if (email) {
+    const userExistsEmail = await User.findOne({
+      email: { $regex: email, $options: "i" },
+    });
+    if (userExistsEmail) {
+      let message = "duplicateInfoEmail";
+      res.status(400);
+      throw new Error(message);
+    }
+  }
+
+  if (phone) {
+    const userExistsPhone = await User.findOne({
+      $and: [{ phone: { $ne: "" } }, { phone }],
+    });
+    if (userExistsPhone) {
+      let message = "Dupplicate phone";
+      res.status(400);
+      throw new Error(message);
+    }
+  }
+
+  if (walletAddress) {
+    const userExistsWalletAddress = await User.findOne({
+      walletAddress: { $in: [walletAddress] },
+    });
+    if (userExistsWalletAddress) {
+      let message = "Dupplicate wallet address";
+      res.status(400);
+      throw new Error(message);
+    }
+  }
+
+  if (idCode) {
+    const userExistsIdCode = await User.findOne({
+      $and: [{ idCode: { $ne: "" } }, { idCode }],
+    });
+    if (userExistsIdCode) {
+      let message = "duplicateInfoIdCode";
+      res.status(400);
+      throw new Error(message);
+    }
+  }
+
   const user = await User.findOne({ _id: req.params.id }).select("-password");
 
   if (user) {
+    if (userId && user.userId !== userId) {
+      user.userId = userId;
+      await Tree.updateMany({ userId: user._id }, { userName: userId });
+    }
+    user.phone = phone || user.phone;
+    user.email = email || user.email;
+    user.idCode = idCode || user.idCode;
     user.status = newStatus || user.status;
     user.fine = newFine || user.fine;
     user.openLah = openLah || user.openLah;
     user.closeLah = closeLah || user.closeLah;
+    user.imgFront = imgFront || user.imgFront;
+    user.imgBack = imgBack || user.imgBack;
     const listTransSuccess = await Transaction.find({
       $and: [
         { userId: user._id },
@@ -270,9 +349,13 @@ const adminUpdateUser = asyncHandler(async (req, res) => {
         { type: { $ne: "REGISTER" } },
       ],
     });
-    if (buyPackage !== user.buyPackage) {
+    if (buyPackage && buyPackage !== user.buyPackage) {
       if (listTransSuccess.length === 0) {
         user.buyPackage = buyPackage || user.buyPackage;
+        await Tree.updateMany(
+          { $and: [{ userId: user._id }, { tier: 1 }] },
+          { buyPackage }
+        );
       } else {
         res.status(400).json({ error: "User has generated a transaction" });
       }
@@ -280,6 +363,38 @@ const adminUpdateUser = asyncHandler(async (req, res) => {
     if (isRegistered && isRegistered === "on" && user.countPay === 0) {
       user.countPay = 1;
     }
+    if (walletAddress && !user.walletAddress.includes(walletAddress)) {
+      user.walletAddress = [walletAddress, ...user.walletAddress];
+    }
+    if (tier && user.tier !== tier && tier >= 2) {
+      // user.countPay = 0;
+      // user.tier = tier;
+      // user.countChild = [...user.countChild, 0];
+      // user.currentLayer = [...user.currentLayer, 0];
+      // user.tierDate = new Date();
+      // user.adminChangeTier = true;
+
+      const newParentId = await findNextUser(tier);
+      console.log({ newParentId });
+      // const newParent = await Tree.findOne({
+      //   userId: newParentId,
+      //   tier,
+      // });
+      // let childs = [...newParent.children];
+      // newParent.children = [...childs, user._id];
+      // await newParent.save();
+
+      // await Tree.create({
+      //   userName: user.userId,
+      //   userId: user._id,
+      //   parentId: newParentId,
+      //   refId: newParentId,
+      //   tier: nextTier,
+      //   buyPackage: "A",
+      //   children: [],
+      // });
+    }
+
     const updatedUser = await user.save();
     if (updatedUser) {
       res.status(200).json({
@@ -1003,6 +1118,7 @@ const checkCanIncreaseNextTier = async (u) => {
     if (u.buyPackage === "A" && u.countPay === 13) {
       if (u.currentLayer.slice(-1) >= 3) {
         const haveC = await doesAnyUserInHierarchyHaveBuyPackageC(u.id);
+        console.log({ haveC });
         return !haveC;
       } else {
         const countedUser = await countChildOfUserById(u);
@@ -1053,13 +1169,14 @@ const doesAnyUserInHierarchyHaveBuyPackageC = async (userId) => {
       return false;
     }
 
-    // if (tree.buyPackage === "C" && cnt <= 3) {
-    //   return true;
-    // }
-
-    if (tree.buyPackage === "C") {
+    if (tree.buyPackage === "C" && cnt <= 3) {
       return true;
     }
+
+    // if (tree.buyPackage === "C") {
+    //   console.log({ tree });
+    //   return true;
+    // }
 
     if (tree.children && tree.children.length > 0) {
       for (const childId of tree.children) {
