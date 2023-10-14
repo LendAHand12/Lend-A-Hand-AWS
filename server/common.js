@@ -1,6 +1,7 @@
 import Tree from "./models/treeModel.js";
 import User from "./models/userModel.js";
 import getParentWithCountPay from "./utils/getParentWithCountPay.js";
+import { findNextUser } from "./utils/methods.js";
 
 export const transferUserToTree = async () => {
   const listUser = await User.find({ isAdmin: false });
@@ -127,4 +128,21 @@ export const addBuyPackageToTree = async () => {
   }
 
   console.log("addBuyPackageToTree done");
+};
+
+export const listTier = async (tier) => {
+  const allTrees = await Tree.find({ tier }).sort({ createdAt: 1 });
+
+  for (let tree of allTrees) {
+    console.log({
+      name: tree.userName,
+      date: tree.createdAt,
+      length: tree.children.length,
+    });
+  }
+};
+
+export const nextUserWithTier = async (tier) => {
+  const nextId = await findNextUser(tier);
+  console.log({ nextId });
 };

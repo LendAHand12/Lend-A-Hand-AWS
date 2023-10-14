@@ -38,25 +38,25 @@ const PaymentPage = () => {
     if (paymentInfo && paymentInfo.registerFee !== 0) {
       setLoadingAddRegister(true);
       try {
-        // const registerTransaction = await transfer(
-        //   import.meta.env.VITE_MAIN_WALLET_ADDRESS,
-        //   paymentInfo.registerFee
-        // );
-        // if (registerTransaction) {
-        //   const { transactionHash } = registerTransaction;
-        await addPayment(
-          paymentInfo.transIds.register,
-          // transactionHash,
-          "hash",
-          "REGISTER",
-          paymentInfo.transIds
+        const registerTransaction = await transfer(
+          import.meta.env.VITE_MAIN_WALLET_ADDRESS,
+          paymentInfo.registerFee
         );
-        setPayStep(2);
-        setLoadingAddRegister(false);
-        // } else {
-        //   setLoadingAddRegister(false);
-        //   throw new Error(t("payment error"));
-        // }
+        if (registerTransaction) {
+          const { transactionHash } = registerTransaction;
+          await addPayment(
+            paymentInfo.transIds.register,
+            transactionHash,
+            // "hash",
+            "REGISTER",
+            paymentInfo.transIds
+          );
+          setPayStep(2);
+          setLoadingAddRegister(false);
+        } else {
+          setLoadingAddRegister(false);
+          throw new Error(t("payment error"));
+        }
       } catch (error) {
         toast.error(t(error.message));
         setLoadingAddRegister(false);
@@ -97,25 +97,25 @@ const PaymentPage = () => {
   const paymentDirectionCommission = useCallback(async () => {
     setLoadingAddDirectCommission(true);
     try {
-      // const registerTransaction = await transfer(
-      //   paymentInfo.directCommissionWallet,
-      //   paymentInfo.directCommissionFee
-      // );
-      // if (registerTransaction) {
-      //   const { transactionHash } = registerTransaction;
-      await addPayment(
-        paymentInfo.transIds.direct,
-        // transactionHash,
-        "hash",
-        "DIRECT",
-        paymentInfo.transIds
+      const registerTransaction = await transfer(
+        paymentInfo.directCommissionWallet,
+        paymentInfo.directCommissionFee
       );
-      setPayStep(3);
-      setLoadingAddDirectCommission(false);
-      // } else {
-      //   setLoadingAddDirectCommission(false);
-      //   throw new Error(t("payment error"));
-      // }
+      if (registerTransaction) {
+        const { transactionHash } = registerTransaction;
+        await addPayment(
+          paymentInfo.transIds.direct,
+          transactionHash,
+          // "hash",
+          "DIRECT",
+          paymentInfo.transIds
+        );
+        setPayStep(3);
+        setLoadingAddDirectCommission(false);
+      } else {
+        setLoadingAddDirectCommission(false);
+        throw new Error(t("payment error"));
+      }
     } catch (error) {
       toast.error(t(error.message));
       setLoadingAddDirectCommission(false);
@@ -125,26 +125,26 @@ const PaymentPage = () => {
   const paymentReferralCommission = useCallback(async () => {
     setLoadingAddReferralCommission(true);
     try {
-      // const referralTransaction = await transfer(
-      //   paymentInfo.referralCommissionWallet,
-      //   paymentInfo.referralCommissionFee
-      // );
-      // if (referralTransaction) {
-      //   const { transactionHash } = referralTransaction;
-      await addPayment(
-        paymentInfo.transIds.referral,
-        // transactionHash,
-        "hash",
-        "REFERRAL",
-        paymentInfo.transIds
+      const referralTransaction = await transfer(
+        paymentInfo.referralCommissionWallet,
+        paymentInfo.referralCommissionFee
       );
-      setPayStep(0);
-      setLoadingAddReferralCommission(false);
-      window.location.reload();
-      // } else {
-      //   setLoadingAddReferralCommission(false);
-      //   throw new Error(t("payment error"));
-      // }
+      if (referralTransaction) {
+        const { transactionHash } = referralTransaction;
+        await addPayment(
+          paymentInfo.transIds.referral,
+          transactionHash,
+          // "hash",
+          "REFERRAL",
+          paymentInfo.transIds
+        );
+        setPayStep(0);
+        setLoadingAddReferralCommission(false);
+        window.location.reload();
+      } else {
+        setLoadingAddReferralCommission(false);
+        throw new Error(t("payment error"));
+      }
     } catch (error) {
       toast.error(t(error.message));
       setLoadingAddReferralCommission(false);
@@ -285,13 +285,17 @@ const PaymentPage = () => {
               </div>
             </div>
           </div>
-        ) : (
+        ) : !loadingCheckIncrease && !showCanIncrease ? (
           <div
             className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-5"
             role="alert"
           >
-            <span className="block sm:inline">{t("noTier")}</span>
+            <span className="block sm:inline">
+              {t("noTier")} {userInfo.tier}
+            </span>
           </div>
+        ) : (
+          <Loading />
         )
       ) : loadingPaymentInfo ? (
         <div className="w-full flex justify-center">

@@ -10,6 +10,7 @@ import dotenv from "dotenv";
 import Tree from "../models/treeModel.js";
 import { getActivePackages } from "./packageControllers.js";
 import { findNextUser } from "../utils/methods.js";
+import generateGravatar from "../utils/generateGravatar.js";
 
 dotenv.config();
 
@@ -367,32 +368,31 @@ const adminUpdateUser = asyncHandler(async (req, res) => {
       user.walletAddress = [walletAddress, ...user.walletAddress];
     }
     if (tier && user.tier !== tier && tier >= 2) {
-      // user.countPay = 0;
-      // user.tier = tier;
-      // user.countChild = [...user.countChild, 0];
-      // user.currentLayer = [...user.currentLayer, 0];
-      // user.tierDate = new Date();
-      // user.adminChangeTier = true;
+      user.countPay = 0;
+      user.tier = tier;
+      user.countChild = [...user.countChild, 0];
+      user.currentLayer = [...user.currentLayer, 0];
+      user.tierDate = new Date();
+      user.adminChangeTier = true;
 
       const newParentId = await findNextUser(tier);
-      console.log({ newParentId });
-      // const newParent = await Tree.findOne({
-      //   userId: newParentId,
-      //   tier,
-      // });
-      // let childs = [...newParent.children];
-      // newParent.children = [...childs, user._id];
-      // await newParent.save();
+      const newParent = await Tree.findOne({
+        userId: newParentId,
+        tier,
+      });
+      let childs = [...newParent.children];
+      newParent.children = [...childs, user._id];
+      await newParent.save();
 
-      // await Tree.create({
-      //   userName: user.userId,
-      //   userId: user._id,
-      //   parentId: newParentId,
-      //   refId: newParentId,
-      //   tier: nextTier,
-      //   buyPackage: "A",
-      //   children: [],
-      // });
+      await Tree.create({
+        userName: user.userId,
+        userId: user._id,
+        parentId: newParentId,
+        refId: newParentId,
+        tier,
+        buyPackage: "A",
+        children: [],
+      });
     }
 
     const updatedUser = await user.save();
@@ -1118,7 +1118,6 @@ const checkCanIncreaseNextTier = async (u) => {
     if (u.buyPackage === "A" && u.countPay === 13) {
       if (u.currentLayer.slice(-1) >= 3) {
         const haveC = await doesAnyUserInHierarchyHaveBuyPackageC(u.id);
-        console.log({ haveC });
         return !haveC;
       } else {
         const countedUser = await countChildOfUserById(u);
@@ -1197,6 +1196,105 @@ const doesAnyUserInHierarchyHaveBuyPackageC = async (userId) => {
   return hasBuyPackageC;
 };
 
+const adminCreateUser = asyncHandler(async (req, res) => {
+  const {
+    userId,
+    walletAddress,
+    email,
+    password,
+    phone,
+    idCode,
+    imgFront,
+    imgBack,
+    tier,
+  } = req.body;
+
+  const userExistsUserId = await User.findOne({
+    userId: { $regex: userId, $options: "i" },
+  });
+  const userExistsEmail = await User.findOne({
+    email: { $regex: email, $options: "i" },
+  });
+  const userExistsPhone = await User.findOne({
+    $and: [{ phone: { $ne: "" } }, { phone }],
+  });
+  const userExistsWalletAddress = await User.findOne({
+    walletAddress: { $in: [walletAddress] },
+  });
+  const userExistsIdCode = await User.findOne({
+    $and: [{ idCode: { $ne: "" } }, { idCode }],
+  });
+
+  if (userExistsUserId) {
+    let message = "duplicateInfoUserId";
+    res.status(400);
+    throw new Error(message);
+  } else if (userExistsEmail) {
+    let message = "duplicateInfoEmail";
+    res.status(400);
+    throw new Error(message);
+  } else if (userExistsPhone) {
+    let message = "Dupplicate phone";
+    res.status(400);
+    throw new Error(message);
+  } else if (userExistsIdCode) {
+    let message = "duplicateInfoIdCode";
+    res.status(400);
+    throw new Error(message);
+  } else if (userExistsWalletAddress) {
+    let message = "Dupplicate wallet address";
+    res.status(400);
+    throw new Error(message);
+  } else {
+    const avatar = generateGravatar(email);
+
+    const user = await User.create({
+      userId,
+      email,
+      phone,
+      password,
+      avatar,
+      walletAddress: [walletAddress],
+      idCode,
+      imgBack,
+      imgFront,
+      tier,
+      tierDate: new Date(),
+      createBy: "ADMIN",
+      countChild: Array.from({ length: tier }, () => 0),
+      currentLayer: Array.from({ length: tier }, () => 0),
+      status: "APPROVED",
+      isConfirmed: true,
+    });
+
+    const newParentId = await findNextUser(tier);
+    const newParent = await Tree.findOne({
+      userId: newParentId,
+      tier,
+    });
+    let childs = [...newParent.children];
+    newParent.children = [...childs, user._id];
+    await newParent.save();
+
+    await Tree.create({
+      userName: user.userId,
+      userId: user._id,
+      parentId: newParentId,
+      refId: newParentId,
+      tier,
+      children: [],
+    });
+
+    // await sendMail(user._id, email, "email verification");
+
+    let message = "createUserSuccessful";
+
+    res.status(201).json({
+      message,
+    });
+  }
+});
+
 export {
   getUserProfile,
   getAllUsers,
@@ -1221,4 +1319,5 @@ export {
   countChildOfUserById,
   onAcceptIncreaseTier,
   checkCanIncreaseNextTier,
+  adminCreateUser,
 };

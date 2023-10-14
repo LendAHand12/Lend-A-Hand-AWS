@@ -117,6 +117,11 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    createBy: {
+      type: String,
+      enum: ["ADMIN", "USER"],
+      default: "USER",
+    },
   },
   {
     timestamps: true,

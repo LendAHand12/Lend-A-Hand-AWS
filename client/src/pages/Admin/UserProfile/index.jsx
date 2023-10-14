@@ -24,7 +24,7 @@ const UserProfile = (match) => {
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [data, setData] = useState({});
   const [toggler, setToggler] = useState(false);
-  const [isEditting, setEditting] = useState(true);
+  const [isEditting, setEditting] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [packageOptions, setPackageOptions] = useState([]);
   const [currentOpenLah, setCurrentOpenLah] = useState(null);

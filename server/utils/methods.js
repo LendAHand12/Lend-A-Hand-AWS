@@ -36,11 +36,40 @@ export const getRefParentUser = async (userId, tier) => {
 // Hàm tìm người sẽ được lắp tiếp theo
 export const findNextUser = async (tier) => {
   const allTrees = await Tree.find({ tier }).sort({ createdAt: 1 });
-  for (let tree of allTrees) {
-    if (tree.children.length < 3) {
-      return tree.userId;
+  const newAllTrees = allTrees.filter((tree) => tree.children.length < 3);
+
+  // for (let tree of newAllTrees) {
+  //   console.log({
+  //     name: tree.userName,
+  //     date: tree.createdAt,
+  //     length: tree.children.length,
+  //   });
+  // }
+
+  const lastMaxIndex = findLastIndexOfMax(
+    newAllTrees.map((item) => item.children.length)
+  );
+  if (lastMaxIndex > -1) {
+    return newAllTrees[lastMaxIndex + 1].userId;
+  }
+};
+
+const findLastIndexOfMax = (arr) => {
+  if (arr.length === 0) {
+    return -1;
+  }
+
+  let max = arr[0];
+  let lastIndex = 0;
+
+  for (let i = 1; i < arr.length; i++) {
+    if (arr[i] >= max) {
+      max = arr[i];
+      lastIndex = i;
     }
   }
+
+  return lastIndex;
 };
 
 export const findRootLayer = async (id, tier) => {

@@ -64,6 +64,10 @@ const User = {
   checkIncreaseTier: (body) => {
     return API.post(`${URL_API_USER}/tier/increase`, body);
   },
+
+  createUser: (body) => {
+    return API.post(`${URL_API_USER}/create`, body);
+  },
 };
 
 export default User;

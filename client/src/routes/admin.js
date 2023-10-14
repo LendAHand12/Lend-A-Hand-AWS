@@ -12,6 +12,7 @@ const System = lazy(() => import("@/pages/Admin/System"));
 const Trash = lazy(() => import("@/pages/Admin/Trash"));
 const Export = lazy(() => import("@/pages/Admin/Export"));
 const SettingPage = lazy(() => import("@/pages/Admin/Setting"));
+const CreateUserPage = lazy(() => import("@/pages/Admin/CreateUser"));
 
 const routes = [
   {
@@ -60,6 +61,11 @@ const routes = [
     path: "/setting",
     // title: "linkVerify",
     component: SettingPage,
+  },
+  {
+    path: "/create-user",
+    // title: "createUser",
+    component: CreateUserPage,
   },
   {
     path: "/export",

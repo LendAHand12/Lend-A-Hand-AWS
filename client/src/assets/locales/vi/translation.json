@@ -292,8 +292,10 @@
 
   "increaseNextTier": "Nâng cấp lên tier ",
   "congraTier": "CHÚC MỪNG BẠN ĐÃ ĐỦ ĐIỀU KIỆN ĐỂ QUA TIER ",
-  "noTier": "BẠN CHƯA ĐỦ ĐIỀU KIỆN ĐỂ QUA TIER MỚI",
+  "noTier": "ĐÃ HOÀN THÀNH ĐÓNG GÓP TIER : ",
   "pleaseEnterToIncreaseTier": "ĐỂ QUA TIER VUI LÒNG BẠN NHẤP VÀO NÚT BÊN DƯỚI",
 
-  "tier is required": "Vui lòng điền tier"
+  "tier is required": "Vui lòng điền tier",
+  "createUser": "Tạo người dùng mới",
+  "createUserSuccessful": "Tạo người dùng mới thành công"
 }

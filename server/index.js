@@ -32,6 +32,8 @@ import {
   changeDefaultContinue,
   transferCountChildToArray,
   addBuyPackageToTree,
+  listTier,
+  nextUserWithTier,
 } from "./common.js";
 
 const app = express();
@@ -42,8 +44,8 @@ if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 // connect to the mongoDB database
 connectDB();
 
-// await transferCountChildToArray();
-// await addBuyPackageToTree();
+// await listTier(2);
+// await nextUserWithTier(2);
 
 app.use(express.json()); // middleware to use req.body
 app.use(cors()); // to avoid CORS errors
@@ -98,11 +100,11 @@ const cron5 = new CronJob("00 21 * * *", () => {
   countLayerToData();
 });
 
-// cron1.start();
-// cron2.start();
-// cron3.start();
-// cron4.start();
-// cron5.start();
+cron1.start();
+cron2.start();
+cron3.start();
+cron4.start();
+cron5.start();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>

@@ -109,6 +109,8 @@ Ràng buộc không trùng username 1tr => done
 
 - Admin update full thông tin User => 1tr
 - Admin tạo mới user => 2tr
+- Chỉnh data thời gian qua tier mới => 500
+- Update điều kiện qua tier 2 chỉ tính gói A, B trong 3 tầng => 700
 
 - Thêm field ghi chú trong chi tiết user : 500
 - Thêm setting Ví admin (Ví nhận phí đăng ký, Ví admin, Ví hold) : 1tr

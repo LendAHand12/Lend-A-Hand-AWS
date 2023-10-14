@@ -6,7 +6,7 @@ import User from "../models/userModel.js";
 import sendMail from "../utils/sendMail.js";
 import { sendMailUpdateLayerForAdmin } from "../utils/sendMailCustom.js";
 import { getCountAllChildren } from "../controllers/userControllers.js";
-import { findNextUser, findRootLayer } from "../utils/methods.js";
+import { findRootLayer } from "../utils/methods.js";
 import Tree from "../models/treeModel.js";
 
 export const checkUnpayUser = asyncHandler(async () => {
@@ -81,6 +81,7 @@ export const deleteUserNotPay = asyncHandler(async () => {
       { status: "APPROVED" },
       { createdAt: { $lt: currentDay } },
       { countPay: 0 },
+      { tier: 1 },
     ],
   });
 
@@ -112,7 +113,7 @@ export const deleteUserNotPay = asyncHandler(async () => {
     }
   }
 
-  console.log("Remove unveify done");
+  console.log("Delete not pay done");
 });
 
 export const countChildToData = asyncHandler(async () => {
