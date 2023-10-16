@@ -109,6 +109,9 @@ const UserProfile = (match) => {
       if (imgBack) {
         body.imgBack = imgBack;
       }
+      if (values.newStatus !== data.status) {
+        body.newStatus = values.newStatus;
+      }
 
       if (Object.keys(body).length === 0) {
         setEditting(false);
