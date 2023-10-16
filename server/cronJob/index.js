@@ -118,7 +118,7 @@ export const deleteUserNotPay = asyncHandler(async () => {
 
 export const countChildToData = asyncHandler(async () => {
   const listUser = await User.find({
-    $and: [{ isAdmin: false }, { status: "APPROVED" }],
+    $and: [{ isAdmin: false }],
   }).select("tier countChild");
 
   for (let u of listUser) {

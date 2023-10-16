@@ -67,7 +67,11 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         if (refUser.closeLah) {
           directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
           haveRefNotPayEnough = true;
-        } else if (refUser.openLah) {
+        } else if (
+          refUser.openLah ||
+          refUser.adminChangeTier ||
+          refUser.createBy === "ADMIN"
+        ) {
           directCommissionWallet = refUser.walletAddress[0];
         } else {
           if (
@@ -101,7 +105,11 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         if (refUser.closeLah) {
           directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
           haveRefNotPayEnough = true;
-        } else if (refUser.openLah) {
+        } else if (
+          refUser.openLah ||
+          refUser.adminChangeTier ||
+          refUser.createBy === "ADMIN"
+        ) {
           directCommissionWallet = refUser.walletAddress[0];
         } else {
           if (
@@ -121,7 +129,11 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         if (refUser.closeLah) {
           directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
           haveRefNotPayEnough = true;
-        } else if (refUser.openLah) {
+        } else if (
+          refUser.openLah ||
+          refUser.adminChangeTier ||
+          refUser.createBy === "ADMIN"
+        ) {
           directCommissionWallet = refUser.walletAddress[0];
         } else {
           if (
@@ -153,7 +165,11 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       if (refUser.closeLah) {
         directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
         haveRefNotPayEnough = true;
-      } else if (refUser.openLah) {
+      } else if (
+        refUser.openLah ||
+        refUser.adminChangeTier ||
+        refUser.createBy === "ADMIN"
+      ) {
         directCommissionWallet = refUser.walletAddress[0];
       } else {
         if (
@@ -185,7 +201,11 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         if (refUser.closeLah) {
           directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
           haveRefNotPayEnough = true;
-        } else if (refUser.openLah) {
+        } else if (
+          refUser.openLah ||
+          refUser.adminChangeTier ||
+          refUser.createBy === "ADMIN"
+        ) {
           directCommissionWallet = refUser.walletAddress[0];
         } else {
           if (
@@ -204,7 +224,11 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       if (parentUser.closeLah) {
         referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
         haveParentNotPayEnough = true;
-      } else if (parentUser.openLah) {
+      } else if (
+        parentUser.openLah ||
+        parentUser.adminChangeTier ||
+        parentUser.createBy === "ADMIN"
+      ) {
         referralCommissionWallet = parentUser.walletAddress[0];
       } else {
         if (
@@ -224,7 +248,11 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       if (refUser.closeLah) {
         directCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
         haveRefNotPayEnough = true;
-      } else if (refUser.openLah) {
+      } else if (
+        refUser.openLah ||
+        refUser.adminChangeTier ||
+        refUser.createBy === "ADMIN"
+      ) {
         directCommissionWallet = refUser.walletAddress[0];
       } else {
         if (
@@ -245,7 +273,11 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       } else if (parentWithCountPay.closeLah) {
         referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS;
         haveParentNotPayEnough = true;
-      } else if (parentWithCountPay.openLah) {
+      } else if (
+        parentWithCountPay.openLah ||
+        parentWithCountPay.adminChangeTier ||
+        parentWithCountPay.createBy === "ADMIN"
+      ) {
         referralCommissionWallet = parentWithCountPay.walletAddress[0];
       } else if (
         parentWithCountPay.fine > 0 ||
@@ -261,10 +293,10 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       }
     }
 
-    // if (user.userId === "THOALOCPHAT668") {
-    haveParentNotPayEnough = true; // termp
-    referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS; // termp
-    // }
+    if (user.userId === "THOALOCPHAT668") {
+      haveParentNotPayEnough = true; // termp
+      referralCommissionWallet = process.env.MAIN_WALLET_ADDRESS; // termp
+    }
 
     let transactionRegister = null;
     let transactionDirect = null;
