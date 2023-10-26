@@ -9,8 +9,10 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import Tree from "../models/treeModel.js";
 import { getActivePackages } from "./packageControllers.js";
-import { findNextUser } from "../utils/methods.js";
+import { findNextUser, findRootLayer } from "../utils/methods.js";
 import generateGravatar from "../utils/generateGravatar.js";
+import { areArraysEqual } from "../cronJob/index.js";
+import { sendMailUserCanInceaseTierToAdmin } from "../utils/sendMailCustom.js";
 
 dotenv.config();
 
@@ -477,7 +479,7 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
       const tree = { key: user._id, label: user.userId, nodes: [] };
       for (const childId of treeOfUser.children) {
         const child = await User.findById(childId).select(
-          "tier userId countChild countPay fine status"
+          "tier userId countChild countPay fine status errLahCode"
         );
         tree.nodes.push({
           key: child._id,
@@ -497,6 +499,7 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
             child.status === "LOCKED"
               ? true
               : false,
+          isYellow: child.errLahCode === "OVER30",
         });
       }
       res.status(200).json(tree);
@@ -1079,6 +1082,7 @@ const onAcceptIncreaseTier = asyncHandler(async (req, res) => {
   const canIncreaseTier = await checkCanIncreaseNextTier(u);
   if (canIncreaseTier) {
     if (type === "ACCEPT") {
+      await sendMailUserCanInceaseTierToAdmin(u);
       const newParentId = await findNextUser(nextTier);
       const newParent = await Tree.findOne({
         userId: newParentId,
@@ -1116,7 +1120,8 @@ const checkCanIncreaseNextTier = async (u) => {
       return false;
     }
     if (u.buyPackage === "A" && u.countPay === 13) {
-      if (u.currentLayer.slice(-1) >= 3) {
+      const updatedUser = await updateCurrentLayerOfUser(u.id);
+      if (updatedUser.currentLayer.slice(-1) >= 3) {
         const haveC = await doesAnyUserInHierarchyHaveBuyPackageC(u.id);
         return !haveC;
       } else {
@@ -1169,6 +1174,7 @@ const doesAnyUserInHierarchyHaveBuyPackageC = async (userId) => {
     }
 
     if (tree.buyPackage === "C" && cnt <= 3) {
+      console.log({ tree });
       return true;
     }
 
@@ -1294,6 +1300,26 @@ const adminCreateUser = asyncHandler(async (req, res) => {
     });
   }
 });
+
+const updateCurrentLayerOfUser = async (id) => {
+  const u = await User.findById(id);
+  let newLayer = [];
+  for (let i = 1; i <= u.tier; i++) {
+    const layer = await findRootLayer(u._id, i);
+    newLayer.push(layer);
+  }
+
+  if (areArraysEqual(newLayer, u.currentLayer)) {
+    u.oldLayer = u.currentLayer;
+    const updatedUser = await u.save();
+    return updatedUser;
+  } else {
+    u.oldLayer = u.currentLayer;
+    u.currentLayer = newLayer;
+    const updatedUser = await u.save();
+    return updatedUser;
+  }
+};
 
 export {
   getUserProfile,

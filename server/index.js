@@ -16,13 +16,14 @@ import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import packageRoutes from "./routes/packageRoutes.js";
+import walletRoutes from "./routes/walletRoutes.js";
 
 import {
-  checkUnpayUser,
-  deleteUserNotKYC,
   countChildToData,
-  deleteUserNotPay,
   countLayerToData,
+  checkBPackage,
+  checkCPackage,
+  deleteUser24hUnPay,
 } from "./cronJob/index.js";
 import {
   transferUserToTree,
@@ -64,40 +65,46 @@ app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/package", packageRoutes);
+app.use("/api/wallet", walletRoutes);
 
 app.use(notFound);
 
 // configure a custome error handler middleware
 app.use(errorHandler);
 
-const cron1 = new CronJob("00 18 * * *", () => {
+const cron1 = new CronJob("00 18 * * *", async () => {
   // 1h
-  console.log("Check unpay user");
-  checkUnpayUser();
+  console.log("Delete user start");
+  await deleteUser24hUnPay();
+  console.log("Delete user done");
 });
 
-const cron2 = new CronJob("30 18 * * *", () => {
-  // 1h30
-  console.log("Delete un KYC user");
-  deleteUserNotKYC();
-});
-
-const cron3 = new CronJob("00 19 * * *", () => {
+const cron2 = new CronJob("00 19 * * *", async () => {
   // 2h
-  console.log("Delete user not pay");
-  deleteUserNotPay();
+  console.log("Check B Package start");
+  await checkBPackage();
+  console.log("Check B Package done");
 });
 
-const cron4 = new CronJob("30 19 * * *", () => {
-  // 2h30
-  console.log("Count child");
-  countChildToData();
+const cron3 = new CronJob("00 20 * * *", async () => {
+  // 3h
+  console.log("Check C Package start");
+  await checkCPackage();
+  console.log("Check C Package done");
 });
 
-const cron5 = new CronJob("00 21 * * *", () => {
+const cron4 = new CronJob("00 21 * * *", async () => {
   // 4h
-  console.log("Refresh layer");
-  countLayerToData();
+  console.log("Count child start");
+  await countChildToData();
+  console.log("Count child done");
+});
+
+const cron5 = new CronJob("00 22 * * *", async () => {
+  // 5h
+  console.log("Refresh layer start");
+  await countLayerToData();
+  console.log("Refresh layer done");
 });
 
 cron1.start();

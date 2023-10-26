@@ -112,6 +112,9 @@ const UserProfile = (match) => {
       if (values.newStatus !== data.status) {
         body.newStatus = values.newStatus;
       }
+      if (values.newFine !== data.fine) {
+        body.newFine = values.newFine;
+      }
 
       if (Object.keys(body).length === 0) {
         setEditting(false);
@@ -136,7 +139,7 @@ const UserProfile = (match) => {
           setEditting(false);
         });
     },
-    [data, currentCloseLah, currentOpenLah, imgFront, imgBack]
+    [data, currentCloseLah, currentOpenLah, imgFront, imgBack, phone]
   );
 
   const handleDeleteUser = async (onClose) => {

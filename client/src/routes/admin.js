@@ -11,7 +11,8 @@ const TransactionDetail = lazy(() => import("@/pages/Admin/TransactionDetail"));
 const System = lazy(() => import("@/pages/Admin/System"));
 const Trash = lazy(() => import("@/pages/Admin/Trash"));
 const Export = lazy(() => import("@/pages/Admin/Export"));
-const SettingPage = lazy(() => import("@/pages/Admin/Setting"));
+const SettingPackage = lazy(() => import("@/pages/Admin/SettingPackage"));
+const SettingWallet = lazy(() => import("@/pages/Admin/SettingWallet"));
 const CreateUserPage = lazy(() => import("@/pages/Admin/CreateUser"));
 
 const routes = [
@@ -54,17 +55,18 @@ const routes = [
   },
   {
     path: "/linkVerify",
-    // title: "linkVerify",
     component: GetVerifyLink,
   },
   {
-    path: "/setting",
-    // title: "linkVerify",
-    component: SettingPage,
+    path: "/package",
+    component: SettingPackage,
+  },
+  {
+    path: "/wallet",
+    component: SettingWallet,
   },
   {
     path: "/create-user",
-    // title: "createUser",
     component: CreateUserPage,
   },
   {

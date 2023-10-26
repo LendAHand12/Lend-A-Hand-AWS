@@ -297,5 +297,7 @@
 
   "tier is required": "Vui lòng điền tier",
   "createUser": "Tạo người dùng mới",
-  "createUserSuccessful": "Tạo người dùng mới thành công"
+  "createUserSuccessful": "Tạo người dùng mới thành công",
+
+  "settingWallet": "Cài đặt Ví"
 }

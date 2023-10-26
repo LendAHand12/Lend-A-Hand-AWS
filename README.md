@@ -112,11 +112,17 @@ Ràng buộc không trùng username 1tr => done
 - Chỉnh data thời gian qua tier mới => 500
 - Update điều kiện qua tier 2 chỉ tính gói A, B trong 3 tầng => 700
 
-- Thêm field ghi chú trong chi tiết user : 500
-- Thêm setting Ví admin (Ví nhận phí đăng ký, Ví admin, Ví hold) : 1tr
-- Setting web : 1tr
+- Thêm setting Ví admin (Ví nhận phí đăng ký, Ví admin, Ví hold) : 1,5tr
+- Thông báo real time khi user đủ điều kiện qua tier mới : 1tr5
+- Bổ sung chính sách cho gói A, B : 2tr
+  Thời gian 4 ngày sau khi thanh toán
+
+- Admin Up chính sách và User xem chính sách : 4tr
 
 - cms -> 8tr
+
+- user gói C mà thanh toán đủ 13 lần có + 2$ ko
+- Gói A đã thanh toán nhưng ko đủ 3 id thì xoá tk mà lỡ có 2 con thì gắn đâu
 
 // update parent
 db.users.update({

@@ -85,3 +85,40 @@ export const sendActiveLink = async (email, link) => {
   // send a promise since nodemailer is async
   if (mailSent) return Promise.resolve(1);
 };
+
+export const sendMailUserCanInceaseTierToAdmin = async (u) => {
+  // set the correct mail option
+  const mailOptions = {
+    from: process.env.EMAIL, // sender address
+    to: process.env.CC_MAIL,
+    subject: "NGƯỜI DÙNG SANG TIER MỚI",
+    html: `<div style="font-size: 18px">
+					<h2>NGƯỜI DÙNG SANG TIER MỚI</h2>
+          <table>
+            <tr>
+              <th>Tên</th>
+              <th>Email</th>
+              <th>Tier mới</th>
+            </tr>
+              <tr>
+                <td>${u.userId}</td>
+                <td>${u.email}</td>
+                <td>${u.tier + 1}</td>
+              </tr>
+          </table>
+				</div>
+				
+			`,
+  };
+
+  const mailSent = await transporter.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(info);
+    }
+  });
+
+  // send a promise since nodemailer is async
+  if (mailSent) return Promise.resolve(1);
+};

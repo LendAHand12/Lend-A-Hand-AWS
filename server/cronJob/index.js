@@ -9,85 +9,14 @@ import { getCountAllChildren } from "../controllers/userControllers.js";
 import { findRootLayer } from "../utils/methods.js";
 import Tree from "../models/treeModel.js";
 
-export const checkUnpayUser = asyncHandler(async () => {
+export const deleteUser24hUnPay = asyncHandler(async () => {
   const listUser = await User.find({
-    $and: [
-      { isAdmin: false },
-      { status: "APPROVED" },
-      { countPay: { lt: 13 } },
-    ],
-  }).select("createdAt countPay fine status email");
-  for (let u of listUser) {
-    const currentDay = moment(new Date());
-    const userCreatedDay = moment(u.createdAt);
-    const diffDays = currentDay.diff(userCreatedDay, "days") + 1; // ngày đăng ký đến hôm nay
-    const { countPay } = u;
-    const countPayWithDays = 7 * (countPay + 1); // số ngày thanh toán theo lần thanh toán
-    if (countPayWithDays - diffDays < -7) {
-      if (u.fine === 2) {
-        u.fine = 4;
-      } else if (u.fine === 4) {
-        u.fine = 6;
-        u.status = "LOCKED";
-      }
-      await u.save();
-    } else if (countPayWithDays - diffDays < 0) {
-      if (u.fine === 0) {
-        u.fine = 2;
-      }
-      await u.save();
-    } else if (countPayWithDays - diffDays === 0) {
-      // send mail payment
-      sendMail(u._id, u.email, "Payment to not fine");
-    }
-  }
-});
-
-export const deleteUserNotKYC = asyncHandler(async () => {
-  const listUser = await User.find({ status: "UNVERIFY" });
-
-  for (let u of listUser) {
-    let parent = await User.findById(u.parentId);
-    if (parent) {
-      let childs = parent.children;
-      let newChilds = childs.filter((item) => {
-        if (item.toString() !== u._id.toString()) return item;
-      });
-      parent.children = [...newChilds];
-      await parent.save();
-
-      const userDelete = await DeleteUser.create({
-        userId: u.userId,
-        oldId: u._id,
-        email: u.email,
-        phone: u.phone,
-        password: u.password,
-        walletAddress: u.walletAddress,
-        parentId: u.parentId,
-        refId: u.refId,
-      });
-
-      await User.deleteOne({ _id: u._id });
-    }
-  }
-
-  console.log("Remove unveify done");
-});
-
-export const deleteUserNotPay = asyncHandler(async () => {
-  const currentDay = new Date(Date.now() - 24 * 3600 * 1000);
-  const listUser = await User.find({
-    $and: [
-      { status: "APPROVED" },
-      { createdAt: { $lt: currentDay } },
-      { countPay: 0 },
-      { tier: 1 },
-    ],
+    $and: [{ tier: 1, countPay: 0 }, { isAdmin: false }],
   });
 
   for (let u of listUser) {
-    const treeOfUser = await Tree.findOne({ userId: u._id });
-    if (treeOfUser.length !== 0) {
+    const listRefId = await Tree.find({ refId: u._id });
+    if (listRefId.length === 0) {
       let parent = await User.findById(u.parentId);
       if (parent) {
         let childs = parent.children;
@@ -109,11 +38,99 @@ export const deleteUserNotPay = asyncHandler(async () => {
         });
 
         await User.deleteOne({ _id: u._id });
+        await Tree.deleteOne({ userId: u._id });
       }
     }
   }
+});
 
-  console.log("Delete not pay done");
+export const checkBPackage = asyncHandler(async () => {
+  const currentDay = moment();
+  const listUser = await User.find({
+    $and: [{ status: "APPROVED" }, { buyPackage: "B" }],
+  });
+
+  for (let u of listUser) {
+    const diffDays = currentDay.diff(u.createdAt, "days");
+    if (diffDays > 30) {
+      const weekFine = Math.floor((diffDays - 30) / 7) * 2;
+      u.fine = weekFine;
+
+      const listRefId = await Tree.find({ refId: u._id });
+      if (listRefId.length < 3) {
+        u.errLahCode = "OVER30";
+      } else {
+        u.errLahCode = "";
+      }
+    }
+
+    if (u.errLahCode === "OVER30" && diffDays > 60) {
+      const listRefId = await Tree.find({ refId: u._id });
+      if (listRefId.length < 3) {
+        u.errLahCode = "OVER60";
+        u.status = "LOCKED";
+      } else {
+        u.errLahCode = "";
+      }
+    }
+    await u.save();
+  }
+});
+
+export const checkCPackage = asyncHandler(async () => {
+  const listUser = await User.find({
+    $and: [{ isAdmin: false }, { status: "APPROVED" }, { buyPackage: "C" }],
+  }).select("createdAt countPay fine status email");
+  for (let u of listUser) {
+    const currentDay = moment(new Date());
+    const userCreatedDay = moment(u.createdAt);
+    const diffDays = currentDay.diff(userCreatedDay, "days") + 1; // ngày đăng ký đến hôm nay
+    const { countPay } = u;
+    const countPayWithDays = 7 * (countPay + 1); // số ngày thanh toán theo lần thanh toán
+    if (countPayWithDays - diffDays < -7) {
+      const listRefId = await Tree.find({ refId: u._id });
+      if (u.fine === 2) {
+        u.fine = 4;
+      } else if (u.fine === 4) {
+        if (listRefId.length === 0) {
+          let parent = await User.findById(u.parentId);
+          if (parent) {
+            let childs = parent.children;
+            let newChilds = childs.filter((item) => {
+              if (item.toString() !== u._id.toString()) return item;
+            });
+            parent.children = [...newChilds];
+            await parent.save();
+
+            const userDelete = await DeleteUser.create({
+              userId: u.userId,
+              oldId: u._id,
+              email: u.email,
+              phone: u.phone,
+              password: u.password,
+              walletAddress: u.walletAddress,
+              parentId: u.parentId,
+              refId: u.refId,
+            });
+
+            await User.deleteOne({ _id: u._id });
+            await Tree.deleteOne({ userId: u._id });
+          }
+        } else {
+          u.status = "LOCKED";
+        }
+      }
+      await u.save();
+    } else if (countPayWithDays - diffDays < 0) {
+      if (u.fine === 0) {
+        u.fine = 2;
+      }
+      await u.save();
+    } else if (countPayWithDays - diffDays === 0) {
+      // send mail payment
+      sendMail(u._id, u.email, "Payment to not fine");
+    }
+  }
 });
 
 export const countChildToData = asyncHandler(async () => {
@@ -168,6 +185,6 @@ export const countLayerToData = asyncHandler(async () => {
   console.log("updated layer");
 });
 
-const areArraysEqual = (arr1, arr2) => {
+export const areArraysEqual = (arr1, arr2) => {
   return JSON.stringify(arr1) === JSON.stringify(arr2);
 };

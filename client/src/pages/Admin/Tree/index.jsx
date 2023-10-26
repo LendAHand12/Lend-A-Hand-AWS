@@ -57,7 +57,7 @@ const TreePage = ({ match }) => {
   }, [id]);
 
   const StyledNode = useCallback(
-    ({ children, onClick, layer, isRed }) => {
+    ({ children, onClick, layer, isRed, isYellow }) => {
       return (
         <div
           onClick={onClick}
@@ -65,6 +65,8 @@ const TreePage = ({ match }) => {
           style={{
             backgroundColor: isRed
               ? "#b91c1c"
+              : isYellow
+              ? "#F4B400"
               : layer <= userInfo.currentLayer[currentTier - 1]
               ? colors[userInfo.currentLayer[currentTier - 1]]
               : "#16a34a",
@@ -115,6 +117,7 @@ const TreePage = ({ match }) => {
             layer={node.layer}
             onClick={() => onClick(node.key, node.layer)}
             isRed={node.isRed}
+            isYellow={node.isYellow}
           >
             {node.label}
           </StyledNode>

@@ -285,11 +285,13 @@
   "closeLah": "Unconditionally close",
 
   "increaseNextTier": "Upgrade to tier ",
-  "congraTier": "CONGRATULATIONS YOU HAVE QUALIFIED TO PASS TIER",
+  "congraTier": "You have completed Tier {{tier}} contributions. Be proud of yourself;  success is just a step away",
   "noTier": "TIER CONTRIBUTIONS COMPLETED : ",
   "pleaseEnterToIncreaseTier": "TO GO TO TIER PLEASE CLICK THE BUTTON BELOW",
 
   "tier is required": "Please fill in tier",
   "createUser": "Create new user",
-  "createUserSuccessful": "New user created successfully"
+  "createUserSuccessful": "New user created successfully",
+
+  "settingWallet": "Setting Wallets"
 }

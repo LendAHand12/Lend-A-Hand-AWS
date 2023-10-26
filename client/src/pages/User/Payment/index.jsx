@@ -39,7 +39,7 @@ const PaymentPage = () => {
       setLoadingAddRegister(true);
       try {
         const registerTransaction = await transfer(
-          import.meta.env.VITE_MAIN_WALLET_ADDRESS,
+          paymentInfo.registerWallet,
           paymentInfo.registerFee
         );
         if (registerTransaction) {
@@ -69,7 +69,7 @@ const PaymentPage = () => {
       setLoadingAddFine(true);
       try {
         const fineTransaction = await transfer(
-          import.meta.env.VITE_MAIN_WALLET_ADDRESS,
+          paymentInfo.registerWallet,
           paymentInfo.transactionFine.amount
         );
         if (fineTransaction) {
@@ -280,7 +280,11 @@ const PaymentPage = () => {
                   disabled={loadingAcceptIncrease}
                   className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                 >
-                  {t("increaseNextTier")} {userInfo.tier + 1}
+                  {loadingAcceptIncrease ? (
+                    <Loading />
+                  ) : (
+                    `${t("increaseNextTier")} ${userInfo.tier + 1}`
+                  )}
                 </button>
               </div>
             </div>
