@@ -47,7 +47,7 @@ const TreePage = () => {
           className={`cursor-pointer p-3 rotate-180 text-white text-sm rounded-md inline-block`}
           style={{
             backgroundColor: isRed
-              ? "#b91c1c"
+              ? "#8c8c8c"
               : isYellow
               ? "#F4B400"
               : layer <= userInfo.currentLayer[currentTier - 1]

@@ -16,9 +16,15 @@ export const deleteUser24hUnPay = asyncHandler(async () => {
 
   for (let u of listUser) {
     const listRefId = await Tree.find({ refId: u._id });
+    const tree = await Tree.findOne({ userId: u._id });
     if (listRefId.length === 0) {
-      let parent = await User.findById(u.parentId);
-      if (parent) {
+      let parent = await Tree.findOne({ userId: tree.parentId });
+      if (parent && tree) {
+        console.log({
+          name: u.userId,
+          tree: tree.userName,
+          parent: parent.userName,
+        });
         let childs = parent.children;
         let newChilds = childs.filter((item) => {
           if (item.toString() !== u._id.toString()) return item;
@@ -33,8 +39,8 @@ export const deleteUser24hUnPay = asyncHandler(async () => {
           phone: u.phone,
           password: u.password,
           walletAddress: u.walletAddress,
-          parentId: u.parentId,
-          refId: u.refId,
+          parentId: tree.parentId,
+          refId: tree.refId,
         });
 
         await User.deleteOne({ _id: u._id });
