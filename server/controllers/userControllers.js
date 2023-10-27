@@ -341,8 +341,18 @@ const adminUpdateUser = asyncHandler(async (req, res) => {
     user.idCode = idCode || user.idCode;
     user.status = newStatus || user.status;
     user.fine = newFine || user.fine;
-    user.openLah = openLah || user.openLah;
-    user.closeLah = closeLah || user.closeLah;
+    if (!openLah && openLah !== undefined) {
+      user.openLah = false;
+    }
+    if (openLah) {
+      user.openLah = true;
+    }
+    if (!closeLah && closeLah !== undefined) {
+      user.closeLah = false;
+    }
+    if (closeLah) {
+      user.closeLah = true;
+    }
     user.imgFront = imgFront || user.imgFront;
     user.imgBack = imgBack || user.imgBack;
     const listTransSuccess = await Transaction.find({

@@ -11,7 +11,7 @@ import Tree from "../models/treeModel.js";
 
 export const deleteUser24hUnPay = asyncHandler(async () => {
   const listUser = await User.find({
-    $and: [{ tier: 1, countPay: 0 }, { isAdmin: false }],
+    $and: [{ tier: 1 }, { countPay: 0 }, { isAdmin: false }],
   });
 
   for (let u of listUser) {
@@ -20,11 +20,6 @@ export const deleteUser24hUnPay = asyncHandler(async () => {
     if (listRefId.length === 0) {
       let parent = await Tree.findOne({ userId: tree.parentId });
       if (parent && tree) {
-        console.log({
-          name: u.userId,
-          tree: tree.userName,
-          parent: parent.userName,
-        });
         let childs = parent.children;
         let newChilds = childs.filter((item) => {
           if (item.toString() !== u._id.toString()) return item;
@@ -47,6 +42,39 @@ export const deleteUser24hUnPay = asyncHandler(async () => {
         await Tree.deleteOne({ userId: u._id });
       }
     }
+  }
+});
+
+export const checkAPackage = asyncHandler(async () => {
+  const currentDay = moment();
+  const listUser = await User.find({
+    $and: [{ status: "APPROVED" }, { buyPackage: "A" }, { tier: 1 }],
+  });
+
+  for (let u of listUser) {
+    const diffDays = currentDay.diff(u.createdAt, "days");
+    if (diffDays > 30) {
+      const weekFine = Math.floor((diffDays - 30) / 7) * 2;
+      u.fine = weekFine;
+
+      const listRefId = await Tree.find({ refId: u._id });
+      if (listRefId.length < 3) {
+        u.errLahCode = "OVER30";
+      } else {
+        u.errLahCode = "";
+      }
+    }
+
+    if (u.errLahCode === "OVER30" && diffDays > 60) {
+      const listRefId = await Tree.find({ refId: u._id });
+      if (listRefId.length < 3) {
+        u.errLahCode = "OVER60";
+        u.status = "LOCKED";
+      } else {
+        u.errLahCode = "";
+      }
+    }
+    await u.save();
   }
 });
 
@@ -98,33 +126,33 @@ export const checkCPackage = asyncHandler(async () => {
       if (u.fine === 2) {
         u.fine = 4;
       } else if (u.fine === 4) {
-        if (listRefId.length === 0) {
-          let parent = await User.findById(u.parentId);
-          if (parent) {
-            let childs = parent.children;
-            let newChilds = childs.filter((item) => {
-              if (item.toString() !== u._id.toString()) return item;
-            });
-            parent.children = [...newChilds];
-            await parent.save();
+        // if (listRefId.length === 0) {
+        //   let parent = await User.findById(u.parentId);
+        //   if (parent) {
+        //     let childs = parent.children;
+        //     let newChilds = childs.filter((item) => {
+        //       if (item.toString() !== u._id.toString()) return item;
+        //     });
+        //     parent.children = [...newChilds];
+        //     await parent.save();
 
-            const userDelete = await DeleteUser.create({
-              userId: u.userId,
-              oldId: u._id,
-              email: u.email,
-              phone: u.phone,
-              password: u.password,
-              walletAddress: u.walletAddress,
-              parentId: u.parentId,
-              refId: u.refId,
-            });
+        //     const userDelete = await DeleteUser.create({
+        //       userId: u.userId,
+        //       oldId: u._id,
+        //       email: u.email,
+        //       phone: u.phone,
+        //       password: u.password,
+        //       walletAddress: u.walletAddress,
+        //       parentId: u.parentId,
+        //       refId: u.refId,
+        //     });
 
-            await User.deleteOne({ _id: u._id });
-            await Tree.deleteOne({ userId: u._id });
-          }
-        } else {
-          u.status = "LOCKED";
-        }
+        //     await User.deleteOne({ _id: u._id });
+        //     await Tree.deleteOne({ userId: u._id });
+        //   }
+        // } else {
+        u.status = "LOCKED";
+        // }
       }
       await u.save();
     } else if (countPayWithDays - diffDays < 0) {
