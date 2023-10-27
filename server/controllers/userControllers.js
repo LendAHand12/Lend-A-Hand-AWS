@@ -493,12 +493,8 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
               : child.countPay - 1
             // child.countPay <= 1 ? 0 : child.countPay - 1
           })`,
-          isRed:
-            // (child.tier === 1 && child.countPay === 0) ||
-            // child.fine > 0 ||
-            child.status === "LOCKED"
-              ? true
-              : false,
+          isGray: child.status === "LOCKED" ? true : false,
+          isRed: child.tier === 1 && child.countPay === 0 ? true : false,
           isYellow: child.errLahCode === "OVER30",
         });
       }

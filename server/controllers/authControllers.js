@@ -14,11 +14,11 @@ const checkLinkRef = asyncHandler(async (req, res) => {
   let message = "invalidUrl";
   try {
     const userReceive = await User.findOne({
-      $and: [{ _id: receiveId }, { status: "APPROVED" }],
+      $and: [{ _id: receiveId }],
     });
 
     const userRef = await User.findOne({
-      $and: [{ _id: ref }, { status: "APPROVED" }],
+      $and: [{ _id: ref }],
     });
 
     if (userReceive && userRef) {

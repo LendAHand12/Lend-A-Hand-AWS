@@ -40,14 +40,16 @@ const TreePage = () => {
   const [currentTier, setCurrentTier] = useState(1);
 
   const StyledNode = useCallback(
-    ({ children, onClick, layer, isRed, isYellow }) => {
+    ({ children, onClick, layer, isRed, isYellow, isGray }) => {
       return (
         <div
           onClick={onClick}
           className={`cursor-pointer p-3 rotate-180 text-white text-sm rounded-md inline-block`}
           style={{
-            backgroundColor: isRed
+            backgroundColor: isGray
               ? "#8c8c8c"
+              : isRed
+              ? "#b91c1c"
               : isYellow
               ? "#F4B400"
               : layer <= userInfo.currentLayer[currentTier - 1]
@@ -100,6 +102,7 @@ const TreePage = () => {
             layer={node.layer}
             onClick={() => onClick(node.key, node.layer)}
             isRed={node.isRed}
+            isGray={node.isGray}
             isYellow={node.isYellow}
           >
             {node.label}
