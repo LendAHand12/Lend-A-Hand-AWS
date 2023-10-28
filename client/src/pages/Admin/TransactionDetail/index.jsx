@@ -126,7 +126,7 @@ const TransactionDetail = () => {
             ? error.response.data.message
             : error.message;
         toast.error(t(message));
-        setLoadingRefund(false);
+        setLoadingRefund(true);
       });
   };
 
@@ -328,6 +328,13 @@ const TransactionDetail = () => {
                     {t("refund")}
                   </button>
                 )}
+                <button
+                  onClick={handRefund}
+                  className="w-full flex justify-center items-center hover:underline border font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                >
+                  {loadingRefund && <Loading />}
+                  {t("untilRefunds")}
+                </button>
               </div>
             </div>
           </div>

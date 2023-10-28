@@ -112,7 +112,7 @@ export const countDescendants = async (userId, layer, tier) => {
 
   for (const childId of tree.children) {
     const child = await User.findById(childId);
-    if (child.countPay !== 0) {
+    if (child && child.countPay !== 0) {
       count += await countDescendants(childId, layer - 1, tier);
     }
   }

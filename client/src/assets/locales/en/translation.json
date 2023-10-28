@@ -293,5 +293,6 @@
   "createUser": "Create new user",
   "createUserSuccessful": "New user created successfully",
 
-  "settingWallet": "Setting Wallets"
+  "settingWallet": "Setting Wallets",
+  "untilRefunds": "Refunds"
 }

@@ -23,6 +23,7 @@ import {
   countLayerToData,
   checkBPackage,
   checkCPackage,
+  checkAPackage,
   deleteUser24hUnPay,
 } from "./cronJob/index.js";
 import {
@@ -79,28 +80,35 @@ const cron1 = new CronJob("00 18 * * *", async () => {
   console.log("Delete user done");
 });
 
-const cron2 = new CronJob("00 19 * * *", async () => {
+const cron2 = new CronJob("30 19 * * *", async () => {
+  // 1h30
+  console.log("Check A Package start");
+  await checkAPackage();
+  console.log("Check A Package done");
+});
+
+const cron3 = new CronJob("00 19 * * *", async () => {
   // 2h
   console.log("Check B Package start");
   await checkBPackage();
   console.log("Check B Package done");
 });
 
-const cron3 = new CronJob("00 20 * * *", async () => {
+const cron4 = new CronJob("00 20 * * *", async () => {
   // 3h
   console.log("Check C Package start");
   await checkCPackage();
   console.log("Check C Package done");
 });
 
-const cron4 = new CronJob("00 21 * * *", async () => {
+const cron5 = new CronJob("00 21 * * *", async () => {
   // 4h
   console.log("Count child start");
   await countChildToData();
   console.log("Count child done");
 });
 
-const cron5 = new CronJob("00 22 * * *", async () => {
+const cron6 = new CronJob("00 22 * * *", async () => {
   // 5h
   console.log("Refresh layer start");
   await countLayerToData();
@@ -112,6 +120,7 @@ cron2.start();
 cron3.start();
 cron4.start();
 cron5.start();
+cron6.start();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>

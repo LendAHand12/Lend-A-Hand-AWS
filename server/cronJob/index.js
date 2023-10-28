@@ -17,7 +17,8 @@ export const deleteUser24hUnPay = asyncHandler(async () => {
   for (let u of listUser) {
     const listRefId = await Tree.find({ refId: u._id });
     const tree = await Tree.findOne({ userId: u._id });
-    if (listRefId.length === 0) {
+    const diffDays = currentDay.diff(u.createdAt, "days");
+    if (listRefId.length === 0 && diffDays >= 1) {
       let parent = await Tree.findOne({ userId: tree.parentId });
       if (parent && tree) {
         let childs = parent.children;
@@ -54,9 +55,6 @@ export const checkAPackage = asyncHandler(async () => {
   for (let u of listUser) {
     const diffDays = currentDay.diff(u.createdAt, "days");
     if (diffDays > 30) {
-      const weekFine = Math.floor((diffDays - 30) / 7) * 2;
-      u.fine = weekFine;
-
       const listRefId = await Tree.find({ refId: u._id });
       if (listRefId.length < 3) {
         u.errLahCode = "OVER30";
