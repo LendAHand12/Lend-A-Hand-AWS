@@ -13,7 +13,7 @@ export const deleteUser24hUnPay = asyncHandler(async () => {
   const listUser = await User.find({
     $and: [{ tier: 1 }, { countPay: 0 }, { isAdmin: false }],
   });
-
+  const currentDay = moment();
   for (let u of listUser) {
     const listRefId = await Tree.find({ refId: u._id });
     const tree = await Tree.findOne({ userId: u._id });
