@@ -34,43 +34,65 @@ export const getRefParentUser = async (userId, tier) => {
 };
 
 // Hàm tìm người sẽ được lắp tiếp theo
+
 export const findNextUser = async (tier) => {
-  const allTrees = await Tree.find({ tier }).sort({ createdAt: 1 });
-  const newAllTrees = allTrees.filter((tree) => tree.children.length < 3);
+  const newAllTrees = await Tree.find({ tier }).sort({ createdAt: 1 });
 
   // for (let tree of newAllTrees) {
   //   console.log({
   //     name: tree.userName,
-  //     date: tree.createdAt,
+  //     id: tree.userId,
   //     length: tree.children.length,
   //   });
   // }
 
-  const lastMaxIndex = findLastIndexOfMax(
-    newAllTrees.map((item) => item.children.length)
-  );
-  if (lastMaxIndex > -1) {
-    return newAllTrees[lastMaxIndex + 1].userId;
+  const list3Child = newAllTrees.filter((tree) => tree.children.length === 3);
+  if (list3Child.length === newAllTrees.length) return newAllTrees[0].userId;
+  const list2Child = newAllTrees.filter((tree) => tree.children.length === 2);
+  if (list2Child.length === newAllTrees.length) return newAllTrees[0].userId;
+  const list1Child = newAllTrees.filter((tree) => tree.children.length === 1);
+  if (list1Child.length === newAllTrees.length) return newAllTrees[0].userId;
+  const list0Child = newAllTrees.filter((tree) => tree.children.length === 0);
+  if (list0Child.length === newAllTrees.length) return newAllTrees[0].userId;
+
+  const max = findMax(newAllTrees.map((item) => item.children.length));
+
+  for (let tree of newAllTrees) {
+    const listAe = await Tree.find({
+      $and: [
+        { parentId: tree.parentId },
+        { tier },
+        { userName: { $ne: tree.userName } },
+      ],
+    }).sort({ createdAt: 1 });
+    if (listAe.length > 0) {
+      for (let ae of listAe) {
+        if (ae.children.length < tree.children.length) {
+          return ae.userId;
+        }
+      }
+    }
+    if (tree.children.length < max) {
+      return tree.userId;
+    }
   }
 };
 
-const findLastIndexOfMax = (arr) => {
+function findMax(arr) {
   if (arr.length === 0) {
-    return -1;
+    return -1; // Trả về -1 nếu mảng rỗng
   }
 
-  let max = arr[0];
-  let lastIndex = 0;
+  let maxValue = arr[0];
 
   for (let i = 1; i < arr.length; i++) {
-    if (arr[i] >= max) {
-      max = arr[i];
-      lastIndex = i;
+    if (arr[i] > maxValue) {
+      maxValue = arr[i];
     }
   }
 
-  return lastIndex;
-};
+  return maxValue;
+}
 
 export const findRootLayer = async (id, tier) => {
   // Tìm người dùng root đầu tiên (có parentId null)
