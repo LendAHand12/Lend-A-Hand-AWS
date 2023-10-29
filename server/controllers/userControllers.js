@@ -1126,10 +1126,14 @@ const checkCanIncreaseNextTier = async (u) => {
       return false;
     }
     if (u.buyPackage === "A" && u.countPay === 13) {
-      const updatedUser = await updateCurrentLayerOfUser(u.id);
+      let updatedUser = { ...u._doc };
+      if (updatedUser.currentLayer.slice(-1) < 3) {
+        updatedUser = await updateCurrentLayerOfUser(u.id);
+      }
       if (updatedUser.currentLayer.slice(-1) >= 3) {
-        const haveC = await doesAnyUserInHierarchyHaveBuyPackageC(u.id);
+        const haveC = await doesAnyUserInHierarchyHaveBuyPackageC(u.id, 1);
         return !haveC;
+        // return true;
       } else {
         const countedUser = await countChildOfUserById(u);
         if (countedUser.countChild.slice(-1) >= 300) {
@@ -1157,8 +1161,8 @@ const checkCanIncreaseNextTier = async (u) => {
             highestChildSales >= 0.4 * u.countChild &&
             lowestChildSales >= 0.2 * u.countChild
           ) {
-            const haveC = await doesAnyUserInHierarchyHaveBuyPackageC(u.id);
-            return !haveC;
+            // const haveC = await doesAnyUserInHierarchyHaveBuyPackageC(u.id, 1);
+            return true;
           }
         }
       }
@@ -1180,7 +1184,6 @@ const doesAnyUserInHierarchyHaveBuyPackageC = async (userId) => {
     }
 
     if (tree.buyPackage === "C" && cnt <= 3) {
-      console.log({ tree });
       return true;
     }
 
@@ -1191,6 +1194,7 @@ const doesAnyUserInHierarchyHaveBuyPackageC = async (userId) => {
 
     if (tree.children && tree.children.length > 0) {
       for (const childId of tree.children) {
+        if (cnt === 3) continue;
         cnt += 1;
         const childHasBuyPackageC = await recursiveCheck(childId, cnt);
         if (childHasBuyPackageC) {
