@@ -300,10 +300,10 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       }
     }
 
-    // if (user.userId === "THOALOCPHAT668") {
-    haveParentNotPayEnough = true; // termp
-    referralCommissionWallet = holdWallet.address; // termp
-    // }
+    if (user.userId === "THOALOCPHAT668") {
+      haveParentNotPayEnough = true; // termp
+      referralCommissionWallet = holdWallet.address; // termp
+    }
 
     let transactionRegister = null;
     let transactionDirect = null;
