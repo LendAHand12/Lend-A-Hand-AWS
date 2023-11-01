@@ -57,23 +57,26 @@ export const findNextUser = async (tier) => {
 
   const max = findMax(newAllTrees.map((item) => item.children.length));
 
-  for (let tree of newAllTrees) {
-    const listAe = await Tree.find({
-      $and: [
-        { parentId: tree.parentId },
-        { tier },
-        { userName: { $ne: tree.userName } },
-      ],
-    }).sort({ createdAt: 1 });
-    if (listAe.length > 0) {
-      for (let ae of listAe) {
-        if (ae.children.length < tree.children.length) {
-          return ae.userId;
+  for (let i = 0; i < newAllTrees.length; i++) {
+    if (newAllTrees[i].children.length < 3) {
+      const listAe = await Tree.find({
+        $and: [
+          { parentId: newAllTrees[i].parentId },
+          { tier },
+          { userName: { $ne: newAllTrees[i].userName } },
+        ],
+      }).sort({ createdAt: 1 });
+      if (listAe.length > 0) {
+        for (let ae of listAe) {
+          if (ae.children.length < newAllTrees[i].children.length) {
+            return ae.userId;
+          }
         }
       }
-    }
-    if (tree.children.length < max) {
-      return tree.userId;
+      if (newAllTrees[i].children.length < max) {
+        if (newAllTrees[i].children.length > newAllTrees[i + 1].children.length)
+          return newAllTrees[i + 1].userId;
+      }
     }
   }
 };
