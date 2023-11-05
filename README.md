@@ -119,10 +119,14 @@ Ràng buộc không trùng username 1tr => done
 
 - Admin Up chính sách và User xem chính sách : 4tr
 
-- cms -> 8tr
+- cms -> 8trl
 
-- user gói C mà thanh toán đủ 13 lần có + 2$ ko
-- Gói A đã thanh toán nhưng ko đủ 3 id thì xoá tk mà lỡ có 2 con thì gắn đâu
+- Thay đổi chủ sở hữu : 3tr
+- Xuất file giao dịch : 1tr
+- Ghi chú user trên admin : 500
+- Mục 16 : 1tr
+- Mục 17 : 2tr
+- Check thanh toán trước khi nhảy qua tier mới : 1tr
 
 // update parent
 db.users.update({
