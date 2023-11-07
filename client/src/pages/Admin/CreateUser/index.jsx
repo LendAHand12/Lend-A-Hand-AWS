@@ -115,7 +115,7 @@ const CreateUser = () => {
         </h1>
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="md:flex no-wrap md:-mx-2 "
+          className="md:flex no-wrap md:-mx-2"
         >
           <div className="w-full lg:w-3/5 lg:mx-auto">
             <div className="bg-white p-6 shadow-md rounded-sm border-t-4 border-primary">

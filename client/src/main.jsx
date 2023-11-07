@@ -11,6 +11,7 @@ import App from "./App.jsx";
 import "react-toastify/dist/ReactToastify.css";
 import "./i18n";
 import "./index.css";
+import "react-datepicker/dist/react-datepicker.css";
 
 const { publicClient, webSocketPublicClient } = configureChains(
   [bsc],

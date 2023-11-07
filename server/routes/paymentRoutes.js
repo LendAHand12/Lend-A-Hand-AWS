@@ -21,7 +21,7 @@ router.route("/info").get(protectRoute, getPaymentInfo);
 router.route("/user").get(protectRoute, isAdmin, getAllPayments);
 router
   .route("/getAllTransForExport")
-  .get(protectRoute, isAdmin, getAllTransForExport);
+  .post(protectRoute, isAdmin, getAllTransForExport);
 router
   .route("/")
   .get(protectRoute, getPaymentsOfUser)

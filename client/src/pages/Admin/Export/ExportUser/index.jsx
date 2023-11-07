@@ -7,7 +7,7 @@ import { exportToExcel } from "@/utils/export";
 import "./index.less";
 import Payment from "@/api/Payment";
 
-const ExportPage = () => {
+const ExportPaymentPage = () => {
   const { t } = useTranslation();
 
   const [loading, setLoading] = useState(false);
@@ -146,4 +146,4 @@ const ExportPage = () => {
   );
 };
 
-export default ExportPage;
+export default ExportPaymentPage;

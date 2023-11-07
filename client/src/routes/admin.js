@@ -8,9 +8,9 @@ const Transactions = lazy(() => import("@/pages/Admin/Transactions"));
 const Tree = lazy(() => import("@/pages/Admin/Tree"));
 const GetVerifyLink = lazy(() => import("@/pages/Admin/GetVerifyLink"));
 const TransactionDetail = lazy(() => import("@/pages/Admin/TransactionDetail"));
-const System = lazy(() => import("@/pages/Admin/System"));
 const Trash = lazy(() => import("@/pages/Admin/Trash"));
-const Export = lazy(() => import("@/pages/Admin/Export"));
+const ExportPayment = lazy(() => import("@/pages/Admin/Export/ExportPayment"));
+const ExportUser = lazy(() => import("@/pages/Admin/Export/ExportUser"));
 const SettingPackage = lazy(() => import("@/pages/Admin/SettingPackage"));
 const SettingWallet = lazy(() => import("@/pages/Admin/SettingWallet"));
 const CreateUserPage = lazy(() => import("@/pages/Admin/CreateUser"));
@@ -70,9 +70,12 @@ const routes = [
     component: CreateUserPage,
   },
   {
-    path: "/export",
-    title: "export",
-    component: Export,
+    path: "/export/payment",
+    component: ExportPayment,
+  },
+  {
+    path: "/export/user",
+    component: ExportUser,
   },
 ];
 

@@ -82,6 +82,9 @@ const UserProfile = (match) => {
       if (values.userId !== data.userId) {
         body.userId = values.userId;
       }
+      if (values.note !== data.note) {
+        body.note = values.note;
+      }
       if (values.email !== data.email) {
         body.email = values.email;
       }
@@ -585,6 +588,26 @@ const UserProfile = (match) => {
                         </div>
                       ) : (
                         <div className="px-4 py-2">{data.fine}</div>
+                      )}
+                    </div>
+                    <div className="grid lg:grid-cols-2 grid-cols-1">
+                      <div className="px-4 py-2 font-semibold">{t("note")}</div>
+                      {isEditting ? (
+                        <div className="px-4">
+                          <textarea
+                            className="w-full px-4 py-1.5 rounded-md border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                            {...register("note", {
+                              required: t("note is required"),
+                            })}
+                            autoComplete="off"
+                            rows="3"
+                          />
+                          <p className="error-message-text">
+                            {errors.note?.message}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="px-4 py-2">{data.note}</div>
                       )}
                     </div>
 

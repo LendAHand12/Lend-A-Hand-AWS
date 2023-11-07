@@ -8,6 +8,7 @@ import { sendActiveLink } from "../utils/sendMailCustom.js";
 import { getParentUser, getRefParentUser } from "../utils/methods.js";
 import { checkCanIncreaseNextTier } from "./userControllers.js";
 import Wallet from "../models/walletModel.js";
+import moment from "moment";
 
 const getPaymentInfo = asyncHandler(async (req, res) => {
   const { user } = req;
@@ -82,7 +83,6 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           directCommissionWallet = refUser.walletAddress[0];
         } else {
           if (
-            refUser.fine > 0 ||
             refUser.status === "LOCKED" ||
             refUser.tier < user.tier ||
             (refUser.tier === user.tier && refUser.countPay < 13)
@@ -120,7 +120,6 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           directCommissionWallet = refUser.walletAddress[0];
         } else {
           if (
-            refUser.fine > 0 ||
             refUser.status === "LOCKED" ||
             refUser.tier < user.tier ||
             (refUser.tier === user.tier && refUser.countPay < 7)
@@ -144,7 +143,6 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           directCommissionWallet = refUser.walletAddress[0];
         } else {
           if (
-            refUser.fine > 0 ||
             refUser.status === "LOCKED" ||
             refUser.tier < user.tier ||
             (refUser.tier === user.tier && refUser.countPay < 13)
@@ -180,7 +178,6 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         directCommissionWallet = refUser.walletAddress[0];
       } else {
         if (
-          refUser.fine > 0 ||
           refUser.status === "LOCKED" ||
           refUser.tier < user.tier ||
           (refUser.tier === user.tier && refUser.countPay < user.countPay + 1)
@@ -216,7 +213,6 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           directCommissionWallet = refUser.walletAddress[0];
         } else {
           if (
-            refUser.fine > 0 ||
             refUser.status === "LOCKED" ||
             refUser.tier < user.tier ||
             (refUser.tier === user.tier && refUser.countPay < user.countPay + 1)
@@ -239,7 +235,6 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         referralCommissionWallet = parentUser.walletAddress[0];
       } else {
         if (
-          parentUser.fine > 0 ||
           parentUser.status === "LOCKED" ||
           parentUser.tier < user.tier ||
           (parentUser.tier === user.tier &&
@@ -263,7 +258,6 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         directCommissionWallet = refUser.walletAddress[0];
       } else {
         if (
-          refUser.fine > 0 ||
           refUser.status === "LOCKED" ||
           refUser.tier < user.tier ||
           (refUser.tier === user.tier && refUser.countPay < user.countPay + 1)
@@ -287,7 +281,6 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       ) {
         referralCommissionWallet = parentWithCountPay.walletAddress[0];
       } else if (
-        parentWithCountPay.fine > 0 ||
         parentWithCountPay.status === "LOCKED" ||
         parentWithCountPay.tier < user.tier ||
         (parentWithCountPay.tier === user.tier &&
@@ -1078,50 +1071,60 @@ const getParentWithCount = asyncHandler(async (req, res) => {
 });
 
 const getAllTransForExport = asyncHandler(async (req, res) => {
-  const trans = await Transaction.aggregate([
-    {
-      $match: {
-        status: "SUCCESS",
-      },
-    },
-    {
-      $lookup: {
-        from: "users",
-        localField: "address_from",
-        foreignField: "walletAddress",
-        as: "sender",
-      },
-    },
-    { $unwind: "$sender" },
-    {
-      $lookup: {
-        from: "users",
-        localField: "address_ref",
-        foreignField: "walletAddress",
-        as: "receiver",
-      },
-    },
-    { $unwind: "$receiver" },
-    {
-      $project: {
-        _id: 0,
-        type: 1,
-        amount: 1,
-        isHoldRefund: 1,
-        status: 1,
-        createdAt: 1,
-        address_from: 1,
-        tier: 1,
-        address_ref: 1,
-        senderName: "$sender.userId",
-        senderEmail: "$sender.email",
-        receiverName: "$receiver.userId",
-        receiverEmail: "$receiver.email",
-      },
-    },
-  ]);
+  let fromDate, toDate;
+  const { limit, page } = req.body;
+  let match = {
+    status: "SUCCESS",
+    type: { $ne: "PACKAGE" },
+  };
+  if (req.body.fromDate) {
+    fromDate = moment(req.body.fromDate, "DD/MM/YYYY").format("YYYY-MM-DD");
+    match.createdAt = {
+      $gte: new Date(fromDate),
+    };
+  }
+  if (req.body.toDate) {
+    toDate = moment(req.body.toDate, "DD/MM/YYYY").format("YYYY-MM-DD");
+    match.createdAt = {
+      ...match.createdAt,
+      $lte: new Date(toDate),
+    };
+  }
+  const offset = (page - 1) * limit;
 
-  res.json(trans);
+  const trans = await Transaction.find(match)
+    .limit(limit)
+    .skip(offset)
+    .sort({ createdAt: -1 });
+
+  const totalCount = await Transaction.countDocuments(match);
+
+  const result = [];
+  for (let tran of trans) {
+    const sender = await User.findOne({
+      walletAddress: { $in: [tran.address_from] },
+    }).lean();
+    const receiver = await User.findOne({
+      walletAddress: { $in: [tran.address_ref] },
+    }).lean();
+    result.push({
+      _id: tran._id,
+      type: tran.type,
+      amount: tran.amount,
+      isHoldRefund: tran.isHoldRefund,
+      status: tran.status,
+      createdAt: tran.createdAt,
+      address_from: tran.address_from,
+      tier: tran.tier,
+      address_ref: tran.address_ref,
+      senderName: sender ? sender.userId : "unknow",
+      senderEmail: sender ? sender.email : "unknow",
+      receiverName: receiver ? receiver.userId : "unknow",
+      receiverEmail: receiver ? receiver.email : "unknow",
+    });
+  }
+
+  res.json({ totalCount, result });
 });
 
 export {

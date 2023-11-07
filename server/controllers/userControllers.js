@@ -172,6 +172,7 @@ const getUserById = asyncHandler(async (req, res) => {
       openLah: user.openLah,
       closeLah: user.closeLah,
       tierDate: user.tierDate,
+      note: user.note,
     });
   } else {
     res.status(404);
@@ -272,6 +273,7 @@ const adminUpdateUser = asyncHandler(async (req, res) => {
     imgFront,
     tier,
     walletAddress,
+    note,
   } = req.body;
 
   if (userId) {
@@ -341,6 +343,7 @@ const adminUpdateUser = asyncHandler(async (req, res) => {
     user.idCode = idCode || user.idCode;
     user.status = newStatus || user.status;
     user.fine = newFine || user.fine;
+    user.note = note || user.note;
     if (!openLah && openLah !== undefined) {
       user.openLah = false;
     }

@@ -122,6 +122,9 @@ const userSchema = mongoose.Schema(
       enum: ["ADMIN", "USER"],
       default: "USER",
     },
+    note: {
+      type: String,
+    },
   },
   {
     timestamps: true,

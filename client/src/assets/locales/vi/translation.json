@@ -157,8 +157,8 @@
   "You are not eligible for next step payment": "Bạn chưa đủ điều kiện để đến thanh toán tiếp theo",
 
   "export": "Trích xuất",
-  "export users list": "Trích xuất danh sách người dùng",
-  "export trans list": "Trích xuất danh sách giao dịch",
+  "export users list": "Trích xuất người dùng",
+  "export trans list": "Trích xuất giao dịch",
   "refUserName": "Người giới thiệu",
   "name": "Tên",
   "order": "STT",
@@ -300,5 +300,11 @@
   "createUserSuccessful": "Tạo người dùng mới thành công",
 
   "settingWallet": "Cài đặt Ví",
-  "untilRefunds": "Hoàn trả bất chấp"
+  "untilRefunds": "Hoàn trả bất chấp",
+
+  "note is required": "Ghi chú là bắt buộc",
+  "note": "Ghi chú",
+  "fromDate": "Từ ngày",
+  "toDate": "Đến ngày",
+  "From date must be less than to date": "Từ ngày phải nhỏ hơn đến ngày"
 }
