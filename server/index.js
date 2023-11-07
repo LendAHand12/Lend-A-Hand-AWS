@@ -115,12 +115,12 @@ const cron6 = new CronJob("00 22 * * *", async () => {
   console.log("Refresh layer done");
 });
 
-// cron1.start();
-// cron2.start();
-// cron3.start();
-// cron4.start();
-// cron5.start();
-// cron6.start();
+cron1.start();
+cron2.start();
+cron3.start();
+cron4.start();
+cron5.start();
+cron6.start();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
