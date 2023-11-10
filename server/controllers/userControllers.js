@@ -3,6 +3,7 @@ import User from "../models/userModel.js";
 import Transaction from "../models/transactionModel.js";
 import Package from "../models/packageModel.js";
 import DeleteUser from "../models/deleteUserModel.js";
+import ChangeUser from "../models/changeUserModel.js";
 import mongoose from "mongoose";
 import sendMail from "../utils/sendMail.js";
 import jwt from "jsonwebtoken";
@@ -145,6 +146,10 @@ const getUserById = asyncHandler(async (req, res) => {
         listDirectUser.push(refedUser);
       }
     }
+    const changeUser = await ChangeUser.findOne({
+      oldUserId: user._id,
+      status: "APPROVED",
+    }).select("oldUserName oldEmail updatedAt");
 
     res.json({
       id: user._id,
@@ -173,6 +178,7 @@ const getUserById = asyncHandler(async (req, res) => {
       closeLah: user.closeLah,
       tierDate: user.tierDate,
       note: user.note,
+      changeUser,
     });
   } else {
     res.status(404);
@@ -492,7 +498,7 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
       const tree = { key: user._id, label: user.userId, nodes: [] };
       for (const childId of treeOfUser.children) {
         const child = await User.findById(childId).select(
-          "tier userId countChild countPay fine status errLahCode"
+          "tier userId buyPackage countChild countPay fine status errLahCode"
         );
         tree.nodes.push({
           key: child._id,
@@ -507,7 +513,18 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
             // child.countPay <= 1 ? 0 : child.countPay - 1
           })`,
           isGray: child.status === "LOCKED" ? true : false,
-          isRed: child.tier === 1 && child.countPay === 0 ? true : false,
+          isRed:
+            child.tier === 1 && child.countPay === 0
+              ? true
+              : child.tier === 1 &&
+                child.buyPackage === "B" &&
+                child.countPay < 7
+              ? true
+              : child.tier === 1 &&
+                child.buyPackage === "A" &&
+                child.countPay < 13
+              ? true
+              : false,
           isYellow: child.errLahCode === "OVER30",
         });
       }

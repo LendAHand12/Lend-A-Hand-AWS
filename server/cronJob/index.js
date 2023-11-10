@@ -54,6 +54,11 @@ export const checkAPackage = asyncHandler(async () => {
 
   for (let u of listUser) {
     const diffDays = currentDay.diff(u.createdAt, "days");
+
+    if (diffDays >= 1 && u.countPay < 13) {
+      u.status = "LOCKED";
+    }
+
     if (diffDays > 30) {
       const listRefId = await Tree.find({ refId: u._id });
       if (listRefId.length < 3) {
@@ -84,6 +89,11 @@ export const checkBPackage = asyncHandler(async () => {
 
   for (let u of listUser) {
     const diffDays = currentDay.diff(u.createdAt, "days");
+
+    if (diffDays >= 1 && u.countPay < 7) {
+      u.status = "LOCKED";
+    }
+
     if (diffDays > 30) {
       const weekFine = Math.floor((diffDays - 30) / 7) * 2;
       u.fine = weekFine;

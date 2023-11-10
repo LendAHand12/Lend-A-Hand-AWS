@@ -293,11 +293,65 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       }
     }
 
-    if (user.userId === "THOALOCPHAT668" || user.tier === 2) {
-      haveParentNotPayEnough = true; // termp
-      referralCommissionWallet = holdWallet.address; // termp
-      directCommissionWallet = holdWallet.address; // temp
+    let holdDirectCommission = false;
+    let holdReferralCommission = false;
+
+    if (user.tier === 2) {
+      holdDirectCommission = true;
+      holdReferralCommission = true;
+    }
+
+    if (
+      user.buyPackage === "C" &&
+      (refUser.buyPackage === "B" || refUser.buyPackage === "A")
+    ) {
+      console.log("jdhgawjdhgawhj");
+      holdDirectCommission = true;
+    }
+
+    if (
+      user.buyPackage === "B" &&
+      user.countPay === 0 &&
+      (refUser.buyPackage === "C" || refUser.buyPackage === "A")
+    ) {
+      holdDirectCommission = true;
+    }
+
+    if (
+      user.buyPackage === "A" &&
+      (refUser.buyPackage === "B" || refUser.buyPackage === "C")
+    ) {
+      holdDirectCommission = true;
+    }
+
+    if (
+      user.tier === 1 &&
+      refUser.tier === 1 &&
+      ((refUser.buyPackage === "B" && refUser.countPay < 7) ||
+        (refUser.buyPackage === "A" && refUser.countPay < 13))
+    ) {
+      holdDirectCommission = true;
+    }
+
+    if (
+      user.tier === 1 &&
+      parentWithCountPay.tier === 1 &&
+      ((parentWithCountPay.buyPackage === "B" &&
+        parentWithCountPay.countPay < 7) ||
+        (parentWithCountPay.buyPackage === "A" &&
+          parentWithCountPay.countPay < 13))
+    ) {
+      holdReferralCommission = true;
+    }
+
+    if (holdDirectCommission) {
       haveRefNotPayEnough = true; // temp
+      directCommissionWallet = holdWallet.address; // temp
+    }
+
+    if (holdReferralCommission) {
+      referralCommissionWallet = holdWallet.address; // termp
+      haveParentNotPayEnough = true; // termp
     }
 
     let transactionRegister = null;
@@ -353,6 +407,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         hash: "",
         type: haveRefNotPayEnough ? "DIRECTHOLD" : "DIRECT",
         status: "PENDING",
+        refBuyPackage: refUser.buyPackage,
       });
       transIds.direct = transactionDirect._id;
 
@@ -394,6 +449,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           hash: "",
           type: haveRefNotPayEnough ? "DIRECTHOLD" : "DIRECT",
           status: "PENDING",
+          refBuyPackage: refUser.buyPackage,
         });
         transIds.direct = transactionDirect._id;
 
@@ -989,6 +1045,73 @@ const checkCanRefundPayment = asyncHandler(async (req, res) => {
         throw new Error(`User has not had 3 child within 30 days`);
       } else if (userReceive.errLahCode === "OVER60") {
         throw new Error(`User has not had 3 child within 60 days`);
+      } else if (
+        userReceive.buyPackage === "A" &&
+        userReceive.tier === 1 &&
+        userReceive.countPay < 13
+      ) {
+        throw new Error(
+          `User is ${trans.buyPackage} package but pay ${
+            userReceive.countPay === 0 ? 0 : userReceive.countPay - 1
+          } times`
+        );
+      } else if (
+        userReceive.buyPackage === "B" &&
+        userReceive.tier === 1 &&
+        userReceive.countPay < 7
+      ) {
+        throw new Error(
+          `User is ${trans.buyPackage} package but pay ${
+            userReceive.countPay === 0 ? 0 : userReceive.countPay - 1
+          } times`
+        );
+      } else if (
+        trans.type === "DIRECTHOLD" &&
+        trans.buyPackage === "C" &&
+        (trans.refBuyPackage === "A" || trans.refBuyPackage === "B")
+      ) {
+        res.json({
+          amount: 5,
+          message: `User is ${trans.buyPackage} package Parent is ${trans.refBuyPackage} package (refund 5 USDT)`,
+        });
+      } else if (
+        trans.type === "DIRECTHOLD" &&
+        trans.buyPackage === "B" &&
+        trans.amount === 35 &&
+        trans.refBuyPackage === "C"
+      ) {
+        res.json({
+          amount: 5,
+          message: `User is ${trans.buyPackage} package Parent is ${trans.refBuyPackage} package (refund 5 USDT)`,
+        });
+      } else if (
+        trans.type === "DIRECTHOLD" &&
+        trans.buyPackage === "B" &&
+        trans.amount === 35 &&
+        trans.refBuyPackage === "A"
+      ) {
+        res.json({
+          amount: 35,
+          message: `User is ${trans.buyPackage} package Parent is ${trans.refBuyPackage} package (refund 35 USDT)`,
+        });
+      } else if (
+        trans.type === "DIRECTHOLD" &&
+        trans.buyPackage === "A" &&
+        trans.refBuyPackage === "C"
+      ) {
+        res.json({
+          amount: 5,
+          message: `User is ${trans.buyPackage} package Parent is ${trans.refBuyPackage} package (refund 5 USDT)`,
+        });
+      } else if (
+        trans.type === "DIRECTHOLD" &&
+        trans.buyPackage === "A" &&
+        trans.refBuyPackage === "B"
+      ) {
+        res.json({
+          amount: 35,
+          message: `User is ${trans.buyPackage} package Parent is ${trans.refBuyPackage} package (refund 35 USDT)`,
+        });
       } else {
         res.json({
           message: "User is OK for a refund",

@@ -23,6 +23,8 @@ const TransactionDetail = () => {
   const [loadingCheckCanRefund, setLoadingCheckCanRefund] = useState(false);
   const [refunding, setRefunding] = useState(false);
   const [loadingRefund, setLoadingRefund] = useState(false);
+  const [loadingUntilRefund, setLoadingUntilRefund] = useState(false);
+  const [refundAmount, setRefundAmount] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -65,6 +67,7 @@ const TransactionDetail = () => {
     await Payment.checkCanRefund({ id: transId })
       .then((response) => {
         setCheckRefundMess(response.data.message);
+        response.data.amount && setRefundAmount(response.data.amount);
         setLoadingCheckCanRefund(false);
         setRefunding(true);
       })
@@ -78,27 +81,34 @@ const TransactionDetail = () => {
       });
   }, [transId]);
 
-  const handRefund = useCallback(async () => {
-    const account = await getAccount();
-    if (account) {
-      setLoadingRefund(true);
-      try {
-        const refundTrans = await transfer(trans.address_to, trans.amount);
-        const { transactionHash } = refundTrans;
-        await adminDoneRefund(
-          transId,
-          transactionHash,
-          trans.type,
-          account,
-          trans.address_to
-        );
-      } catch (error) {
-        setLoadingRefund(false);
+  const handRefund = useCallback(
+    async (type) => {
+      const account = await getAccount();
+      if (account) {
+        type === "A" ? setLoadingRefund(true) : setLoadingUntilRefund(true);
+        try {
+          const refundTrans = await transfer(
+            trans.address_to,
+            refundAmount > 0 ? refundAmount : trans.amount
+          );
+          const { transactionHash } = refundTrans;
+          await adminDoneRefund(
+            transId,
+            transactionHash,
+            trans.type,
+            account,
+            trans.address_to
+          );
+        } catch (error) {
+          setLoadingRefund(false);
+          setLoadingUntilRefund(false);
+        }
+      } else {
+        toast.error(t("Please login your registered wallet"));
       }
-    } else {
-      toast.error(t("Please login your registered wallet"));
-    }
-  }, [trans]);
+    },
+    [trans, refundAmount]
+  );
 
   const adminDoneRefund = async (
     transId,
@@ -117,6 +127,7 @@ const TransactionDetail = () => {
       .then((response) => {
         toast.success(response.data.message);
         setLoadingRefund(false);
+        setLoadingUntilRefund(false);
         setRefunding(false);
         setRefresh(!refresh);
       })
@@ -127,6 +138,7 @@ const TransactionDetail = () => {
             : error.message;
         toast.error(t(message));
         setLoadingRefund(true);
+        setLoadingUntilRefund(false);
       });
   };
 
@@ -321,20 +333,23 @@ const TransactionDetail = () => {
                   )}
                 {refunding && (
                   <button
-                    onClick={handRefund}
+                    onClick={() => handRefund("A")}
                     className="w-full flex justify-center items-center hover:underline border font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                   >
                     {loadingRefund && <Loading />}
                     {t("refund")}
                   </button>
                 )}
-                <button
-                  onClick={handRefund}
-                  className="w-full flex justify-center items-center hover:underline border font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-                >
-                  {loadingRefund && <Loading />}
-                  {t("untilRefunds")}
-                </button>
+
+                {trans && trans.type !== "DIRECTHOLD" && (
+                  <button
+                    onClick={() => handRefund("B")}
+                    className="w-full flex justify-center items-center hover:underline border font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                  >
+                    {loadingUntilRefund && <Loading />}
+                    {t("untilRefunds")}
+                  </button>
+                )}
               </div>
             </div>
           </div>

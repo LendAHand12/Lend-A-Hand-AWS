@@ -377,6 +377,30 @@ const UserProfile = (match) => {
                       {new Date(data.createdAt).toLocaleDateString("vi")}
                     </span>
                   </li>
+                  {data.changeUser && (
+                    <>
+                      <li className="flex items-center py-3">
+                        <span>{t("old user name")}</span>
+                        <span className="ml-auto">
+                          {data.changeUser.oldUserName}
+                        </span>
+                      </li>
+                      <li className="flex items-center py-3">
+                        <span>{t("old email")}</span>
+                        <span className="ml-auto">
+                          {data.changeUser.oldEmail}
+                        </span>
+                      </li>
+                      <li className="flex items-center py-3">
+                        <span>{t("changeDate")}</span>
+                        <span className="ml-auto">
+                          {new Date(
+                            data.changeUser.updatedAt
+                          ).toLocaleDateString("vi")}
+                        </span>
+                      </li>
+                    </>
+                  )}
                 </ul>
               </div>
             </div>

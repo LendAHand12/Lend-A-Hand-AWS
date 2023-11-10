@@ -126,7 +126,7 @@ Ràng buộc không trùng username 1tr => done
 - Ghi chú user trên admin : 500
 - Mục 16 : 1tr
 - Mục 17 : 2tr
-- Check thanh toán trước khi nhảy qua tier mới : 1tr
+- Chỉnh tier 2 : 1tr5
 
 // update parent
 db.users.update({

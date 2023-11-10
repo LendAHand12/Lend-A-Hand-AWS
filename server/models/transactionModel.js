@@ -49,6 +49,15 @@ const transactionSchema = mongoose.Schema(
       enum: ["A", "B", "C", ""],
       default: "C",
     },
+    refBuyPackage: {
+      type: String,
+      enum: ["", "A", "B", "C"],
+      default: "",
+    },
+    refundAmount: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

@@ -14,6 +14,8 @@ const ExportUser = lazy(() => import("@/pages/Admin/Export/ExportUser"));
 const SettingPackage = lazy(() => import("@/pages/Admin/SettingPackage"));
 const SettingWallet = lazy(() => import("@/pages/Admin/SettingWallet"));
 const CreateUserPage = lazy(() => import("@/pages/Admin/CreateUser"));
+const ChangeUserPage = lazy(() => import("@/pages/Admin/ChangeUser"));
+const ChangeUserDetail = lazy(() => import("@/pages/Admin/ChangeUserDetail"));
 
 const routes = [
   {
@@ -76,6 +78,15 @@ const routes = [
   {
     path: "/export/user",
     component: ExportUser,
+  },
+  {
+    path: "/changeUser",
+    title: "changeUser",
+    component: ChangeUserPage,
+  },
+  {
+    path: "/changeUser/:id",
+    component: ChangeUserDetail,
   },
 ];
 
