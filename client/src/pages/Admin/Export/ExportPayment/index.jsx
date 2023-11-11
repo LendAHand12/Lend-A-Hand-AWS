@@ -56,10 +56,7 @@ const ExportUserPage = () => {
         const initialResponse = await getData(body);
         const { result } = initialResponse;
         exportData = result;
-        const totalCount =
-          initialResponse.totalCount <= 1000
-            ? initialResponse.totalCount
-            : 1000;
+        const totalCount = initialResponse.totalCount;
 
         if (totalCount > result.length) {
           const totalPage = Math.ceil(totalCount / limit);
@@ -73,7 +70,7 @@ const ExportUserPage = () => {
 
           exportData = [...exportData, ...temporaryArray];
         }
-        console.log({ exportData });
+
         const excelData = convertResponseDataToExportData(exportData, {
           [t("order")]: null,
           [t("senderName")]: null,
