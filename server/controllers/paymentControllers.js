@@ -8,7 +8,6 @@ import { sendActiveLink } from "../utils/sendMailCustom.js";
 import { getParentUser, getRefParentUser } from "../utils/methods.js";
 import { checkCanIncreaseNextTier } from "./userControllers.js";
 import Wallet from "../models/walletModel.js";
-import moment from "moment";
 
 const getPaymentInfo = asyncHandler(async (req, res) => {
   const { user } = req;
@@ -1201,16 +1200,16 @@ const getAllTransForExport = asyncHandler(async (req, res) => {
     type: { $ne: "PACKAGE" },
   };
   if (req.body.fromDate) {
-    fromDate = moment(req.body.fromDate, "DD/MM/YYYY").format("YYYY-MM-DD");
+    fromDate = req.body.fromDate.split("T")[0];
     match.createdAt = {
-      $gte: new Date(fromDate),
+      $gte: new Date(new Date(fromDate).valueOf() + 1000 * 3600 * 24),
     };
   }
   if (req.body.toDate) {
-    toDate = moment(req.body.toDate, "DD/MM/YYYY").format("YYYY-MM-DD");
+    toDate = req.body.toDate.split("T")[0];
     match.createdAt = {
       ...match.createdAt,
-      $lte: new Date(toDate),
+      $lte: new Date(new Date(toDate).valueOf() + 1000 * 3600 * 24),
     };
   }
   const offset = (page - 1) * limit;
