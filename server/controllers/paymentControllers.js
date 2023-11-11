@@ -1212,10 +1212,10 @@ const getAllTransForExport = asyncHandler(async (req, res) => {
       $lte: new Date(new Date(toDate).valueOf() + 1000 * 3600 * 24),
     };
   }
-  const offset = (page - 1) * limit;
+  const offset = (page - 1) * 50;
 
   const trans = await Transaction.find(match)
-    .limit(limit)
+    .limit(50)
     .skip(offset)
     .sort({ createdAt: -1 });
 
