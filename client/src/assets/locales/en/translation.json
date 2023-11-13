@@ -328,5 +328,12 @@
   "inputNoAcceptReason": "Enter reason for rejection",
   "old user name": "Old user name",
   "old email": "Old email",
-  "changeDate": "Change date"
+  "changeDate": "Change date",
+
+  "listNextTier": "List of users receiving tier",
+  "listTier": "List Tier",
+  "chooseNextUserForTier": "Choose the next user for tier",
+  "listUserReceiveNextTier": "List of recipients by tier",
+  "Tree does not exist": "The system tree was not found",
+  "Are you sure to change this.": "Do you want to prioritize this person?"
 }

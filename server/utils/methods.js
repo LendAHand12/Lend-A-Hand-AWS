@@ -1,3 +1,4 @@
+import NextUserTier from "../models/nextUserTierModel.js";
 import Tree from "../models/treeModel.js";
 import User from "../models/userModel.js";
 
@@ -82,6 +83,9 @@ export const getRefParentUser = async (userId, tier) => {
 // };
 
 export const findNextUser = async (tier) => {
+  const nextUserInDB = await NextUserTier.findOne({ tier });
+  if (nextUserInDB) return nextUserInDB.userId;
+
   const newAllTrees = await Tree.find({ tier }).sort({ createdAt: 1 });
   const allTrees = newAllTrees.filter((ele) => ele.children.length < 3);
 

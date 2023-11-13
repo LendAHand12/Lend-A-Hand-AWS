@@ -4,6 +4,7 @@ import Transaction from "../models/transactionModel.js";
 import Package from "../models/packageModel.js";
 import DeleteUser from "../models/deleteUserModel.js";
 import ChangeUser from "../models/changeUserModel.js";
+import NextUserTier from "../models/nextUserTierModel.js";
 import mongoose from "mongoose";
 import sendMail from "../utils/sendMail.js";
 import jwt from "jsonwebtoken";
@@ -14,6 +15,7 @@ import { findNextUser, findRootLayer } from "../utils/methods.js";
 import generateGravatar from "../utils/generateGravatar.js";
 import { areArraysEqual } from "../cronJob/index.js";
 import { sendMailUserCanInceaseTierToAdmin } from "../utils/sendMailCustom.js";
+import { json } from "express";
 
 dotenv.config();
 
@@ -1108,6 +1110,7 @@ const onAcceptIncreaseTier = asyncHandler(async (req, res) => {
   const canIncreaseTier = await checkCanIncreaseNextTier(u);
   if (canIncreaseTier) {
     if (type === "ACCEPT") {
+      await NextUserTier.deleteMany({ tier });
       await sendMailUserCanInceaseTierToAdmin(u);
       const newParentId = await findNextUser(nextTier);
       const newParent = await Tree.findOne({
@@ -1312,6 +1315,8 @@ const adminCreateUser = asyncHandler(async (req, res) => {
     newParent.children = [...childs, user._id];
     await newParent.save();
 
+    await NextUserTier.deleteMany({ tier });
+
     await Tree.create({
       userName: user.userId,
       userId: user._id,
@@ -1351,6 +1356,100 @@ const updateCurrentLayerOfUser = async (id) => {
   }
 };
 
+const getListNextUserWithTier = asyncHandler(async (req, res) => {
+  const listTier = [2, 3, 4, 5];
+  const listNextUserTier = [];
+  for (let tier of listTier) {
+    const nextUserIdTier = await findNextUser(tier);
+    const nextUserTier = await User.findById(nextUserIdTier);
+    const nextUserInDB = await findNextUserTierInDB(tier);
+    if (nextUserInDB) {
+      listNextUserTier.push({
+        userId: nextUserInDB._id,
+        userName: nextUserInDB.userId,
+        tier,
+      });
+    } else {
+      listNextUserTier.push({
+        userId: nextUserTier._id,
+        userName: nextUserTier.userId,
+        tier,
+      });
+    }
+  }
+  res.json(listNextUserTier);
+});
+
+const findNextUserTierInDB = async (tier) => {
+  const nextUserDBTier = await NextUserTier.findOne({ tier });
+  if (nextUserDBTier) {
+    const user = await User.findById(nextUserDBTier.userId);
+    return user;
+  } else {
+    return null;
+  }
+};
+
+const getUsersWithTier = asyncHandler(async (req, res) => {
+  const { pageNumber, searchKey, tier, childLength } = req.body;
+  const page = Number(pageNumber) || 1;
+  const size = Number(childLength) || 0;
+
+  const pageSize = 10;
+
+  const count = await Tree.countDocuments({
+    $and: [
+      { userName: { $regex: searchKey, $options: "i" } },
+      {
+        tier,
+      },
+      { children: { $size: size } },
+    ],
+  });
+  const allUsers = await Tree.find({
+    $and: [
+      { userName: { $regex: searchKey, $options: "i" } },
+      {
+        tier,
+      },
+      { children: { $size: size } },
+    ],
+  })
+    .limit(pageSize)
+    .skip(pageSize * (page - 1))
+    .sort({ createdAt: 1 })
+    .select("-password");
+
+  res.json({
+    users: allUsers,
+    pages: Math.ceil(count / pageSize),
+  });
+});
+
+const changeNextUserTier = asyncHandler(async (req, res) => {
+  const { userId, tier } = req.body;
+
+  const tree = await Tree.findOne({ userId, tier });
+
+  if (tree) {
+    if (tree.children.length >= 3) {
+      res.status(500);
+      throw new Error("full3child");
+    } else {
+      await NextUserTier.deleteMany({ tier });
+
+      await NextUserTier.create({ userId, tier });
+
+      res.status(200).json({
+        message: "Update successful",
+      });
+    }
+  } else {
+    res.status(500);
+    throw new Error("Tree does not exist");
+  }
+});
+
 export {
   getUserProfile,
   getAllUsers,
@@ -1376,4 +1475,7 @@ export {
   onAcceptIncreaseTier,
   checkCanIncreaseNextTier,
   adminCreateUser,
+  getListNextUserWithTier,
+  getUsersWithTier,
+  changeNextUserTier,
 };

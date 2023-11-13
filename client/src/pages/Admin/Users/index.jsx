@@ -7,8 +7,6 @@ import { ToastContainer, toast } from "react-toastify";
 import NoContent from "@/components/NoContent";
 import Loading from "@/components/Loading";
 import { useHistory, useLocation } from "react-router-dom";
-import { confirmAlert } from "react-confirm-alert";
-import "react-confirm-alert/src/react-confirm-alert.css";
 import { PaginationControl } from "react-bootstrap-pagination-control";
 
 const Users = () => {

@@ -334,5 +334,12 @@
   "inputNoAcceptReason": "Nhập lý do từ chối",
   "old user name": "Tên tài khoản cũ",
   "old email": "Email cũ",
-  "changeDate": "Ngày chuyển"
+  "changeDate": "Ngày chuyển",
+
+  "listNextTier": "Danh sách người dùng nhận tier",
+  "listTier": "Danh sách Tier",
+  "chooseNextUserForTier": "Chọn người dùng tiếp theo cho tier ",
+  "listUserReceiveNextTier": "Danh sách người nhận theo tier",
+  "Tree does not exist": "Không tìm thấy cây hệ thống",
+  "Are you sure to change this.": "Bạn muốn ưu tiên người này?"
 }

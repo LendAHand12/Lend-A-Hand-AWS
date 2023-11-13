@@ -16,6 +16,7 @@ const SettingWallet = lazy(() => import("@/pages/Admin/SettingWallet"));
 const CreateUserPage = lazy(() => import("@/pages/Admin/CreateUser"));
 const ChangeUserPage = lazy(() => import("@/pages/Admin/ChangeUser"));
 const ChangeUserDetail = lazy(() => import("@/pages/Admin/ChangeUserDetail"));
+const ListUserNextTier = lazy(() => import("@/pages/Admin/ListUserNextTier"));
 
 const routes = [
   {
@@ -87,6 +88,10 @@ const routes = [
   {
     path: "/changeUser/:id",
     component: ChangeUserDetail,
+  },
+  {
+    path: "/listTier",
+    component: ListUserNextTier,
   },
 ];
 

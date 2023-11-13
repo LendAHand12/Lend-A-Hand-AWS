@@ -21,6 +21,9 @@ import {
   adminDeleteUser,
   onAcceptIncreaseTier,
   adminCreateUser,
+  getListNextUserWithTier,
+  getUsersWithTier,
+  changeNextUserTier,
 } from "../controllers/userControllers.js";
 import { protectRoute, isAdmin } from "../middleware/authMiddleware.js";
 import uploadCloud from "../middleware/uploadCloud.js";
@@ -68,5 +71,15 @@ router.route("/update/:id").post(protectRoute, isAdmin, adminUpdateUser);
 router.route("/tier/increase").post(protectRoute, onAcceptIncreaseTier);
 
 router.route("/create").post(protectRoute, isAdmin, adminCreateUser);
+
+router
+  .route("/listNextUserTier")
+  .post(protectRoute, isAdmin, getListNextUserWithTier);
+
+router.route("/getUsersWithTier").post(protectRoute, isAdmin, getUsersWithTier);
+
+router
+  .route("/changeNextUserTier")
+  .post(protectRoute, isAdmin, changeNextUserTier);
 
 export default router;

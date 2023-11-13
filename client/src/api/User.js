@@ -68,6 +68,18 @@ const User = {
   createUser: (body) => {
     return API.post(`${URL_API_USER}/create`, body);
   },
+
+  getListNextUserTier: (body) => {
+    return API.post(`${URL_API_USER}/listNextUserTier`, body);
+  },
+
+  getUsersWithTier: (body) => {
+    return API.post(`${URL_API_USER}/getUsersWithTier`, body);
+  },
+
+  changeNextUserTier: (body) => {
+    return API.post(`${URL_API_USER}/changeNextUserTier`, body);
+  },
 };
 
 export default User;
