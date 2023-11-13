@@ -8,6 +8,7 @@ import { sendActiveLink } from "../utils/sendMailCustom.js";
 import { getParentUser, getRefParentUser } from "../utils/methods.js";
 import { checkCanIncreaseNextTier } from "./userControllers.js";
 import Wallet from "../models/walletModel.js";
+import Tree from "../models/treeModel.js";
 
 const getPaymentInfo = asyncHandler(async (req, res) => {
   const { user } = req;
@@ -787,6 +788,7 @@ const onDonePayment = async (user, transIds) => {
     if (user.countPay === 12 && user.buyPackage === "B") {
       if (user.continueWithBuyPackageB === true) {
         user.buyPackage = "A";
+        await Tree.findOneAndUpdate({ userId: user._id }, { buyPackage: "A" });
       } else {
         user.buyPackage = "C";
       }
