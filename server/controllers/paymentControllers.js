@@ -236,6 +236,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       } else {
         if (
           parentUser.status === "LOCKED" ||
+          parentUser.errLahCode !== "" ||
           parentUser.tier < user.tier ||
           (parentUser.tier === user.tier &&
             parentUser.countPay < user.countPay + 1)
@@ -282,6 +283,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         referralCommissionWallet = parentWithCountPay.walletAddress[0];
       } else if (
         parentWithCountPay.status === "LOCKED" ||
+        parentUser.errLahCode !== "" ||
         parentWithCountPay.tier < user.tier ||
         (parentWithCountPay.tier === user.tier &&
           parentWithCountPay.countPay < user.countPay + 1)
@@ -302,17 +304,9 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
     }
 
     if (
-      user.buyPackage === "C" &&
-      (refUser.buyPackage === "B" || refUser.buyPackage === "A")
-    ) {
-      console.log("jdhgawjdhgawhj");
-      holdDirectCommission = true;
-    }
-
-    if (
       user.buyPackage === "B" &&
       user.countPay === 0 &&
-      (refUser.buyPackage === "C" || refUser.buyPackage === "A")
+      refUser.buyPackage === "C"
     ) {
       holdDirectCommission = true;
     }
@@ -344,8 +338,8 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       holdReferralCommission = true;
     }
 
-    holdDirectCommission = true; // temp
-    holdReferralCommission = true; // temp
+    // holdDirectCommission = true; // temp
+    // holdReferralCommission = true; // temp
 
     if (holdDirectCommission) {
       haveRefNotPayEnough = true;
@@ -1071,15 +1065,6 @@ const checkCanRefundPayment = asyncHandler(async (req, res) => {
         );
       } else if (
         trans.type === "DIRECTHOLD" &&
-        trans.buyPackage === "C" &&
-        (trans.refBuyPackage === "A" || trans.refBuyPackage === "B")
-      ) {
-        res.json({
-          amount: 5,
-          message: `User is ${trans.buyPackage} package Parent is ${trans.refBuyPackage} package (refund 5 USDT)`,
-        });
-      } else if (
-        trans.type === "DIRECTHOLD" &&
         trans.buyPackage === "B" &&
         trans.amount === 35 &&
         trans.refBuyPackage === "C"
@@ -1087,16 +1072,6 @@ const checkCanRefundPayment = asyncHandler(async (req, res) => {
         res.json({
           amount: 5,
           message: `User is ${trans.buyPackage} package Parent is ${trans.refBuyPackage} package (refund 5 USDT)`,
-        });
-      } else if (
-        trans.type === "DIRECTHOLD" &&
-        trans.buyPackage === "B" &&
-        trans.amount === 35 &&
-        trans.refBuyPackage === "A"
-      ) {
-        res.json({
-          amount: 35,
-          message: `User is ${trans.buyPackage} package Parent is ${trans.refBuyPackage} package (refund 35 USDT)`,
         });
       } else if (
         trans.type === "DIRECTHOLD" &&
