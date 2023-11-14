@@ -344,14 +344,17 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       holdReferralCommission = true;
     }
 
+    holdDirectCommission = true; // temp
+    holdReferralCommission = true; // temp
+
     if (holdDirectCommission) {
-      haveRefNotPayEnough = true; // temp
-      directCommissionWallet = holdWallet.address; // temp
+      haveRefNotPayEnough = true;
+      directCommissionWallet = holdWallet.address;
     }
 
     if (holdReferralCommission) {
-      referralCommissionWallet = holdWallet.address; // termp
-      haveParentNotPayEnough = true; // termp
+      referralCommissionWallet = holdWallet.address;
+      haveParentNotPayEnough = true;
     }
 
     let transactionRegister = null;

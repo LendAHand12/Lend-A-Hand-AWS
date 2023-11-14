@@ -146,3 +146,15 @@ export const nextUserWithTier = async (tier) => {
   const nextId = await findNextUser(tier);
   console.log({ nextId });
 };
+
+export const changeTree12 = async (tier) => {
+  const listPackageA = await User.find({ countPay: 13, tier: 1 });
+  for (let u of listPackageA) {
+    const tree = await Tree.findOne({ userId: u._id, tier: 1 });
+    if (tree.buyPackage !== u.buyPackage) {
+      console.log({ name: tree.userName });
+      tree.buyPackage = u.buyPackage;
+      await tree.save();
+    }
+  }
+};
