@@ -339,7 +339,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
     }
 
     // holdDirectCommission = true; // temp
-    // holdReferralCommission = true; // temp
+    holdReferralCommission = true; // temp
 
     if (holdDirectCommission) {
       haveRefNotPayEnough = true;
