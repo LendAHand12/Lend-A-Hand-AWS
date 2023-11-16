@@ -1110,7 +1110,7 @@ const onAcceptIncreaseTier = asyncHandler(async (req, res) => {
   const canIncreaseTier = await checkCanIncreaseNextTier(u);
   if (canIncreaseTier) {
     if (type === "ACCEPT") {
-      await NextUserTier.deleteMany({ tier });
+      await NextUserTier.deleteMany({ tier: u.tier });
       await sendMailUserCanInceaseTierToAdmin(u);
       const newParentId = await findNextUser(nextTier);
       const newParent = await Tree.findOne({
