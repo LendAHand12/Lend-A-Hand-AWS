@@ -278,7 +278,7 @@ const PaymentPage = () => {
                 <button
                   onClick={handleAcceptIncreaseTier}
                   disabled={loadingAcceptIncrease}
-                  className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                  className="w-xl flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                 >
                   {loadingAcceptIncrease ? (
                     <Loading />
@@ -302,7 +302,7 @@ const PaymentPage = () => {
           <Loading />
         )
       ) : loadingPaymentInfo ? (
-        <div className="w-full flex justify-center">
+        <div className="w-xl flex justify-center">
           <Loading />
         </div>
       ) : (
@@ -427,7 +427,7 @@ const PaymentPage = () => {
                         type="submit"
                         onClick={paymentFineFee}
                         disabled={loadingAddFine}
-                        className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                        className="w-xl flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                       >
                         {loadingAddFine && <Loading />}
                         {t("payment")}
@@ -468,7 +468,7 @@ const PaymentPage = () => {
                             type="submit"
                             onClick={paymentRegisterFee}
                             disabled={loadingAddRegister}
-                            className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                            className="w-xl flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                           >
                             {loadingAddRegister && <Loading />}
                             {t("payment")}
@@ -537,7 +537,7 @@ const PaymentPage = () => {
                             type="submit"
                             disabled={loadingAddDirectCommission}
                             onClick={paymentDirectionCommission}
-                            className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                            className="w-xl flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                           >
                             {loadingAddDirectCommission && <Loading />}
                             {t("payment")}
@@ -630,7 +630,7 @@ const PaymentPage = () => {
                             type="submit"
                             onClick={paymentReferralCommission}
                             disabled={loadingAddReferralCommission}
-                            className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                            className="w-xl flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                           >
                             {loadingAddReferralCommission && <Loading />}
                             {t("payment")}
@@ -723,7 +723,7 @@ const PaymentPage = () => {
                           <button
                             type="submit"
                             onClick={onDonePay}
-                            className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                            className="w-xl flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                           >
                             {t("donePayment")}
                           </button>

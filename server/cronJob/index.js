@@ -8,6 +8,7 @@ import { sendMailUpdateLayerForAdmin } from "../utils/sendMailCustom.js";
 import { getCountAllChildren } from "../controllers/userControllers.js";
 import { findRootLayer } from "../utils/methods.js";
 import Tree from "../models/treeModel.js";
+import Transaction from "../models/transactionModel.js";
 
 export const deleteUser24hUnPay = asyncHandler(async () => {
   const listUser = await User.find({
@@ -225,6 +226,29 @@ export const countLayerToData = asyncHandler(async () => {
   }
   await sendMailUpdateLayerForAdmin(result);
   console.log("updated layer");
+});
+
+export const resetTransTierUnPay = asyncHandler(async () => {
+  const listUser = await User.find({
+    $and: [{ tier: { $gt: 1 } }, { countPay: { $lt: 13 } }],
+  });
+
+  for (let u of listUser) {
+    console.log({ name: u.userId });
+    const listTrans = await Transaction.find({
+      userId: u._id,
+      tier: u.tier,
+      status: "SUCCESS",
+    });
+    if (listTrans.length > 0) {
+      await Transaction.deleteMany({ userId: u._id, tier: u.tier });
+      u.countPay = 0;
+      u.havePaid = true;
+      await u.save();
+    }
+  }
+
+  console.log(`resetTransTierUnPay done!!!`);
 });
 
 export const areArraysEqual = (arr1, arr2) => {

@@ -26,6 +26,7 @@ import {
   checkCPackage,
   checkAPackage,
   deleteUser24hUnPay,
+  resetTransTierUnPay,
 } from "./cronJob/index.js";
 import {
   transferUserToTree,
@@ -49,6 +50,7 @@ connectDB();
 
 // await listTier(2);
 // await nextUserWithTier(2);
+// await checkUnPayUserOnTierUser(2);
 
 app.use(express.json()); // middleware to use req.body
 app.use(cors()); // to avoid CORS errors
@@ -117,12 +119,20 @@ const cron6 = new CronJob("00 22 * * *", async () => {
   console.log("Refresh layer done");
 });
 
+const cron7 = new CronJob("00 23 * * *", async () => {
+  // 6h
+  console.log("Reset trans unpay tier start");
+  await resetTransTierUnPay();
+  console.log("Reset trans unpay tier done");
+});
+
 cron1.start();
 cron2.start();
 cron3.start();
 cron4.start();
 cron5.start();
 cron6.start();
+cron7.start();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>

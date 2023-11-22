@@ -119,7 +119,7 @@ Ràng buộc không trùng username 1tr => done
 
 - Admin Up chính sách và User xem chính sách : 4tr
 
-- cms -> 8trl
+- cms -> 8tr
 
 - Thay đổi chủ sở hữu : 3tr
 - Xuất file giao dịch : 1tr
@@ -127,6 +127,15 @@ Ràng buộc không trùng username 1tr => done
 - Mục 16 : 1tr
 - Mục 17 : 2tr
 - Chỉnh tier 2 : 1tr5
+
+- hỗ trợ chỉnh sửa gói B => 500
+- hỗ trợ tắt mở hold => 500
+- thay đổi kích thước, màu nút thanh toán => 500
+
+- Check người dùng chưa thanh toán trước khi gắn tier => 1tr5
+- Trong vòng 24h qua tier mới, không thanh toán đủ 13 lần thì reset thanh toán về 0 => 1tr
+- Thêm nút KYC trong chi tiết user => 500
+- Xoá cây user theo tier => 1tr
 
 // update parent
 db.users.update({

@@ -122,6 +122,9 @@ const userSchema = mongoose.Schema(
       enum: ["ADMIN", "USER"],
       default: "USER",
     },
+    havePaid: {
+      type: Boolean,
+    },
     note: {
       type: String,
     },

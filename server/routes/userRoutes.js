@@ -2,7 +2,6 @@ import express from "express";
 import {
   getUserProfile,
   getAllUsers,
-  deleteUser,
   getUserById,
   updateUser,
   changeStatusUser,

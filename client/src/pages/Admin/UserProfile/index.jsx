@@ -303,6 +303,22 @@ const UserProfile = (match) => {
       });
   };
 
+  const handleApprove = async (id) => {
+    await User.changeStatus({ id, status: "APPROVED" })
+      .then((response) => {
+        const { message } = response.data;
+        setRefresh(!refresh);
+        toast.success(t(message));
+      })
+      .catch((error) => {
+        let message =
+          error.response && error.response.data.error
+            ? error.response.data.error
+            : error.message;
+        toast.error(t(message));
+      });
+  };
+
   return (
     <div>
       <ToastContainer />
@@ -810,6 +826,16 @@ const UserProfile = (match) => {
                     )}
                   </div>
                 </div>
+                {data.status === "PENDING" && (
+                  <>
+                    <div
+                      onClick={() => handleApprove(id)}
+                      className="w-full cursor-pointer flex justify-center items-center hover:underline bg-green-600 text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                    >
+                      {t("accept")}
+                    </div>
+                  </>
+                )}
                 {isEditting && (
                   <>
                     <button

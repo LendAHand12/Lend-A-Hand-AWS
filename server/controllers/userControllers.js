@@ -15,7 +15,6 @@ import { findNextUser, findRootLayer } from "../utils/methods.js";
 import generateGravatar from "../utils/generateGravatar.js";
 import { areArraysEqual } from "../cronJob/index.js";
 import { sendMailUserCanInceaseTierToAdmin } from "../utils/sendMailCustom.js";
-import { json } from "express";
 
 dotenv.config();
 
@@ -94,44 +93,6 @@ const getAllUsersWithKeyword = asyncHandler(async (req, res) => {
   res.json({
     users: allUsers,
   });
-});
-
-const deleteUser = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id);
-  if (user) {
-    if (user.children.length > 0) {
-      res.status(404);
-      throw new Error("This account have child");
-    }
-    let parent = await User.findById(user.parentId);
-    if (parent) {
-      let childs = parent.children;
-      let newChilds = childs.filter((item) => {
-        if (item.toString() !== user._id.toString()) return item;
-      });
-      parent.children = [...newChilds];
-      await parent.save();
-
-      await DeleteUser.create({
-        userId: user.userId,
-        oldId: user._id,
-        phone: user.phone,
-        email: user.email,
-        password: user.password,
-        walletAddress: user.walletAddress,
-        parentId: user.parentId,
-        refId: user.refId,
-      });
-
-      await User.deleteOne({ _id: user._id });
-      res.json({
-        message: "Delete user successfull",
-      });
-    }
-  } else {
-    res.status(404);
-    throw new Error("User not found");
-  }
 });
 
 const getUserById = asyncHandler(async (req, res) => {
@@ -1112,6 +1073,7 @@ const onAcceptIncreaseTier = asyncHandler(async (req, res) => {
     if (type === "ACCEPT") {
       await NextUserTier.deleteMany({ tier: u.tier });
       await sendMailUserCanInceaseTierToAdmin(u);
+      await checkUnPayUserOnTierUser(u.tier + 1);
       const newParentId = await findNextUser(nextTier);
       const newParent = await Tree.findOne({
         userId: newParentId,
@@ -1306,6 +1268,7 @@ const adminCreateUser = asyncHandler(async (req, res) => {
       isConfirmed: true,
     });
 
+    await checkUnPayUserOnTierUser(tier);
     const newParentId = await findNextUser(tier);
     const newParent = await Tree.findOne({
       userId: newParentId,
@@ -1450,10 +1413,53 @@ const changeNextUserTier = asyncHandler(async (req, res) => {
   }
 });
 
+const checkUnPayUserOnTierUser = async (tier) => {
+  const lastUserInTier = await Tree.findOne({ tier }).sort({ createdAt: -1 });
+  if (lastUserInTier.countPay > 0) {
+    return;
+  }
+  const listTrans = await Transaction.find({
+    userId: lastUserInTier.userId,
+    tier,
+    status: "SUCCESS",
+  });
+  if (listTrans.length === 0) {
+    let user = await User.findById(lastUserInTier.userId);
+    if (!user.havePaid) {
+      user.countPay = 13;
+      user.tier = user.tier - 1;
+      const newCountChild = user.countChild.slice(0, -1);
+      user.countChild = [...newCountChild];
+      const newCurrentLayer = user.currentLayer.slice(0, -1);
+      user.currentLayer = [...newCurrentLayer];
+      await user.save();
+
+      let parent = await Tree.findOne({
+        userId: lastUserInTier.parentId,
+        tier,
+      });
+      if (parent) {
+        let childs = parent.children;
+        let newChilds = childs.filter((item) => {
+          if (item !== lastUserInTier.userId) return item;
+        });
+        parent.children = [...newChilds];
+        await parent.save();
+
+        await Tree.deleteOne({
+          userId: lastUserInTier.userId,
+          tier,
+        });
+      }
+    }
+  }
+
+  return;
+};
+
 export {
   getUserProfile,
   getAllUsers,
-  deleteUser,
   getUserById,
   updateUser,
   changeStatusUser,

@@ -310,7 +310,7 @@ const TransactionDetail = () => {
                 {!trans.isHoldRefund && trans.type.includes("HOLD") && (
                   <button
                     onClick={changeToRefunded}
-                    className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                    className="w-xl flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                   >
                     {loadingChangeToRefunded && <Loading />}
                     {t("changeToRefunded")}
@@ -325,7 +325,7 @@ const TransactionDetail = () => {
                   trans.userReceiveEmail !== "Unknow" && (
                     <button
                       onClick={checkCanRefund}
-                      className="w-full flex justify-center items-center hover:underline border font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                      className="w-xl bg-yellow-500 text-white flex justify-center items-center hover:underline border font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                     >
                       {loadingCheckCanRefund && <Loading />}
                       {t("checkCanRefund")}
@@ -334,7 +334,7 @@ const TransactionDetail = () => {
                 {refunding && (
                   <button
                     onClick={() => handRefund("A")}
-                    className="w-full flex justify-center items-center hover:underline border font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                    className="w-xl flex bg-green-600 text-white justify-center items-center hover:underline border font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                   >
                     {loadingRefund && <Loading />}
                     {t("refund")}
@@ -343,7 +343,7 @@ const TransactionDetail = () => {
 
                 <button
                   onClick={() => handRefund("B")}
-                  className="w-full flex justify-center items-center hover:underline border font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                  className="w-xl bg-red-600 text-white flex justify-center items-center hover:underline border font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                 >
                   {loadingUntilRefund && <Loading />}
                   {t("untilRefunds")}
