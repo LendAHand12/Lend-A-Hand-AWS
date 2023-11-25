@@ -63,7 +63,7 @@ export const getRefParentUser = async (userId, tier) => {
 //     if (newAllTrees[i].children.length < 3) {
 //       const listAe = await Tree.find({
 //         $and: [
-//           { parentId: newAllTrees[i].parentId },
+//           { parentId: newAllTrees[i].userId },
 //           { tier },
 //           { userName: { $ne: newAllTrees[i].userName } },
 //         ],
@@ -90,37 +90,50 @@ export const findNextUser = async (tier) => {
   const newAllTrees = await Tree.find({ tier }).sort({ createdAt: 1 });
   const allTrees = newAllTrees.filter((ele) => ele.children.length < 3);
 
-  for (let tree of allTrees) {
-    console.log({
-      name: tree.userName,
-      id: tree.userId,
-      length: tree.children.length,
-    });
-  }
-
+  // for (let tree of allTrees) {
+  //   console.log({
+  //     name: tree.userName,
+  //     id: tree.userId,
+  //     length: tree.children.length,
+  //   });
+  // }
   const max = findMax(allTrees.map((item) => item.children.length));
 
-  const nextUserId = findNext(allTrees, max, tier);
+  for (let i = 0; i < allTrees.length; i++) {
+    if (allTrees[i].children.length === 2) {
+      if (allTrees[i].children.length > allTrees[i + 1].children.length) {
+        return allTrees[i + 1].userId;
+      }
+    } else {
+      const nextUserId = findNext(allTrees, max, tier);
 
-  if (nextUserId) {
-    return nextUserId;
-  } else {
-    return allTrees[0].userId;
+      if (nextUserId) {
+        return nextUserId;
+      } else {
+        return allTrees[0].userId;
+      }
+    }
   }
 };
 
 async function findNext(allTrees, max, tier) {
   for (let i = 0; i < allTrees.length; i++) {
     if (allTrees[i].children.length < max) {
-      const parent = await Tree.findOne({
-        userId: allTrees[i].parentId,
-        tier,
-      });
-      if (parent && parent.children.length < 3) {
-        return parent.userId;
+      if (allTrees[i].parentId) {
+        const parent = await Tree.findOne({
+          userId: allTrees[i].parentId,
+          tier,
+        });
+        if (parent && parent.children.length < 3) {
+          return parent.userId;
+        } else {
+          return allTrees[i].userId;
+        }
       } else {
         return allTrees[i].userId;
       }
+    } else {
+      return allTrees[i].userId;
     }
   }
 }
