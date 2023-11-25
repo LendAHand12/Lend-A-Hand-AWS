@@ -23,6 +23,8 @@ import {
   getListNextUserWithTier,
   getUsersWithTier,
   changeNextUserTier,
+  getLastUserInTier,
+  removeLastUserInTier,
 } from "../controllers/userControllers.js";
 import { protectRoute, isAdmin } from "../middleware/authMiddleware.js";
 import uploadCloud from "../middleware/uploadCloud.js";
@@ -80,5 +82,13 @@ router.route("/getUsersWithTier").post(protectRoute, isAdmin, getUsersWithTier);
 router
   .route("/changeNextUserTier")
   .post(protectRoute, isAdmin, changeNextUserTier);
+
+router
+  .route("/getLastUserInTier")
+  .post(protectRoute, isAdmin, getLastUserInTier);
+
+router
+  .route("/removeLastUserInTier")
+  .post(protectRoute, isAdmin, removeLastUserInTier);
 
 export default router;

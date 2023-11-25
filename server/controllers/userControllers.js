@@ -1457,6 +1457,77 @@ const checkUnPayUserOnTierUser = async (tier) => {
   return;
 };
 
+const getLastUserInTier = asyncHandler(async (req, res) => {
+  const { tier } = req.body;
+  const lastUser = await Tree.findOne({ tier }).sort({ createdAt: -1 });
+  if (lastUser) {
+    const listTrans = await Transaction.find({
+      userId: lastUser.userId,
+      tier,
+      status: "SUCCESS",
+    });
+    let user = await User.findById(lastUser.userId);
+    if (user.havePaid) {
+      res.json(null);
+    }
+    if (listTrans.length === 0) {
+      res.json(lastUser);
+    } else {
+      res.json(null);
+    }
+  } else {
+    res.json(null);
+  }
+});
+
+const removeLastUserInTier = asyncHandler(async (req, res) => {
+  const { userId, tier } = req.body;
+  console.log({ userId, tier });
+  const listTrans = await Transaction.find({
+    userId,
+    tier,
+    status: "SUCCESS",
+  });
+  const lastUser = await Tree.findOne({ userId, tier });
+  console.log({ listTrans: listTrans.length });
+  if (listTrans.length === 0) {
+    let user = await User.findById(userId);
+    if (!user.havePaid) {
+      user.countPay = 13;
+      user.tier = user.tier - 1;
+      const newCountChild = user.countChild.slice(0, -1);
+      user.countChild = [...newCountChild];
+      const newCurrentLayer = user.currentLayer.slice(0, -1);
+      user.currentLayer = [...newCurrentLayer];
+      await user.save();
+
+      let parent = await Tree.findOne({
+        userId: lastUser.parentId,
+        tier,
+      });
+      if (parent) {
+        let childs = parent.children;
+        let newChilds = childs.filter((item) => {
+          if (item !== lastUser.userId) return item;
+        });
+        parent.children = [...newChilds];
+        await parent.save();
+
+        await Tree.deleteOne({
+          userId: lastUser.userId,
+          tier,
+        });
+
+        res.json({ message: "removeTreeSuccess" });
+      }
+    } else {
+      res.json({ message: "accountHanvePaid" });
+    }
+  } else {
+    res.json({ message: "accountHanvePaid" });
+  }
+});
+
 export {
   getUserProfile,
   getAllUsers,
@@ -1484,4 +1555,6 @@ export {
   getListNextUserWithTier,
   getUsersWithTier,
   changeNextUserTier,
+  getLastUserInTier,
+  removeLastUserInTier,
 };

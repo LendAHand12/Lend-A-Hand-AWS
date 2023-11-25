@@ -7,7 +7,6 @@ import cors from "cors"; // allow cross origin requests
 import cookieSession from "cookie-session"; // for implementing cookie sessions for passport
 import helmet from "helmet";
 import { CronJob } from "cron";
-import { findNextUser } from "./utils/methods.js";
 
 // middleware
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
@@ -126,13 +125,13 @@ const cron7 = new CronJob("00 23 * * *", async () => {
   console.log("Reset trans unpay tier done");
 });
 
-cron1.start();
-cron2.start();
-cron3.start();
-cron4.start();
-cron5.start();
-cron6.start();
-cron7.start();
+// cron1.start();
+// cron2.start();
+// cron3.start();
+// cron4.start();
+// cron5.start();
+// cron6.start();
+// cron7.start();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>

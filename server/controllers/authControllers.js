@@ -24,6 +24,7 @@ const checkLinkRef = asyncHandler(async (req, res) => {
     if (userReceive && userRef) {
       const treeUserReceive = await Tree.findOne({
         userId: userReceive._id,
+        tier: 1,
       });
       if (treeUserReceive.children.length < 3) {
         message = "validUrl";

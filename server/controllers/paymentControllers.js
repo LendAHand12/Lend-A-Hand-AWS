@@ -1091,6 +1091,16 @@ const checkCanRefundPayment = asyncHandler(async (req, res) => {
           amount: 35,
           message: `User is ${trans.buyPackage} package Parent is ${trans.refBuyPackage} package (refund 35 USDT)`,
         });
+      } else if (trans.type === "DIRECTHOLD" && trans.amount === 30) {
+        const receiveParent = await User.findOne({
+          walletAddress: { $in: [trans.address_ref] },
+        });
+
+        if (receiveParent.buyPackage !== "A") {
+          res.json({
+            message: `parent has not paid enough to upgrade to package A`,
+          });
+        }
       } else {
         res.json({
           message: "User is OK for a refund",
