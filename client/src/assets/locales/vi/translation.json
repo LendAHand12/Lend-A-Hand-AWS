@@ -341,5 +341,11 @@
   "chooseNextUserForTier": "Chọn người dùng tiếp theo cho tier ",
   "listUserReceiveNextTier": "Danh sách người nhận theo tier",
   "Tree does not exist": "Không tìm thấy cây hệ thống",
-  "Are you sure to change this.": "Bạn muốn ưu tiên người này?"
+  "Are you sure to change this.": "Bạn muốn ưu tiên người này?",
+
+  "removeTreeSuccess": "Xoá hệ thống thành công",
+  "accountHanvePaid": "Tài khoản đã phát sinh giao dịch",
+  "removeLastUserTier": "Xoá hệ thống mới",
+  "systemNewInTier": "Hệ thống mới nhất ở tier :",
+  "Are you remove tree this.": "Xoá hệ thống của người dùng này"
 }

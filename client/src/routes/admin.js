@@ -17,6 +17,9 @@ const CreateUserPage = lazy(() => import("@/pages/Admin/CreateUser"));
 const ChangeUserPage = lazy(() => import("@/pages/Admin/ChangeUser"));
 const ChangeUserDetail = lazy(() => import("@/pages/Admin/ChangeUserDetail"));
 const ListUserNextTier = lazy(() => import("@/pages/Admin/ListUserNextTier"));
+const RemoveLastUserTier = lazy(() =>
+  import("@/pages/Admin/RemoveLastUserTier")
+);
 
 const routes = [
   {
@@ -92,6 +95,10 @@ const routes = [
   {
     path: "/listTier",
     component: ListUserNextTier,
+  },
+  {
+    path: "/lastUserTier",
+    component: RemoveLastUserTier,
   },
 ];
 

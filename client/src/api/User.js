@@ -76,9 +76,14 @@ const User = {
   getUsersWithTier: (body) => {
     return API.post(`${URL_API_USER}/getUsersWithTier`, body);
   },
-
   changeNextUserTier: (body) => {
     return API.post(`${URL_API_USER}/changeNextUserTier`, body);
+  },
+  getLastUserInTier: (body) => {
+    return API.post(`${URL_API_USER}/getLastUserInTier`, body);
+  },
+  removeLastUserInTier: (body) => {
+    return API.post(`${URL_API_USER}/removeLastUserInTier`, body);
   },
 };
 

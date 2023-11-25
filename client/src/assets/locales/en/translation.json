@@ -335,5 +335,11 @@
   "chooseNextUserForTier": "Choose the next user for tier",
   "listUserReceiveNextTier": "List of recipients by tier",
   "Tree does not exist": "The system tree was not found",
-  "Are you sure to change this.": "Do you want to prioritize this person?"
+  "Are you sure to change this.": "Do you want to prioritize this person?",
+
+  "removeTreeSuccess": "Delete system successfully",
+  "accountHanvePaid": "The account that generated the transaction",
+  "removeLastUserTier": "Remove newest system",
+  "systemNewInTier": "Latest system in tier :",
+  "Are you remove tree this.": "Delete this user's system"
 }
