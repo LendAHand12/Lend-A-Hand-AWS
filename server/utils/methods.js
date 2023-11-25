@@ -39,13 +39,13 @@ export const getRefParentUser = async (userId, tier) => {
 // export const findNextUser = async (tier) => {
 //   const newAllTrees = await Tree.find({ tier }).sort({ createdAt: 1 });
 
-//   // for (let tree of newAllTrees) {
-//   //   console.log({
-//   //     name: tree.userName,
-//   //     id: tree.userId,
-//   //     length: tree.children.length,
-//   //   });
-//   // }
+//   for (let tree of newAllTrees) {
+//     console.log({
+//       name: tree.userName,
+//       id: tree.userId,
+//       length: tree.children.length,
+//     });
+//   }
 
 //   const list3Child = newAllTrees.filter((tree) => tree.children.length === 3);
 //   if (list3Child.length === newAllTrees.length) return newAllTrees[0].userId;
@@ -57,6 +57,7 @@ export const getRefParentUser = async (userId, tier) => {
 //   if (list0Child.length === newAllTrees.length) return newAllTrees[0].userId;
 
 //   const max = findMax(newAllTrees.map((item) => item.children.length));
+//   console.log({ max });
 
 //   for (let i = 0; i < newAllTrees.length; i++) {
 //     if (newAllTrees[i].children.length < 3) {
@@ -89,17 +90,17 @@ export const findNextUser = async (tier) => {
   const newAllTrees = await Tree.find({ tier }).sort({ createdAt: 1 });
   const allTrees = newAllTrees.filter((ele) => ele.children.length < 3);
 
-  // for (let tree of allTrees) {
-  //   console.log({
-  //     name: tree.userName,
-  //     id: tree.userId,
-  //     length: tree.children.length,
-  //   });
-  // }
+  for (let tree of allTrees) {
+    console.log({
+      name: tree.userName,
+      id: tree.userId,
+      length: tree.children.length,
+    });
+  }
 
   const max = findMax(allTrees.map((item) => item.children.length));
 
-  const nextUserId = findNext(allTrees, max);
+  const nextUserId = findNext(allTrees, max, tier);
 
   if (nextUserId) {
     return nextUserId;
@@ -108,10 +109,18 @@ export const findNextUser = async (tier) => {
   }
 };
 
-function findNext(allTrees, max) {
+async function findNext(allTrees, max, tier) {
   for (let i = 0; i < allTrees.length; i++) {
     if (allTrees[i].children.length < max) {
-      return allTrees[i].userId;
+      const parent = await Tree.findOne({
+        userId: allTrees[i].parentId,
+        tier,
+      });
+      if (parent && parent.children.length < 3) {
+        return parent.userId;
+      } else {
+        return allTrees[i].userId;
+      }
     }
   }
 }
