@@ -97,7 +97,7 @@ const registerUser = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error(message);
   } else {
-    const treeReceiveUser = await Tree.findOne({ userId: receiveId });
+    const treeReceiveUser = await Tree.findOne({ userId: receiveId, tier: 1 });
 
     if (treeReceiveUser.children.length < 3) {
       const avatar = generateGravatar(email);
