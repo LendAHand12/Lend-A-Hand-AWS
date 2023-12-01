@@ -84,19 +84,32 @@ export const getRefParentUser = async (userId, tier) => {
 // };
 
 export const findNextUser = async (tier) => {
+  const newAllTrees = await Tree.find({ tier }).sort({ createdAt: 1 });
+  const userIdCheckLevel1 = await checkNextUserLevel1(tier);
+  const indexOfNextUser = newAllTrees.findIndex(
+    (ele) => ele.userId === userIdCheckLevel1
+  );
+  const newAllTrees2 = newAllTrees.splice(0, indexOfNextUser);
+  for (let tree of newAllTrees2) {
+    // console.log({
+    //   name: tree.userName,
+    //   id: tree.userId,
+    //   length: tree.children.length,
+    // });
+    if (tree.children.length < 3) {
+      return tree.userId;
+    }
+  }
+  return userIdCheckLevel1;
+};
+
+const checkNextUserLevel1 = async (tier) => {
   const nextUserInDB = await NextUserTier.findOne({ tier });
   if (nextUserInDB) return nextUserInDB.userId;
 
   const newAllTrees = await Tree.find({ tier }).sort({ createdAt: 1 });
   const allTrees = newAllTrees.filter((ele) => ele.children.length < 3);
 
-  // for (let tree of allTrees) {
-  //   console.log({
-  //     name: tree.userName,
-  //     id: tree.userId,
-  //     length: tree.children.length,
-  //   });
-  // }
   const max = findMax(allTrees.map((item) => item.children.length));
 
   for (let i = 0; i < allTrees.length; i++) {
