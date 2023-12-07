@@ -159,3 +159,31 @@ export const changeTree12 = async (tier) => {
     }
   }
 };
+
+export const addLockTime = async () => {
+  const listUser = await User.find({ isAdmin: false, status: "LOCKED" });
+
+  for (let user of listUser) {
+    user.lockedTime = new Date();
+    await user.save();
+  }
+
+  console.log("addLockTime done");
+};
+
+export const syncStatusToTree = async () => {
+  const listUser = await User.find({ isAdmin: false });
+
+  for (let user of listUser) {
+    const tree = await Tree.findOne({
+      userName: user.userId,
+      tier: 1,
+    });
+    if (tree) {
+      tree.status = user.status;
+      await tree.save();
+    }
+  }
+
+  console.log("syncStatusToTree done");
+};

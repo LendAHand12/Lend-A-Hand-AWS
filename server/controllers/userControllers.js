@@ -310,7 +310,13 @@ const adminUpdateUser = asyncHandler(async (req, res) => {
     user.phone = phone || user.phone;
     user.email = email || user.email;
     user.idCode = idCode || user.idCode;
+    if (user.status === "LOCKED" && newStatus !== "LOCKED") {
+      user.lockedTime = null;
+    }
     user.status = newStatus || user.status;
+    if (newStatus === "LOCKED") {
+      user.lockedTime = new Date();
+    }
     user.fine = newFine || user.fine;
     user.note = note || user.note;
     if (!openLah && openLah !== undefined) {

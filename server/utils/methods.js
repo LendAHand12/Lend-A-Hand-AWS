@@ -1,3 +1,4 @@
+import moment from "moment";
 import NextUserTier from "../models/nextUserTierModel.js";
 import Tree from "../models/treeModel.js";
 import User from "../models/userModel.js";
@@ -213,4 +214,16 @@ export const countDescendants = async (userId, layer, tier) => {
   }
 
   return count;
+};
+
+export const getUserClosestToNow = (users) => {
+  const currentTime = moment();
+
+  users.sort((userA, userB) => {
+    const timeA = moment(userA.userId.lockedTime);
+    const timeB = moment(userB.userId.lockedTime);
+    return currentTime.diff(timeA) - currentTime.diff(timeB);
+  });
+
+  return users[0];
 };

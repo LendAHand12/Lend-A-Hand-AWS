@@ -6,7 +6,7 @@ import User from "../models/userModel.js";
 import sendMail from "../utils/sendMail.js";
 import { sendMailUpdateLayerForAdmin } from "../utils/sendMailCustom.js";
 import { getCountAllChildren } from "../controllers/userControllers.js";
-import { findRootLayer } from "../utils/methods.js";
+import { findRootLayer, getUserClosestToNow } from "../utils/methods.js";
 import Tree from "../models/treeModel.js";
 import Transaction from "../models/transactionModel.js";
 
@@ -254,3 +254,61 @@ export const resetTransTierUnPay = asyncHandler(async () => {
 export const areArraysEqual = (arr1, arr2) => {
   return JSON.stringify(arr1) === JSON.stringify(arr2);
 };
+
+export const checkBlockChildren = asyncHandler(async () => {
+  const currentDay = moment();
+  const listUser = await User.find({
+    isAdmin: false,
+    status: "APPROVED",
+  });
+
+  for (let user of listUser) {
+    const listRefChild = await Tree.find({
+      tier: 1,
+      refId: user._id,
+    })
+      .select("userId userName")
+      .populate({
+        path: "userId",
+        model: "User",
+        select: "userId status lockedTime",
+      });
+
+    if (listRefChild.length >= 3) {
+      const listLockedChild = listRefChild.filter(
+        (ele) => ele.userId.status === "LOCKED"
+      );
+      const countChildLocked = listRefChild.length - listLockedChild.length;
+      if (countChildLocked < 2) {
+        if (user.lockedTime === null) {
+          user.lockedTime = new Date();
+          await user.save();
+        }
+        if (countChildLocked === 1) {
+          const closedChild = getUserClosestToNow(listLockedChild);
+          const diffDays = currentDay.diff(
+            closedChild.userId.lockedTime,
+            "days"
+          );
+          if (diffDays >= 30) {
+            user.lockedTime = new Date();
+            user.status = "LOCKED";
+            await user.save();
+          }
+        }
+        if (countChildLocked === 0) {
+          const closedChild = getUserClosestToNow(listLockedChild);
+          const diffDays = currentDay.diff(
+            closedChild.userId.lockedTime,
+            "days"
+          );
+          if (diffDays >= 45) {
+            user.lockedTime = new Date();
+            user.status = "LOCKED";
+            await user.save();
+          }
+        }
+      }
+    }
+  }
+});

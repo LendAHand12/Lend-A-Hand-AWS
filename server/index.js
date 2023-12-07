@@ -26,6 +26,7 @@ import {
   checkAPackage,
   deleteUser24hUnPay,
   resetTransTierUnPay,
+  checkBlockChildren,
 } from "./cronJob/index.js";
 import {
   transferUserToTree,
@@ -37,6 +38,7 @@ import {
   addBuyPackageToTree,
   listTier,
   nextUserWithTier,
+  addLockTime,
 } from "./common.js";
 
 const app = express();
@@ -50,6 +52,7 @@ connectDB();
 // await listTier(2);
 // await nextUserWithTier(2);
 // await checkUnPayUserOnTierUser(2);
+// await addLockTime();
 
 app.use(express.json()); // middleware to use req.body
 app.use(cors()); // to avoid CORS errors
@@ -125,6 +128,13 @@ const cron7 = new CronJob("00 23 * * *", async () => {
   console.log("Reset trans unpay tier done");
 });
 
+const cron8 = new CronJob("30 23 * * *", async () => {
+  // 6h
+  console.log("Check block children start");
+  await checkBlockChildren();
+  console.log("Check block children done");
+});
+
 cron1.start();
 cron2.start();
 cron3.start();
@@ -132,6 +142,7 @@ cron4.start();
 cron5.start();
 cron6.start();
 cron7.start();
+cron8.start();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>

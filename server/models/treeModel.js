@@ -28,6 +28,10 @@ const treeSchema = mongoose.Schema(
       enum: ["A", "B", "C", ""],
       default: "",
     },
+    status: {
+      type: String,
+      default: "",
+    },
   },
   { timestamps: true }
 );

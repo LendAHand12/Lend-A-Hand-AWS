@@ -46,6 +46,7 @@ const userSchema = mongoose.Schema(
     },
     status: {
       type: String,
+      enum: ["UNVERIFY", "PENDING", "APPROVED", "LOCKED", "DELETED"],
       default: "UNVERIFY",
     },
     imgFront: {
@@ -128,6 +129,11 @@ const userSchema = mongoose.Schema(
     note: {
       type: String,
     },
+    lockedTime: {
+      type: Date,
+      default: null
+    },
+
   },
   {
     timestamps: true,
