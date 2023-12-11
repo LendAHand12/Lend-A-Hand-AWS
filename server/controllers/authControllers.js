@@ -14,11 +14,13 @@ const checkLinkRef = asyncHandler(async (req, res) => {
   let message = "invalidUrl";
   try {
     const userReceive = await User.findOne({
-      $and: [{ _id: receiveId }],
+      _id: receiveId,
+      status: { $in: ["APPROVED", "LOCKED"] },
     });
 
     const userRef = await User.findOne({
-      $and: [{ _id: ref }],
+      _id: ref,
+      status: { $in: ["APPROVED", "LOCKED"] },
     });
 
     if (userReceive && userRef) {
@@ -26,7 +28,7 @@ const checkLinkRef = asyncHandler(async (req, res) => {
         userId: userReceive._id,
         tier: 1,
       });
-      if (treeUserReceive.children.length < 3) {
+      if (treeUserReceive && treeUserReceive.children.length < 3) {
         message = "validUrl";
         res.status(200).json({
           message,
@@ -62,18 +64,22 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const userExistsUserId = await User.findOne({
     userId: { $regex: userId, $options: "i" },
+    status: { $ne: "DELETED" },
   });
   const userExistsEmail = await User.findOne({
     email: { $regex: email, $options: "i" },
+    status: { $ne: "DELETED" },
   });
   const userExistsPhone = await User.findOne({
     $and: [{ phone: { $ne: "" } }, { phone }],
+    status: { $ne: "DELETED" },
   });
   const userExistsWalletAddress = await User.findOne({
     walletAddress: { $in: [walletAddress] },
   });
   const userExistsIdCode = await User.findOne({
     $and: [{ idCode: { $ne: "" } }, { idCode }],
+    status: { $ne: "DELETED" },
   });
 
   if (userExistsUserId) {

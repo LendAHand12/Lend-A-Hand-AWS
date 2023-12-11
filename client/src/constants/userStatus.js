@@ -4,4 +4,5 @@ export default [
   { status: "APPROVED", color: "bg-green-600" },
   { status: "REJECTED", color: "bg-red-600" },
   { status: "LOCKED", color: "bg-red-600" },
+  { status: "DELETED", color: "bg-red-600" },
 ];

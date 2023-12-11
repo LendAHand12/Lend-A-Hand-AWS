@@ -35,11 +35,14 @@ const Profile = () => {
     countPay,
     listDirectUser,
     phone,
-    oldLayer,
-    currentLayer,
     idCode,
     buyPackage,
     packages,
+    tier1Time,
+    tier2Time,
+    tier3Time,
+    tier4Time,
+    tier5Time,
   } = userInfo;
   const [imgFront, setImgFront] = useState("");
   const [imgBack, setImgBack] = useState("");
@@ -303,6 +306,46 @@ const Profile = () => {
                   <span>{t("memberSince")}</span>
                   <span className="ml-auto">
                     {new Date(createdAt).toLocaleDateString("vi")}
+                  </span>
+                </li>
+                <li className="flex items-center py-3">
+                  <span>{t("tier1Time")}</span>
+                  <span className="ml-auto">
+                    {tier1Time
+                      ? new Date(tier1Time).toLocaleDateString("vi")
+                      : ""}
+                  </span>
+                </li>
+                <li className="flex items-center py-3">
+                  <span>{t("tier2Time")}</span>
+                  <span className="ml-auto">
+                    {tier2Time
+                      ? new Date(tier2Time).toLocaleDateString("vi")
+                      : ""}
+                  </span>
+                </li>
+                <li className="flex items-center py-3">
+                  <span>{t("tier3Time")}</span>
+                  <span className="ml-auto">
+                    {tier3Time
+                      ? new Date(tier3Time).toLocaleDateString("vi")
+                      : ""}
+                  </span>
+                </li>
+                <li className="flex items-center py-3">
+                  <span>{t("tier4Time")}</span>
+                  <span className="ml-auto">
+                    {tier4Time
+                      ? new Date(tier4Time).toLocaleDateString("vi")
+                      : ""}
+                  </span>
+                </li>
+                <li className="flex items-center py-3">
+                  <span>{t("tier5Time")}</span>
+                  <span className="ml-auto">
+                    {tier5Time
+                      ? new Date(tier1Time).toLocaleDateString("vi")
+                      : ""}
                   </span>
                 </li>
               </ul>

@@ -357,6 +357,8 @@ const UserProfile = (match) => {
                               ? "bg-red-600"
                               : data.status === "LOCKED"
                               ? "bg-red-600"
+                              : data.status === "DELETED"
+                              ? "bg-red-600"
                               : ""
                           }  py-1 px-2 rounded text-white text-sm`}
                         >
@@ -387,10 +389,66 @@ const UserProfile = (match) => {
                       </li>
                     </>
                   )}
+                  {data.status === "LOCKED" && (
+                    <li className="flex items-center py-3">
+                      <span>{t("lockedTime")}</span>
+                      <span className="ml-auto">
+                        {new Date(data.lockedTime).toLocaleDateString("vi")}
+                      </span>
+                    </li>
+                  )}
+                  {data.status === "DELETED" && (
+                    <li className="flex items-center py-3">
+                      <span>{t("lockedTime")}</span>
+                      <span className="ml-auto">
+                        {new Date(data.deletedTime).toLocaleDateString("vi")}
+                      </span>
+                    </li>
+                  )}
                   <li className="flex items-center py-3">
                     <span>{t("memberSince")}</span>
                     <span className="ml-auto">
                       {new Date(data.createdAt).toLocaleDateString("vi")}
+                    </span>
+                  </li>
+                  <li className="flex items-center py-3">
+                    <span>{t("tier1Time")}</span>
+                    <span className="ml-auto">
+                      {data.tier1Time
+                        ? new Date(data.tier1Time).toLocaleDateString("vi")
+                        : ""}
+                    </span>
+                  </li>
+                  <li className="flex items-center py-3">
+                    <span>{t("tier2Time")}</span>
+                    <span className="ml-auto">
+                      {data.tier1Time
+                        ? new Date(data.tier2Time).toLocaleDateString("vi")
+                        : ""}
+                    </span>
+                  </li>
+                  <li className="flex items-center py-3">
+                    <span>{t("tier3Time")}</span>
+                    <span className="ml-auto">
+                      {data.tier3Time
+                        ? new Date(data.tier1Time).toLocaleDateString("vi")
+                        : ""}
+                    </span>
+                  </li>
+                  <li className="flex items-center py-3">
+                    <span>{t("tier4Time")}</span>
+                    <span className="ml-auto">
+                      {data.tier4Time
+                        ? new Date(data.tier1Time).toLocaleDateString("vi")
+                        : ""}
+                    </span>
+                  </li>
+                  <li className="flex items-center py-3">
+                    <span>{t("tier5Time")}</span>
+                    <span className="ml-auto">
+                      {data.tier5Time
+                        ? new Date(data.tier1Time).toLocaleDateString("vi")
+                        : ""}
                     </span>
                   </li>
                   {data.changeUser && (
@@ -854,15 +912,17 @@ const UserProfile = (match) => {
                     </button>
                   </>
                 )}
-                {!isEditting && data.status !== "UNVERIFY" && (
-                  <button
-                    onClick={() => setEditting(true)}
-                    className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-                  >
-                    {t("edit")}
-                  </button>
-                )}
-                {!isEditting && (
+                {!isEditting &&
+                  data.status !== "UNVERIFY" &&
+                  data.status !== "DELETED" && (
+                    <button
+                      onClick={() => setEditting(true)}
+                      className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                    >
+                      {t("edit")}
+                    </button>
+                  )}
+                {!isEditting && data.status !== "DELETED" && (
                   <div
                     onClick={handleDelete}
                     className="w-full flex justify-center items-center cursor-pointer hover:underline border font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out bg-red-500 text-white"

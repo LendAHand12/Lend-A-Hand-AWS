@@ -347,5 +347,15 @@
   "accountHanvePaid": "Tài khoản đã phát sinh giao dịch",
   "removeLastUserTier": "Xoá hệ thống mới",
   "systemNewInTier": "Hệ thống mới nhất ở tier :",
-  "Are you remove tree this.": "Xoá hệ thống của người dùng này"
+  "Are you remove tree this.": "Xoá hệ thống của người dùng này",
+
+  "lockedTime": "Thời gian khoá",
+  "DELETED": "Đã xoá",
+  "deletedTime": "Thời gian xoá",
+  "senderStatus": "Trạng thái tài khoản",
+  "tier1Time": "Hoàn thành tier 1 :",
+  "tier2Time": "Hoàn thành tier 2 :",
+  "tier3Time": "Hoàn thành tier 3 :",
+  "tier4Time": "Hoàn thành tier 4 :",
+  "tier5Time": "Hoàn thành tier 5 :"
 }

@@ -1300,13 +1300,17 @@ const getAllTransForExport = asyncHandler(async (req, res) => {
     address_ref: tran.address_ref,
     senderName: tran.sender.length > 0 ? tran.sender[0].userId : "unknown",
     senderEmail: tran.sender.length > 0 ? tran.sender[0].email : "unknown",
+    senderStatus:
+      tran.sender.length > 0
+        ? tran.sender[0].status === "DELETED"
+          ? "TK đã xoá"
+          : ""
+        : "unknow",
     receiverName:
       tran.receiver.length > 0 ? tran.receiver[0].userId : "unknown",
     receiverEmail:
       tran.receiver.length > 0 ? tran.receiver[0].email : "unknown",
   }));
-
-  console.log({ totalCount, result: result.length, offset });
 
   res.json({ totalCount, result });
 });

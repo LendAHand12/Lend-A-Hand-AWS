@@ -341,5 +341,15 @@
   "accountHanvePaid": "The account that generated the transaction",
   "removeLastUserTier": "Remove newest system",
   "systemNewInTier": "Latest system in tier :",
-  "Are you remove tree this.": "Delete this user's system"
+  "Are you remove tree this.": "Delete this user's system",
+
+  "lockedTime": "Locked Time",
+  "DELETED": "Deleted",
+  "deletedTime": "Deleted time",
+  "senderStatus": "Account status",
+  "tier1Time": "Completed tier 1 :",
+  "tier2Time": "Completed tier 2 :",
+  "tier3Time": "Completed tier 3 :",
+  "tier4Time": "Complete tier 4 :",
+  "tier5Time": "Completed tier 5 :"
 }

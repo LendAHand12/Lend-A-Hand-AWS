@@ -75,6 +75,7 @@ const ExportUserPage = () => {
           [t("order")]: null,
           [t("senderName")]: null,
           [t("senderEmail")]: null,
+          [t("senderStatus")]: null,
           [t("address_from")]: null,
           [t("receiverName")]: null,
           [t("receiverEmail")]: null,

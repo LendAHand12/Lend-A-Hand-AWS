@@ -39,6 +39,7 @@ import {
   listTier,
   nextUserWithTier,
   addLockTime,
+  addTierTime,
 } from "./common.js";
 
 const app = express();
@@ -53,6 +54,7 @@ connectDB();
 // await nextUserWithTier(2);
 // await checkUnPayUserOnTierUser(2);
 // await addLockTime();
+// await addTierTime();
 
 app.use(express.json()); // middleware to use req.body
 app.use(cors()); // to avoid CORS errors

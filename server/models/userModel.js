@@ -131,9 +131,32 @@ const userSchema = mongoose.Schema(
     },
     lockedTime: {
       type: Date,
-      default: null
+      default: null,
     },
-
+    deletedTime: {
+      type: Date,
+      default: null,
+    },
+    tier1Time: {
+      type: Date,
+      default: null,
+    },
+    tier2Time: {
+      type: Date,
+      default: null,
+    },
+    tier3Time: {
+      type: Date,
+      default: null,
+    },
+    tier4Time: {
+      type: Date,
+      default: null,
+    },
+    tier5Time: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,

@@ -187,3 +187,32 @@ export const syncStatusToTree = async () => {
 
   console.log("syncStatusToTree done");
 };
+
+export const addTierTime = async () => {
+  const listUser = await User.find({ isAdmin: false, countPay: 13 });
+
+  for (let user of listUser) {
+    console.log({ user: user.userId });
+    const trans1 = await Transaction.findOne({
+      userId: user._id,
+      userCountPay: 12,
+      tier: 1,
+      status: "SUCCESS",
+    });
+    if (trans1) {
+      user.tier1Time = trans1.updatedAt;
+    }
+    const trans2 = await Transaction.findOne({
+      userId: user._id,
+      userCountPay: 12,
+      tier: 2,
+      status: "SUCCESS",
+    });
+    if (trans2) {
+      user.tier2Time = trans2.updatedAt;
+    }
+    await user.save();
+  }
+
+  console.log("addTierTime done");
+};

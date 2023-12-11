@@ -5,7 +5,6 @@ import { ToastContainer, toast } from "react-toastify";
 import moment from "moment";
 import { exportToExcel } from "@/utils/export";
 import "./index.less";
-import Payment from "@/api/Payment";
 
 const ExportPaymentPage = () => {
   const { t } = useTranslation();
@@ -46,40 +45,40 @@ const ExportPaymentPage = () => {
       });
   };
 
-  const exportTrans = async () => {
-    setLoading(true);
-    await Payment.getAllTransForExport()
-      .then((response) => {
-        const excelData = convertResponseDataToExportData(response.data, {
-          [t("order")]: null,
-          [t("senderName")]: null,
-          [t("senderEmail")]: null,
-          [t("address_from")]: null,
-          [t("receiverName")]: null,
-          [t("receiverEmail")]: null,
-          [t("address_ref")]: null,
-          [t("type")]: null,
-          [t("amount")]: null,
-          [t("tier")]: null,
-          [t("isHoldRefund")]: null,
-          [t("status")]: null,
-        });
-        exportToExcel(
-          excelData,
-          `${t("transListFileName")}_${moment().format("DD/MM/YYYY_HH:mm:ss")}`
-        );
-        setLoading(false);
-        toast.success(t("export successful"));
-      })
-      .catch((error) => {
-        let message =
-          error.response && error.response.data.message
-            ? error.response.data.message
-            : error.message;
-        toast.error(t(message));
-        setLoading(false);
-      });
-  };
+  // const exportTrans = async () => {
+  //   setLoading(true);
+  //   await Payment.getAllTransForExport()
+  //     .then((response) => {
+  //       const excelData = convertResponseDataToExportData(response.data, {
+  //         [t("order")]: null,
+  //         [t("senderName")]: null,
+  //         [t("senderEmail")]: null,
+  //         [t("address_from")]: null,
+  //         [t("receiverName")]: null,
+  //         [t("receiverEmail")]: null,
+  //         [t("address_ref")]: null,
+  //         [t("type")]: null,
+  //         [t("amount")]: null,
+  //         [t("tier")]: null,
+  //         [t("isHoldRefund")]: null,
+  //         [t("status")]: null,
+  //       });
+  //       exportToExcel(
+  //         excelData,
+  //         `${t("transListFileName")}_${moment().format("DD/MM/YYYY_HH:mm:ss")}`
+  //       );
+  //       setLoading(false);
+  //       toast.success(t("export successful"));
+  //     })
+  //     .catch((error) => {
+  //       let message =
+  //         error.response && error.response.data.message
+  //           ? error.response.data.message
+  //           : error.message;
+  //       toast.error(t(message));
+  //       setLoading(false);
+  //     });
+  // };
 
   const convertResponseDataToExportData = (responseData, nullObj) => {
     return responseData.map((item, i) => {
@@ -135,12 +134,12 @@ const ExportPaymentPage = () => {
         >
           {t("export users list")}
         </button>
-        <button
+        {/* <button
           onClick={exportTrans}
           className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
         >
           {t("export trans list")}
-        </button>
+        </button> */}
       </div>
     </>
   );

@@ -141,6 +141,13 @@ const getUserById = asyncHandler(async (req, res) => {
       closeLah: user.closeLah,
       tierDate: user.tierDate,
       note: user.note,
+      lockedTime: user.lockedTime,
+      deletedTime: user.deletedTime,
+      tier1Time: user.tier1Time,
+      tier2Time: user.tier2Time,
+      tier3Time: user.tier3Time,
+      tier4Time: user.tier4Time,
+      tier5Time: user.tier5Time,
       changeUser,
     });
   } else {
@@ -599,6 +606,11 @@ const getUserProfile = asyncHandler(async (req, res) => {
       openLah: user.openLah,
       closeLah: user.closeLah,
       tierDate: user.tierDate,
+      tier1Time: user.tier1Time,
+      tier2Time: user.tier2Time,
+      tier3Time: user.tier3Time,
+      tier4Time: user.tier4Time,
+      tier5Time: user.tier5Time,
     });
   } else {
     res.status(400);
@@ -758,7 +770,7 @@ const getAllUsersForExport = asyncHandler(async (req, res) => {
       },
     },
     {
-      $unwind: "$treeData",
+      $unwind: { path: "$treeData", preserveNullAndEmptyArrays: true },
     },
     {
       $lookup: {
@@ -769,7 +781,7 @@ const getAllUsersForExport = asyncHandler(async (req, res) => {
       },
     },
     {
-      $unwind: "$parent",
+      $unwind: { path: "$parent", preserveNullAndEmptyArrays: true },
     },
     {
       $project: {
@@ -891,7 +903,7 @@ const adminDeleteUser = asyncHandler(async (req, res) => {
       }
     }
     await replaceRefId(user._id);
-    await deleteTransactions(user._id);
+    // await deleteTransactions(user._id);
     await addDeleteUserToData(user);
     res.json({
       message: "Delete user successfull",
@@ -1005,17 +1017,9 @@ const deleteTransactions = async (userId) => {
 };
 
 const addDeleteUserToData = async (user) => {
-  await DeleteUser.create({
-    userId: user.userId,
-    oldId: user._id,
-    phone: user.phone,
-    email: user.email,
-    password: user.password,
-    walletAddress: user.walletAddress,
-    parentId: user.parentId,
-    refId: user.refId,
-  });
-  await User.deleteOne({ _id: user._id });
+  user.status = "DELETED";
+  user.deletedTime = new Date();
+  await user.save();
   await Tree.deleteOne({ userId: user._id, tier: 1 });
 };
 
@@ -1103,6 +1107,7 @@ const onAcceptIncreaseTier = asyncHandler(async (req, res) => {
       u.countChild = [...u.countChild, 0];
       u.currentLayer = [...u.currentLayer, 0];
       u.tierDate = new Date();
+      u[`tier${nextTier}Time`] = new Date();
       await u.save();
     }
     res.json({ canIncrease: true });
@@ -1272,6 +1277,10 @@ const adminCreateUser = asyncHandler(async (req, res) => {
       currentLayer: Array.from({ length: tier }, () => 0),
       status: "APPROVED",
       isConfirmed: true,
+      tier2Time: tier === 2 ? new Date() : null,
+      tier3Time: tier === 3 ? new Date() : null,
+      tier4Time: tier === 4 ? new Date() : null,
+      tier5Time: tier === 5 ? new Date() : null,
     });
 
     await checkUnPayUserOnTierUser(tier);
