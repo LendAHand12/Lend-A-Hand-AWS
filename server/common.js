@@ -161,10 +161,15 @@ export const changeTree12 = async (tier) => {
 };
 
 export const addLockTime = async () => {
-  const listUser = await User.find({ isAdmin: false, status: "LOCKED" });
+  const listUser = await User.find({
+    isAdmin: false,
+    status: "LOCKED",
+    lockedTime: null,
+  });
 
   for (let user of listUser) {
-    user.lockedTime = new Date();
+    console.log({ user: user.userId });
+    user.lockedTime = new Date("2023-12-07T07:04:46.909+00:00");
     await user.save();
   }
 

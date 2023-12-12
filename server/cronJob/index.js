@@ -29,18 +29,22 @@ export const deleteUser24hUnPay = asyncHandler(async () => {
         parent.children = [...newChilds];
         await parent.save();
 
-        const userDelete = await DeleteUser.create({
-          userId: u.userId,
-          oldId: u._id,
-          email: u.email,
-          phone: u.phone,
-          password: u.password,
-          walletAddress: u.walletAddress,
-          parentId: tree.parentId,
-          refId: tree.refId,
-        });
+        // const userDelete = await DeleteUser.create({
+        //   userId: u.userId,
+        //   oldId: u._id,
+        //   email: u.email,
+        //   phone: u.phone,
+        //   password: u.password,
+        //   walletAddress: u.walletAddress,
+        //   parentId: tree.parentId,
+        //   refId: tree.refId,
+        // });
 
-        await User.deleteOne({ _id: u._id });
+        // await User.deleteOne({ _id: u._id });
+        u.status = "DELETED";
+        u.deletedTime = new Date();
+        await u.save();
+
         await Tree.deleteOne({ userId: u._id });
       }
     }
@@ -58,6 +62,7 @@ export const checkAPackage = asyncHandler(async () => {
 
     if (diffDays >= 1 && u.countPay < 13) {
       u.status = "LOCKED";
+      u.lockedTime = new Date();
     }
 
     if (diffDays > 30) {
@@ -74,6 +79,7 @@ export const checkAPackage = asyncHandler(async () => {
       if (listRefId.length < 3) {
         u.errLahCode = "OVER60";
         u.status = "LOCKED";
+        u.lockedTime = new Date();
       } else {
         u.errLahCode = "";
       }
@@ -93,6 +99,7 @@ export const checkBPackage = asyncHandler(async () => {
 
     if (diffDays >= 1 && u.countPay < 7) {
       u.status = "LOCKED";
+      u.lockedTime = new Date();
     }
 
     if (diffDays > 30) {
@@ -112,6 +119,7 @@ export const checkBPackage = asyncHandler(async () => {
       if (listRefId.length < 3) {
         u.errLahCode = "OVER60";
         u.status = "LOCKED";
+        u.lockedTime = new Date();
       } else {
         u.errLahCode = "";
       }
@@ -161,6 +169,7 @@ export const checkCPackage = asyncHandler(async () => {
         //   }
         // } else {
         u.status = "LOCKED";
+        u.lockedTime = new Date();
         // }
       }
       await u.save();
