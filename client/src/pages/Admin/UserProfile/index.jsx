@@ -399,7 +399,7 @@ const UserProfile = (match) => {
                   )}
                   {data.status === "DELETED" && (
                     <li className="flex items-center py-3">
-                      <span>{t("lockedTime")}</span>
+                      <span>{t("deletedTime")}</span>
                       <span className="ml-auto">
                         {new Date(data.deletedTime).toLocaleDateString("vi")}
                       </span>
@@ -422,7 +422,7 @@ const UserProfile = (match) => {
                   <li className="flex items-center py-3">
                     <span>{t("tier2Time")}</span>
                     <span className="ml-auto">
-                      {data.tier1Time
+                      {data.tier2Time
                         ? new Date(data.tier2Time).toLocaleDateString("vi")
                         : ""}
                     </span>
@@ -431,7 +431,7 @@ const UserProfile = (match) => {
                     <span>{t("tier3Time")}</span>
                     <span className="ml-auto">
                       {data.tier3Time
-                        ? new Date(data.tier1Time).toLocaleDateString("vi")
+                        ? new Date(data.tier3Time).toLocaleDateString("vi")
                         : ""}
                     </span>
                   </li>
@@ -439,7 +439,7 @@ const UserProfile = (match) => {
                     <span>{t("tier4Time")}</span>
                     <span className="ml-auto">
                       {data.tier4Time
-                        ? new Date(data.tier1Time).toLocaleDateString("vi")
+                        ? new Date(data.tier4Time).toLocaleDateString("vi")
                         : ""}
                     </span>
                   </li>
@@ -447,7 +447,7 @@ const UserProfile = (match) => {
                     <span>{t("tier5Time")}</span>
                     <span className="ml-auto">
                       {data.tier5Time
-                        ? new Date(data.tier1Time).toLocaleDateString("vi")
+                        ? new Date(data.tier5Time).toLocaleDateString("vi")
                         : ""}
                     </span>
                   </li>
