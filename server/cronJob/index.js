@@ -12,14 +12,19 @@ import Transaction from "../models/transactionModel.js";
 
 export const deleteUser24hUnPay = asyncHandler(async () => {
   const listUser = await User.find({
-    $and: [{ tier: 1 }, { countPay: 0 }, { isAdmin: false }],
+    $and: [
+      { tier: 1 },
+      { countPay: 0 },
+      { isAdmin: false },
+      { status: { $ne: "DELETED" } },
+    ],
   });
   const currentDay = moment();
   for (let u of listUser) {
     const listRefId = await Tree.find({ refId: u._id });
     const tree = await Tree.findOne({ userId: u._id });
     const diffDays = currentDay.diff(u.createdAt, "days");
-    if (listRefId.length === 0 && diffDays >= 1) {
+    if (listRefId.length === 0 && diffDays >= 1 && tree) {
       let parent = await Tree.findOne({ userId: tree.parentId });
       if (parent && tree) {
         let childs = parent.children;
@@ -29,18 +34,6 @@ export const deleteUser24hUnPay = asyncHandler(async () => {
         parent.children = [...newChilds];
         await parent.save();
 
-        // const userDelete = await DeleteUser.create({
-        //   userId: u.userId,
-        //   oldId: u._id,
-        //   email: u.email,
-        //   phone: u.phone,
-        //   password: u.password,
-        //   walletAddress: u.walletAddress,
-        //   parentId: tree.parentId,
-        //   refId: tree.refId,
-        // });
-
-        // await User.deleteOne({ _id: u._id });
         u.status = "DELETED";
         u.deletedTime = new Date();
         await u.save();
