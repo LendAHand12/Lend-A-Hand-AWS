@@ -333,8 +333,12 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       holdReferralCommission = true;
     }
 
-    if (user.tier === 2) {
-      holdDirectCommission = true;
+    if (
+      user.tier === 2 &&
+      (parentWithCountPay._id === "64abd685283a28bf06274b1e" ||
+        parentWithCountPay._id === "6494f725d9af0570b3a748d0" ||
+        parentWithCountPay._id === "64c61c996e724e717455c601")
+    ) {
       holdReferralCommission = true;
     }
 
