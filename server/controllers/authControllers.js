@@ -199,6 +199,7 @@ const authUser = asyncHandler(async (req, res) => {
       { $or: [{ email: code }, { userId: code }] },
       { isConfirmed: true },
       { status: { $ne: "LOCKED" } },
+      { status: { $ne: "DELETED" } },
     ],
   });
   // if the passwords are matching, then check if a refresh token exists for this user
