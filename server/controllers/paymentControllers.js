@@ -298,10 +298,6 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
     let holdDirectCommission = false;
     let holdReferralCommission = false;
 
-    if (user.tier === 2) {
-      holdReferralCommission = true;
-    }
-
     if (
       user.buyPackage === "B" &&
       user.countPay === 0 &&
@@ -334,6 +330,11 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         (parentWithCountPay.buyPackage === "A" &&
           parentWithCountPay.countPay < 13))
     ) {
+      holdReferralCommission = true;
+    }
+
+    if (user.tier === 2) {
+      holdDirectCommission = true;
       holdReferralCommission = true;
     }
 
