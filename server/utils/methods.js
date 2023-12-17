@@ -85,6 +85,8 @@ export const getRefParentUser = async (userId, tier) => {
 // };
 
 export const findNextUser = async (tier) => {
+  const nextUserInDB = await NextUserTier.findOne({ tier });
+  if (nextUserInDB) return nextUserInDB.userId;
   const newAllTrees = await Tree.find({ tier }).sort({ createdAt: 1 });
   const userIdCheckLevel1 = await checkNextUserLevel1(tier);
   const indexOfNextUser = newAllTrees.findIndex(
@@ -105,9 +107,6 @@ export const findNextUser = async (tier) => {
 };
 
 const checkNextUserLevel1 = async (tier) => {
-  const nextUserInDB = await NextUserTier.findOne({ tier });
-  if (nextUserInDB) return nextUserInDB.userId;
-
   const newAllTrees = await Tree.find({ tier }).sort({ createdAt: 1 });
   const allTrees = newAllTrees.filter((ele) => ele.children.length < 3);
 
