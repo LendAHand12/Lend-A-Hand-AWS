@@ -111,7 +111,9 @@ export const findNextUser = async (tier) => {
       ? currentItem
       : minItem;
   }, sortedData[0]);
-  return itemWithMinLength.userId;
+  return itemWithMinLength
+    ? itemWithMinLength.userId
+    : "6494e9101e2f152a593b66f2";
 };
 
 // const findNextUser = async (tier) => {
