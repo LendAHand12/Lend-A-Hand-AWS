@@ -1277,6 +1277,7 @@ const adminCreateUser = asyncHandler(async (req, res) => {
       currentLayer: Array.from({ length: tier }, () => 0),
       status: "APPROVED",
       isConfirmed: true,
+      buyPackage: "A",
       tier2Time: tier === 2 ? new Date() : null,
       tier3Time: tier === 3 ? new Date() : null,
       tier4Time: tier === 4 ? new Date() : null,
