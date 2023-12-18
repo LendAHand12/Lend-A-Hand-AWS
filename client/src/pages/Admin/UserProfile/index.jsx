@@ -118,6 +118,9 @@ const UserProfile = (match) => {
       if (values.newFine !== data.fine) {
         body.newFine = values.newFine;
       }
+      if (values.hold !== data.hold) {
+        body.hold = values.hold;
+      }
 
       if (Object.keys(body).length === 0) {
         setEditting(false);
@@ -363,6 +366,30 @@ const UserProfile = (match) => {
                           }  py-1 px-2 rounded text-white text-sm`}
                         >
                           {t(data.status)}
+                        </span>
+                      )}
+                    </span>
+                  </li>
+                  <li className="flex items-center py-3">
+                    <span>Hold Tier</span>
+                    <span className="ml-auto">
+                      {isEditting ? (
+                        <select
+                          className="block p-2 pr-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none active:outline-none"
+                          {...register("hold")}
+                          defaultValue={data.hold}
+                          disabled={loadingUpdate}
+                        >
+                          <option value="no">{t("no")}</option>
+                          <option value={1}>Tier 1</option>
+                          <option value={2}>Tier 2</option>
+                          <option value={3}>Tier 3</option>
+                          <option value={4}>Tier 4</option>
+                          <option value={5}>Tier 5</option>
+                        </select>
+                      ) : (
+                        <span className={`py-1 px-2 text-sm`}>
+                          {data.hold === "no" ? t("no") : data.hold}
                         </span>
                       )}
                     </span>

@@ -148,6 +148,7 @@ const getUserById = asyncHandler(async (req, res) => {
       tier3Time: user.tier3Time,
       tier4Time: user.tier4Time,
       tier5Time: user.tier5Time,
+      hold: user.hold,
       changeUser,
     });
   } else {
@@ -250,6 +251,7 @@ const adminUpdateUser = asyncHandler(async (req, res) => {
     tier,
     walletAddress,
     note,
+    hold,
   } = req.body;
 
   if (userId) {
@@ -317,6 +319,7 @@ const adminUpdateUser = asyncHandler(async (req, res) => {
     user.phone = phone || user.phone;
     user.email = email || user.email;
     user.idCode = idCode || user.idCode;
+    user.hold = hold || user.hold;
     if (user.status === "LOCKED" && newStatus !== "LOCKED") {
       user.lockedTime = null;
     }
@@ -611,6 +614,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
       tier3Time: user.tier3Time,
       tier4Time: user.tier4Time,
       tier5Time: user.tier5Time,
+      hold: user.hold,
     });
   } else {
     res.status(400);
@@ -1129,7 +1133,6 @@ const checkCanIncreaseNextTier = async (u) => {
       if (updatedUser.currentLayer.slice(-1) >= 3) {
         const haveC = await doesAnyUserInHierarchyHaveBuyPackageC(u.id, 1);
         return !haveC;
-        // return true;
       } else {
         const countedUser = await countChildOfUserById(u);
         if (countedUser.countChild.slice(-1) >= 300) {

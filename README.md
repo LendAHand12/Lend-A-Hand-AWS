@@ -137,6 +137,11 @@ Ràng buộc không trùng username 1tr => done
 - Thêm nút KYC trong chi tiết user => 500
 - Xoá cây user theo tier => 1tr
 
+- Hold tạm thời lah > 3 => 500
+- Chỉnh lại thời gian vào tier 2 của user => 500
+- Nút bật tắt hold theo tier => 1tr5
+- Lưu lịch sử cấp trên của user => 1tr
+
 // update parent
 db.users.update({
 $and: [

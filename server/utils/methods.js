@@ -291,3 +291,34 @@ export const getUserClosestToNow = (users) => {
 
   return users[0];
 };
+
+export const checkRatioCountChildOfUser = async (userId) => {
+  const u = await User.findById(userId);
+  if (u.countChild[0] >= 300) {
+    const listChildId = await Tree.find({
+      parentId: u._id,
+      tier: 1,
+    }).select("userId");
+
+    let highestChildSales = 0;
+    let lowestChildSales = Infinity;
+
+    for (const childId of listChildId) {
+      const child = await User.findById(childId.userId);
+
+      if (child.countChild[0] > highestChildSales) {
+        highestChildSales = child.countChild[0];
+      }
+
+      if (child.countChild[0] < lowestChildSales) {
+        lowestChildSales = child.countChild[0];
+      }
+    }
+
+    if (highestChildSales >= 0.4 * 300 && lowestChildSales >= 0.2 * 300) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+};

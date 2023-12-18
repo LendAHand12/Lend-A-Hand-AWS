@@ -5,7 +5,11 @@ import getParentWithCountPay from "../utils/getParentWithCountPay.js";
 import Refund from "../models/refundModel.js";
 import { getActiveLink } from "../utils/getLinksActive.js";
 import { sendActiveLink } from "../utils/sendMailCustom.js";
-import { getParentUser, getRefParentUser } from "../utils/methods.js";
+import {
+  checkRatioCountChildOfUser,
+  getParentUser,
+  getRefParentUser,
+} from "../utils/methods.js";
 import { checkCanIncreaseNextTier } from "./userControllers.js";
 import Wallet from "../models/walletModel.js";
 import Tree from "../models/treeModel.js";
@@ -334,17 +338,24 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
     }
 
     if (
-      user.tier === 2 &&
-      (parentWithCountPay.userId === "BAOTRAM" ||
-        parentWithCountPay.userId === "FREEDOM" ||
-        parentWithCountPay._id === "Kinhoang Lah" ||
-        user.countPay >= 3)
+      (user.tier >= 2 &&
+        user.countPay >= 3 &&
+        parentWithCountPay.countChild[0] < 300) ||
+      parentWithCountPay.hold.toString() === user.tier.toString()
     ) {
       holdReferralCommission = true;
     }
 
-    // holdDirectCommission = true; // temp
-    // holdReferralCommission = true; // temp
+    if (
+      user.tier >= 2 &&
+      user.countPay >= 3 &&
+      parentWithCountPay.countChild[0] >= 300
+    ) {
+      const checkRatioCountChild = await checkRatioCountChildOfUser(
+        parentWithCountPay._id
+      );
+      if (!checkRatioCountChild) holdReferralCommission = true;
+    }
 
     if (holdDirectCommission) {
       haveRefNotPayEnough = true;

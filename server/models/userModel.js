@@ -156,6 +156,11 @@ const userSchema = mongoose.Schema(
       type: Date,
       default: null,
     },
+    hold: {
+      type: String,
+      enum: ["no", 1, 2, 3, 4, 5],
+      default: "no",
+    },
   },
   {
     timestamps: true,
