@@ -351,5 +351,7 @@
   "tier2Time": "Completed tier 2 :",
   "tier3Time": "Completed tier 3 :",
   "tier4Time": "Complete tier 4 :",
-  "tier5Time": "Completed tier 5 :"
+  "tier5Time": "Completed tier 5 :",
+
+  "oldParent": "Old parents"
 }

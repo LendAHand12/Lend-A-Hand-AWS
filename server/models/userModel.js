@@ -161,6 +161,10 @@ const userSchema = mongoose.Schema(
       enum: ["no", 1, 2, 3, 4, 5],
       default: "no",
     },
+    oldParents: {
+      type: Array,
+      default: [],
+    },
   },
   {
     timestamps: true,

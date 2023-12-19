@@ -25,7 +25,7 @@ export const deleteUser24hUnPay = asyncHandler(async () => {
     const tree = await Tree.findOne({ userId: u._id });
     const diffDays = currentDay.diff(u.createdAt, "days");
     if (listRefId.length === 0 && diffDays >= 1 && tree) {
-      let parent = await Tree.findOne({ userId: tree.parentId });
+      let parent = await Tree.findOne({ userId: tree.parentId, tier: 1 });
       if (parent && tree) {
         let childs = parent.children;
         let newChilds = childs.filter((item) => {
@@ -36,6 +36,7 @@ export const deleteUser24hUnPay = asyncHandler(async () => {
 
         u.status = "DELETED";
         u.deletedTime = new Date();
+        u.oldParents = [parent.userId, ...u.oldParents];
         await u.save();
 
         await Tree.deleteOne({ userId: u._id });
