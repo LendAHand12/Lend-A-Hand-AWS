@@ -157,6 +157,7 @@ const getUserById = asyncHandler(async (req, res) => {
       tier4Time: user.tier4Time,
       tier5Time: user.tier5Time,
       hold: user.hold,
+      holdLevel: user.holdLevel,
       changeUser,
       listOldParent,
     });
@@ -261,6 +262,7 @@ const adminUpdateUser = asyncHandler(async (req, res) => {
     walletAddress,
     note,
     hold,
+    holdLevel,
   } = req.body;
 
   if (userId) {
@@ -329,6 +331,7 @@ const adminUpdateUser = asyncHandler(async (req, res) => {
     user.email = email || user.email;
     user.idCode = idCode || user.idCode;
     user.hold = hold || user.hold;
+    user.holdLevel = holdLevel || user.holdLevel;
     if (user.status === "LOCKED" && newStatus !== "LOCKED") {
       user.lockedTime = null;
     }

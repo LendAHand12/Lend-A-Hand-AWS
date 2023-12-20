@@ -122,6 +122,10 @@ const UserProfile = (match) => {
         body.hold = values.hold;
       }
 
+      if (values.holdLevel !== data.holdLevel) {
+        body.holdLevel = values.holdLevel;
+      }
+
       if (Object.keys(body).length === 0) {
         setEditting(false);
         return;
@@ -390,6 +394,38 @@ const UserProfile = (match) => {
                       ) : (
                         <span className={`py-1 px-2 text-sm`}>
                           {data.hold === "no" ? t("no") : data.hold}
+                        </span>
+                      )}
+                    </span>
+                  </li>
+                  <li className="flex items-center py-3">
+                    <span>{t("holdLevel")}</span>
+                    <span className="ml-auto">
+                      {isEditting ? (
+                        <select
+                          className="block p-2 pr-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none active:outline-none"
+                          {...register("holdLevel")}
+                          defaultValue={data.holdLevel}
+                          disabled={loadingUpdate}
+                        >
+                          <option value="no">{t("no")}</option>
+                          <option value={0}>{t("level")} 0</option>
+                          <option value={1}>{t("level")} 1</option>
+                          <option value={2}>{t("level")} 2</option>
+                          <option value={3}>{t("level")} 3</option>
+                          <option value={4}>{t("level")} 4</option>
+                          <option value={5}>{t("level")} 5</option>
+                          <option value={6}>{t("level")} 6</option>
+                          <option value={7}>{t("level")} 7</option>
+                          <option value={8}>{t("level")} 8</option>
+                          <option value={9}>{t("level")} 9</option>
+                          <option value={10}>{t("level")} 10</option>
+                          <option value={11}>{t("level")} 11</option>
+                          <option value={12}>{t("level")} 12</option>
+                        </select>
+                      ) : (
+                        <span className={`py-1 px-2 text-sm`}>
+                          {data.holdLevel === "no" ? t("no") : data.holdLevel}
                         </span>
                       )}
                     </span>

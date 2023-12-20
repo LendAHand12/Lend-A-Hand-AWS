@@ -161,6 +161,11 @@ const userSchema = mongoose.Schema(
       enum: ["no", 1, 2, 3, 4, 5],
       default: "no",
     },
+    holdLevel: {
+      type: String,
+      enum: ["no", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+      default: "no",
+    },
     oldParents: {
       type: Array,
       default: [],

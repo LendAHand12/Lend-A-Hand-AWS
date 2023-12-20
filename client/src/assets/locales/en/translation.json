@@ -353,5 +353,7 @@
   "tier4Time": "Complete tier 4 :",
   "tier5Time": "Completed tier 5 :",
 
-  "oldParent": "Old parents"
+  "oldParent": "Old parents",
+  "holdLevel": "Hold level (above)",
+  "level": "Level"
 }

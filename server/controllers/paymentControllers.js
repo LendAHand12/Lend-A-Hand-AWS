@@ -338,15 +338,22 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
     }
 
     if (
-      (user.tier >= 2 &&
-        user.countPay >= 3 &&
-        parentWithCountPay.countChild[0] < 300) ||
-      parentWithCountPay.hold.toString() === user.tier.toString()
+      parentWithCountPay.hold !== "no" &&
+      parentWithCountPay.holdLevel !== "no"
+    ) {
+      if (
+        parentWithCountPay.hold.toString() === user.tier.toString() &&
+        parseInt(parentWithCountPay.holdLevel) <= parseInt(user.countPay)
+      ) {
+        holdReferralCommission = true;
+      }
+    } else if (
+      user.tier >= 2 &&
+      user.countPay >= 3 &&
+      parentWithCountPay.countChild[0] < 300
     ) {
       holdReferralCommission = true;
-    }
-
-    if (
+    } else if (
       user.tier >= 2 &&
       user.countPay >= 3 &&
       parentWithCountPay.countChild[0] >= 300
