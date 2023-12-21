@@ -114,13 +114,13 @@ const SettingPage = () => {
                 </div>
                 <div className="w-full flex flex-col mb-4">
                   <span className="font-semibold">
-                    {t("walletAddress")} Hold :
+                    {t("walletAddress")} Hold Tier 1 :
                   </span>
                   <input
                     className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
                     type="text"
                     placeholder={`Oxbx7...`}
-                    {...register("HOLD", {
+                    {...register("HOLD1", {
                       required: t("Wallet address is required"),
                       pattern: {
                         value: /^0x[a-fA-F0-9]{40}$/g,
@@ -129,7 +129,83 @@ const SettingPage = () => {
                     })}
                     disabled={submiting}
                   />
-                  <p className="error-message-text">{errors.HOLD?.message}</p>
+                  <p className="error-message-text">{errors.HOLD1?.message}</p>
+                </div>
+                <div className="w-full flex flex-col mb-4">
+                  <span className="font-semibold">
+                    {t("walletAddress")} Hold Tier 2 :
+                  </span>
+                  <input
+                    className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                    type="text"
+                    placeholder={`Oxbx7...`}
+                    {...register("HOLD2", {
+                      required: t("Wallet address is required"),
+                      pattern: {
+                        value: /^0x[a-fA-F0-9]{40}$/g,
+                        message: t("Please enter the correct wallet format"),
+                      },
+                    })}
+                    disabled={submiting}
+                  />
+                  <p className="error-message-text">{errors.HOLD2?.message}</p>
+                </div>
+                <div className="w-full flex flex-col mb-4">
+                  <span className="font-semibold">
+                    {t("walletAddress")} Hold Tier 3 :
+                  </span>
+                  <input
+                    className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                    type="text"
+                    placeholder={`Oxbx7...`}
+                    {...register("HOLD3", {
+                      required: t("Wallet address is required"),
+                      pattern: {
+                        value: /^0x[a-fA-F0-9]{40}$/g,
+                        message: t("Please enter the correct wallet format"),
+                      },
+                    })}
+                    disabled={submiting}
+                  />
+                  <p className="error-message-text">{errors.HOLD3?.message}</p>
+                </div>
+                <div className="w-full flex flex-col mb-4">
+                  <span className="font-semibold">
+                    {t("walletAddress")} Hold Tier 4 :
+                  </span>
+                  <input
+                    className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                    type="text"
+                    placeholder={`Oxbx7...`}
+                    {...register("HOLD4", {
+                      required: t("Wallet address is required"),
+                      pattern: {
+                        value: /^0x[a-fA-F0-9]{40}$/g,
+                        message: t("Please enter the correct wallet format"),
+                      },
+                    })}
+                    disabled={submiting}
+                  />
+                  <p className="error-message-text">{errors.HOLD4?.message}</p>
+                </div>
+                <div className="w-full flex flex-col mb-4">
+                  <span className="font-semibold">
+                    {t("walletAddress")} Hold Tier 5 :
+                  </span>
+                  <input
+                    className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                    type="text"
+                    placeholder={`Oxbx7...`}
+                    {...register("HOLD5", {
+                      required: t("Wallet address is required"),
+                      pattern: {
+                        value: /^0x[a-fA-F0-9]{40}$/g,
+                        message: t("Please enter the correct wallet format"),
+                      },
+                    })}
+                    disabled={submiting}
+                  />
+                  <p className="error-message-text">{errors.HOLD5?.message}</p>
                 </div>
                 <button
                   type="submit"

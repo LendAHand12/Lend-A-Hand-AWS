@@ -20,11 +20,12 @@ const Transactions = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [searchKey, setSearchKey] = useState("");
+  const [tier, setTier] = useState(1);
 
   useEffect(() => {
     (async () => {
       setLoading(true);
-      await Payment.getAllPayments(pageNumber, searchKey, searchStatus)
+      await Payment.getAllPayments(pageNumber, searchKey, searchStatus, tier)
         .then((response) => {
           const { payments, pages } = response.data;
           setData(payments);
@@ -46,7 +47,7 @@ const Transactions = () => {
     (async () => {
       setLoading(true);
       setPageNumber(1);
-      await Payment.getAllPayments(1, searchKey, searchStatus)
+      await Payment.getAllPayments(1, searchKey, searchStatus, tier)
         .then((response) => {
           const { payments, pages } = response.data;
           setData(payments);
@@ -62,7 +63,7 @@ const Transactions = () => {
           setLoading(false);
         });
     })();
-  }, [searchKey, searchStatus]);
+  }, [searchKey, searchStatus, tier]);
 
   const onChangeStatus = (e) => setSearchStatus(e.target.value);
 
@@ -71,14 +72,6 @@ const Transactions = () => {
       setKeyword(e.target.value);
     }, 1000);
   };
-
-  // const handleNextPage = () => {
-  //   setPageNumber((pageNumber) => pageNumber + 1);
-  // };
-
-  // const handlePrevPage = () => {
-  //   setPageNumber((pageNumber) => pageNumber - 1);
-  // };
 
   const handleChangePage = (page) => {
     setPageNumber(page);
@@ -95,6 +88,19 @@ const Transactions = () => {
   return (
     <div>
       <ToastContainer />
+      <div className="flex items-center gap-4">
+        {[...Array(5)].map((item, i) => (
+          <button
+            key={i}
+            onClick={() => setTier(i + 1)}
+            className={`flex justify-center items-center hover:underline gradient text-white font-bold ${
+              tier === i + 1 ? "border-2 border-gray-700" : ""
+            } rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out`}
+          >
+            {t("tier")} {i + 1}
+          </button>
+        ))}
+      </div>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg p-10">
         <div className="flex items-center justify-between pb-4 bg-white">
           <div>

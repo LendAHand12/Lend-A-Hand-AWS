@@ -142,6 +142,12 @@ Ràng buộc không trùng username 1tr => done
 - Nút bật tắt hold theo tier => 1tr5
 - Lưu lịch sử cấp trên của user => 1tr
 
+- cms -> có tài liệu => 8tr
+- phân quyền -> có tài liệu => 3tr
+
+- filter show giao dịch theo từng tier
+- thêm settings ví hold cho từng tier
+
 // update parent
 db.users.update({
 $and: [

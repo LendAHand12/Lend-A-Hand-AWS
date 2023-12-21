@@ -13,9 +13,9 @@ const Payment = {
   onDonePayment: (body) => {
     return API.post(`${URL_API_PAYMENT}/done`, body);
   },
-  getAllPayments: (pageNumber, keyword, statusSearch) => {
+  getAllPayments: (pageNumber, keyword, statusSearch, tier) => {
     return API.get(
-      `${URL_API_PAYMENT}/user/?pageNumber=${pageNumber}&keyword=${keyword}&status=${statusSearch}`
+      `${URL_API_PAYMENT}/user/?pageNumber=${pageNumber}&keyword=${keyword}&status=${statusSearch}&tier=${tier}`
     );
   },
   getPaymentsOfUser: (pageNumber) => {
