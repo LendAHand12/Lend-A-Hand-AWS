@@ -21,7 +21,19 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
 
   const registerWallet = wallets.find((ele) => ele.type === "REGISTER");
   const adminWallet = wallets.find((ele) => ele.type === "ADMIN");
-  const holdWallet = wallets.find((ele) => ele.type === "HOLD");
+  const holdWallet1 = wallets.find((ele) => ele.type === "HOLD1");
+  const holdWallet2 = wallets.find((ele) => ele.type === "HOLD2");
+  const holdWallet3 = wallets.find((ele) => ele.type === "HOLD3");
+  const holdWallet4 = wallets.find((ele) => ele.type === "HOLD4");
+  const holdWallet5 = wallets.find((ele) => ele.type === "HOLD5");
+
+  const holdWallet = {
+    1: holdWallet1,
+    2: holdWallet2,
+    3: holdWallet3,
+    4: holdWallet4,
+    5: holdWallet5,
+  };
 
   if (user.tier === 1) {
     if (
@@ -77,7 +89,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       if (user.countPay === 0) {
         directCommissionFee = 65 * user.tier;
         if (refUser.closeLah) {
-          directCommissionWallet = holdWallet.address;
+          directCommissionWallet = holdWallet[user.tier].address;
           haveRefNotPayEnough = true;
         } else if (
           refUser.openLah ||
@@ -91,7 +103,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
             refUser.tier < user.tier ||
             (refUser.tier === user.tier && refUser.countPay < 13)
           ) {
-            directCommissionWallet = holdWallet.address;
+            directCommissionWallet = holdWallet[user.tier].address;
             haveRefNotPayEnough = true;
           } else {
             directCommissionWallet = refUser.walletAddress[0];
@@ -114,7 +126,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       if (user.countPay === 0) {
         directCommissionFee = 35 * user.tier;
         if (refUser.closeLah) {
-          directCommissionWallet = holdWallet.address;
+          directCommissionWallet = holdWallet[user.tier].address;
           haveRefNotPayEnough = true;
         } else if (
           refUser.openLah ||
@@ -128,7 +140,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
             refUser.tier < user.tier ||
             (refUser.tier === user.tier && refUser.countPay < 7)
           ) {
-            directCommissionWallet = holdWallet.address;
+            directCommissionWallet = holdWallet[user.tier].address;
             haveRefNotPayEnough = true;
           } else {
             directCommissionWallet = refUser.walletAddress[0];
@@ -137,7 +149,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       } else if (user.countPay === 7 && user.continueWithBuyPackageB) {
         directCommissionFee = 30 * user.tier;
         if (refUser.closeLah) {
-          directCommissionWallet = holdWallet.address;
+          directCommissionWallet = holdWallet[user.tier].address;
           haveRefNotPayEnough = true;
         } else if (
           refUser.openLah ||
@@ -151,7 +163,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
             refUser.tier < user.tier ||
             (refUser.tier === user.tier && refUser.countPay < 13)
           ) {
-            directCommissionWallet = holdWallet.address;
+            directCommissionWallet = holdWallet[user.tier].address;
             haveRefNotPayEnough = true;
           } else {
             directCommissionWallet = refUser.walletAddress[0];
@@ -172,7 +184,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       }
     } else if (user.tier === 1 && user.buyPackage === "C") {
       if (refUser.closeLah) {
-        directCommissionWallet = holdWallet.address;
+        directCommissionWallet = holdWallet[user.tier].address;
         haveRefNotPayEnough = true;
       } else if (
         refUser.openLah ||
@@ -186,7 +198,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           refUser.tier < user.tier ||
           (refUser.tier === user.tier && refUser.countPay < user.countPay + 1)
         ) {
-          directCommissionWallet = holdWallet.address;
+          directCommissionWallet = holdWallet[user.tier].address;
           haveRefNotPayEnough = true;
         } else {
           directCommissionWallet = refUser.walletAddress[0];
@@ -207,7 +219,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
     if (user.countPay === 0) {
       if (user.tier >= 2) {
         if (refUser.closeLah) {
-          directCommissionWallet = holdWallet.address;
+          directCommissionWallet = holdWallet[user.tier].address;
           haveRefNotPayEnough = true;
         } else if (
           refUser.openLah ||
@@ -221,7 +233,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
             refUser.tier < user.tier ||
             (refUser.tier === user.tier && refUser.countPay < user.countPay + 1)
           ) {
-            directCommissionWallet = holdWallet.address;
+            directCommissionWallet = holdWallet[user.tier].address;
             haveRefNotPayEnough = true;
           } else {
             directCommissionWallet = refUser.walletAddress[0];
@@ -229,7 +241,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         }
       }
       if (parentUser.closeLah) {
-        referralCommissionWallet = holdWallet.address;
+        referralCommissionWallet = holdWallet[user.tier].address;
         haveParentNotPayEnough = true;
       } else if (
         parentUser.openLah ||
@@ -245,7 +257,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           (parentUser.tier === user.tier &&
             parentUser.countPay < user.countPay + 1)
         ) {
-          referralCommissionWallet = holdWallet.address;
+          referralCommissionWallet = holdWallet[user.tier].address;
           haveParentNotPayEnough = true;
         } else {
           referralCommissionWallet = parentUser.walletAddress[0];
@@ -253,7 +265,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       }
     } else {
       if (refUser.closeLah) {
-        directCommissionWallet = holdWallet.address;
+        directCommissionWallet = holdWallet[user.tier].address;
         haveRefNotPayEnough = true;
       } else if (
         refUser.openLah ||
@@ -267,7 +279,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           refUser.tier < user.tier ||
           (refUser.tier === user.tier && refUser.countPay < user.countPay + 1)
         ) {
-          directCommissionWallet = holdWallet.address;
+          directCommissionWallet = holdWallet[user.tier].address;
           haveRefNotPayEnough = true;
         } else {
           directCommissionWallet = refUser.walletAddress[0];
@@ -275,9 +287,9 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       }
 
       if (!parentWithCountPay) {
-        referralCommissionWallet = holdWallet.address;
+        referralCommissionWallet = holdWallet[user.tier].address;
       } else if (parentWithCountPay.closeLah) {
-        referralCommissionWallet = holdWallet.address;
+        referralCommissionWallet = holdWallet[user.tier].address;
         haveParentNotPayEnough = true;
       } else if (
         parentWithCountPay.openLah ||
@@ -292,7 +304,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         (parentWithCountPay.tier === user.tier &&
           parentWithCountPay.countPay < user.countPay + 1)
       ) {
-        referralCommissionWallet = holdWallet.address;
+        referralCommissionWallet = holdWallet[user.tier].address;
         haveParentNotPayEnough = true;
       } else {
         referralCommissionWallet = parentWithCountPay.walletAddress[0];
@@ -366,11 +378,11 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
 
     if (holdDirectCommission) {
       haveRefNotPayEnough = true;
-      directCommissionWallet = holdWallet.address;
+      directCommissionWallet = holdWallet[user.tier].address;
     }
 
     if (holdReferralCommission) {
-      referralCommissionWallet = holdWallet.address;
+      referralCommissionWallet = holdWallet[user.tier].address;
       haveParentNotPayEnough = true;
     }
 
@@ -827,7 +839,7 @@ const onDonePayment = async (user, transIds) => {
 };
 
 const getAllPayments = asyncHandler(async (req, res) => {
-  const { pageNumber, keyword, status } = req.query;
+  const { pageNumber, keyword, status, tier } = req.query;
   const page = Number(pageNumber) || 1;
   let searchType = {};
   if (
@@ -854,6 +866,7 @@ const getAllPayments = asyncHandler(async (req, res) => {
         ],
       },
       { ...searchType },
+      { tier },
       {
         status: "SUCCESS",
       },
@@ -871,6 +884,7 @@ const getAllPayments = asyncHandler(async (req, res) => {
         ],
       },
       { ...searchType },
+      { tier },
       {
         status: "SUCCESS",
       },
