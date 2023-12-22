@@ -1076,9 +1076,15 @@ const checkCanRefundPayment = asyncHandler(async (req, res) => {
                 userReceive.countPay - 1
               } time but user pay = ${userCountPay} time`
         );
-      } else if (userReceive.errLahCode === "OVER30") {
+      } else if (
+        trans.type === "REFERRALHOLD" &&
+        userReceive.errLahCode === "OVER30"
+      ) {
         throw new Error(`User has not had 3 child within 30 days`);
-      } else if (userReceive.errLahCode === "OVER60") {
+      } else if (
+        trans.type === "REFERRALHOLD" &&
+        userReceive.errLahCode === "OVER60"
+      ) {
         throw new Error(`User has not had 3 child within 60 days`);
       } else if (
         userReceive.buyPackage === "A" &&

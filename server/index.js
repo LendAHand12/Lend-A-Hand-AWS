@@ -17,6 +17,8 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import packageRoutes from "./routes/packageRoutes.js";
 import walletRoutes from "./routes/walletRoutes.js";
 import changeUserRoutes from "./routes/changeUserRoutes.js";
+import pageRoutes from "./routes/pageRoutes.js";
+import permissionRoutes from "./routes/permissionRoutes.js";
 
 import {
   countChildToData,
@@ -75,6 +77,8 @@ app.use("/api/payment", paymentRoutes);
 app.use("/api/package", packageRoutes);
 app.use("/api/wallet", walletRoutes);
 app.use("/api/changeUser", changeUserRoutes);
+app.use("/api/page", pageRoutes);
+app.use("/api/permissions", permissionRoutes);
 
 app.use(notFound);
 
