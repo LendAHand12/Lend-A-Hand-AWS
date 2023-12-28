@@ -48,8 +48,8 @@ const User = {
       `${URL_API_USER}/getAllDeletedUsers/?pageNumber=${pageNumber}&keyword=${keyword}`
     );
   },
-  getAllUsersForExport: () => {
-    return API.get(`${URL_API_USER}/getAllUsersForExport`);
+  getAllUsersForExport: (body) => {
+    return API.post(`${URL_API_USER}/getAllUsersForExport`, body);
   },
   getMailChangeWallet: () => {
     return API.get(`${URL_API_USER}/changeWallet`);

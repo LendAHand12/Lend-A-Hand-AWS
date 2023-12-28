@@ -361,5 +361,7 @@
 
   "oldParent": "Cấp trên cũ",
   "holdLevel": "Hold tầng (trở lên)",
-  "level": "Tầng"
+  "level": "Tầng",
+
+  "refUserEmail": "Email người giới thiệu"
 }

@@ -355,5 +355,7 @@
 
   "oldParent": "Old parents",
   "holdLevel": "Hold level (above)",
-  "level": "Level"
+  "level": "Level",
+
+  "refUserEmail": "Referer email"
 }

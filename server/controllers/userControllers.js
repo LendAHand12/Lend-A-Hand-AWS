@@ -122,6 +122,13 @@ const getUserById = asyncHandler(async (req, res) => {
       status: "APPROVED",
     }).select("oldUserName oldEmail updatedAt");
 
+    const tree = await Tree.findOne({ userId: user._id, tier: 1 });
+
+    let refUser;
+    if (tree) {
+      refUser = await User.findById(tree.refId);
+    }
+
     res.json({
       id: user._id,
       email: user.email,
@@ -159,6 +166,8 @@ const getUserById = asyncHandler(async (req, res) => {
       hold: user.hold,
       holdLevel: user.holdLevel,
       changeUser,
+      refUserName: refUser ? refUser.userId : "",
+      refUserEmail: refUser ? refUser.email : "",
       listOldParent,
     });
   } else {
@@ -768,7 +777,28 @@ const getAllDeletedUsers = asyncHandler(async (req, res) => {
 });
 
 const getAllUsersForExport = asyncHandler(async (req, res) => {
+  let fromDate, toDate;
+  const { limit, page } = req.body;
+  let match = { isAdmin: false };
+
+  if (req.body.fromDate) {
+    fromDate = req.body.fromDate.split("T")[0];
+    match.createdAt = {
+      $gte: new Date(new Date(fromDate).valueOf() + 1000 * 3600 * 24),
+    };
+  }
+  if (req.body.toDate) {
+    toDate = req.body.toDate.split("T")[0];
+    match.createdAt = {
+      ...match.createdAt,
+      $lte: new Date(new Date(toDate).valueOf() + 1000 * 3600 * 24),
+    };
+  }
+
+  const offset = (page - 1) * limit;
+
   const users = await User.aggregate([
+    { $match: match },
     {
       $lookup: {
         from: "trees",
@@ -800,6 +830,25 @@ const getAllUsersForExport = asyncHandler(async (req, res) => {
       $unwind: { path: "$parent", preserveNullAndEmptyArrays: true },
     },
     {
+      $lookup: {
+        from: "users",
+        let: { parentUserId: { $toObjectId: "$parent.userId" } },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$_id", "$$parentUserId"],
+              },
+            },
+          },
+        ],
+        as: "parentUser",
+      },
+    },
+    {
+      $unwind: { path: "$parentUser", preserveNullAndEmptyArrays: true },
+    },
+    {
       $project: {
         _id: 1,
         userId: 1,
@@ -809,12 +858,20 @@ const getAllUsersForExport = asyncHandler(async (req, res) => {
         countPay: 1,
         status: 1,
         countChild: 1,
+        tier: 1,
         phone: 1,
         createdAt: 1,
+        note: 1,
         parent: "$parent",
+        parentUser: "$parentUser",
       },
     },
+    { $skip: offset },
+    { $limit: limit },
+    { $sort: { createdAt: -1 } },
   ]);
+
+  const totalCount = await User.countDocuments(match);
 
   const result = [];
   for (let u of users) {
@@ -824,15 +881,18 @@ const getAllUsersForExport = asyncHandler(async (req, res) => {
       phone: u.phone,
       walletAddress: u.walletAddress[0],
       memberSince: u.createdAt,
-      countChild: u.countChild,
-      refUserName: u.parent ? u.parent.userName : "",
+      tier: u.tier,
       "count pay": u.countPay,
       fine: u.fine,
       status: u.status,
+      countChild: u.countChild[u.tier - 1],
+      refUserName: u.parent ? u.parent.userName : "",
+      refUserEmail: u.parentUser ? u.parentUser.email : "",
+      note: u.note ? u.note : "",
     });
   }
 
-  res.json(result);
+  res.json({ totalCount, result });
 });
 
 const mailForChangeWallet = asyncHandler(async (req, res) => {

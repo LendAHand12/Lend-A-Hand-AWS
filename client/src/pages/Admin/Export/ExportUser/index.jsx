@@ -1,32 +1,92 @@
 import User from "@/api/User";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ToastContainer, toast } from "react-toastify";
 import moment from "moment";
 import { exportToExcel } from "@/utils/export";
 import "./index.less";
+import { Controller, useForm } from "react-hook-form";
+import DatePicker from "react-datepicker";
 
 const ExportPaymentPage = () => {
   const { t } = useTranslation();
+  const {
+    handleSubmit,
+    control,
+    watch,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      tier: 2,
+    },
+  });
 
   const [loading, setLoading] = useState(false);
+  const fromDate = watch("fromDate");
+  const toDate = watch("toDate");
+  const [minToDate, setMinToDate] = useState(null);
+  const [maxFromDate, setMaxFromDate] = useState(null);
+  const [errorDate, setErrorDate] = useState(false);
 
-  const exportUsers = async () => {
+  const exportUsers = async (values) => {
+    const limit = 200;
+    const body = { page: 1, limit };
+    if (values.fromDate && values.toDate) {
+      const fromDate = moment(values.fromDate);
+      const toDate = moment(values.toDate);
+      if (toDate < fromDate) {
+        setErrorDate(true);
+        return;
+      } else {
+        body.fromDate = fromDate;
+        body.toDate = toDate;
+      }
+    } else if (values.fromDate) {
+      const fromDate = moment(values.fromDate);
+      body.fromDate = fromDate;
+    } else if (values.toDate) {
+      const toDate = moment(values.toDate);
+      body.toDate = toDate;
+    }
+    let exportData = [];
+
     setLoading(true);
-    await User.getAllUsersForExport()
-      .then((response) => {
-        const excelData = convertResponseDataToExportData(response.data, {
+
+    const fetchData = async () => {
+      try {
+        const initialResponse = await getData(body);
+        const { result } = initialResponse;
+        exportData = result;
+        const totalCount = initialResponse.totalCount;
+
+        if (totalCount > result.length) {
+          const totalPage = Math.ceil(totalCount / limit);
+          const temporaryArray = [];
+
+          for (let page = 2; page <= totalPage; page++) {
+            const pageResponse = await getData({ ...body, page: page });
+            const pageResult = pageResponse.result;
+            temporaryArray.push(...pageResult);
+          }
+
+          exportData = [...exportData, ...temporaryArray];
+        }
+
+        const excelData = convertResponseDataToExportData(exportData, {
           [t("order")]: null,
           [t("name")]: null,
-          [t("phone")]: null,
           [t("email")]: null,
+          [t("phone")]: null,
           [t("walletAddress")]: null,
           [t("memberSince")]: null,
-          [t("refUserName")]: null,
+          [t("tier")]: null,
           [t("count pay")]: null,
-          [t("countChild")]: null,
           [t("fine")]: null,
           [t("status")]: null,
+          [t("countChild")]: null,
+          [t("refUserName")]: null,
+          [t("refUserEmail")]: null,
+          [t("note")]: null,
         });
         exportToExcel(
           excelData,
@@ -34,51 +94,14 @@ const ExportPaymentPage = () => {
         );
         setLoading(false);
         toast.success(t("export successful"));
-      })
-      .catch((error) => {
-        let message =
-          error.response && error.response.data.message
-            ? error.response.data.message
-            : error.message;
-        toast.error(t(message));
+      } catch (error) {
+        console.error("Error fetching data: ", error);
         setLoading(false);
-      });
-  };
+      }
+    };
 
-  // const exportTrans = async () => {
-  //   setLoading(true);
-  //   await Payment.getAllTransForExport()
-  //     .then((response) => {
-  //       const excelData = convertResponseDataToExportData(response.data, {
-  //         [t("order")]: null,
-  //         [t("senderName")]: null,
-  //         [t("senderEmail")]: null,
-  //         [t("address_from")]: null,
-  //         [t("receiverName")]: null,
-  //         [t("receiverEmail")]: null,
-  //         [t("address_ref")]: null,
-  //         [t("type")]: null,
-  //         [t("amount")]: null,
-  //         [t("tier")]: null,
-  //         [t("isHoldRefund")]: null,
-  //         [t("status")]: null,
-  //       });
-  //       exportToExcel(
-  //         excelData,
-  //         `${t("transListFileName")}_${moment().format("DD/MM/YYYY_HH:mm:ss")}`
-  //       );
-  //       setLoading(false);
-  //       toast.success(t("export successful"));
-  //     })
-  //     .catch((error) => {
-  //       let message =
-  //         error.response && error.response.data.message
-  //           ? error.response.data.message
-  //           : error.message;
-  //       toast.error(t(message));
-  //       setLoading(false);
-  //     });
-  // };
+    fetchData();
+  };
 
   const convertResponseDataToExportData = (responseData, nullObj) => {
     return responseData.map((item, i) => {
@@ -100,19 +123,41 @@ const ExportPaymentPage = () => {
     });
   };
 
-  //   File 1: danh sách user
+  const getData = async (body) => {
+    try {
+      return await User.getAllUsersForExport(body).then((response) => {
+        return response.data;
+      });
+    } catch (error) {
+      let message =
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message;
+      toast.error(t(message));
+    }
+  };
 
-  // Tên, email, địa chỉ ví, Ngày tham gia, Người giới thiệu, Số lần thanh toán, Tiền phạt, Trạng thái tài khoản
+  useEffect(() => {
+    if (fromDate) {
+      setMinToDate(fromDate);
+    } else {
+      setMinToDate(null);
+    }
 
-  // File 2: danh sách giao dịch
-
-  // Người gửi, Địa chỉ ví gửi, Người nhận, Địa chỉ ví nhận, Loại giao dịch (đăng ký. HHTT, LAH...), Số tiền, Đã hoàn trả hay chưa,
-  // Thời gian giao dịch
+    if (toDate && !fromDate) {
+      setMaxFromDate(toDate);
+    } else {
+      setMaxFromDate(null);
+    }
+  }, [fromDate, toDate]);
 
   return (
     <>
       <ToastContainer />
       <div>
+        <h1 className="text-xl font-semibold mb-10">
+          {t("export users list")}
+        </h1>
         {loading && (
           <div
             className="flex items-center gradient text-white text-sm px-4 py-3 mb-4"
@@ -128,18 +173,50 @@ const ExportPaymentPage = () => {
             <p>{t("Getting data")}...</p>
           </div>
         )}
-        <button
-          onClick={exportUsers}
-          className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-        >
-          {t("export users list")}
-        </button>
-        {/* <button
-          onClick={exportTrans}
-          className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-        >
-          {t("export trans list")}
-        </button> */}
+        <form onSubmit={handleSubmit(exportUsers)} className="">
+          <div className="flex items-center gap-10 lg:w-1/2">
+            <Controller
+              control={control}
+              name="fromDate"
+              render={({ field }) => (
+                <DatePicker
+                  placeholderText={t("fromDate")}
+                  onChange={(date) => field.onChange(date)}
+                  selected={field.value}
+                  dateFormat="dd/MM/yyyy"
+                  maxDate={maxFromDate ? new Date(maxFromDate) : null}
+                  className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                />
+              )}
+            />
+            <span>-</span>
+            <Controller
+              control={control}
+              name="toDate"
+              render={({ field }) => (
+                <DatePicker
+                  placeholderText={t("toDate")}
+                  onChange={(date) => field.onChange(date)}
+                  selected={field.value}
+                  dateFormat="dd/MM/yyyy"
+                  minDate={minToDate ? new Date(minToDate) : null}
+                  className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                />
+              )}
+            />
+          </div>
+          {errorDate && (
+            <p className="error-message-text">
+              {t("From date must be less than to date")}
+            </p>
+          )}
+          <button
+            type="submit"
+            className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+          >
+            {t("export users list")}
+          </button>
+        </form>
       </div>
     </>
   );

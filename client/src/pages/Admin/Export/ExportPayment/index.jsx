@@ -94,6 +94,7 @@ const ExportUserPage = () => {
         toast.success(t("export successful"));
       } catch (error) {
         console.error("Error fetching data: ", error);
+        setLoading(false);
       }
     };
 

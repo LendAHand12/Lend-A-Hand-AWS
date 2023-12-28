@@ -541,6 +541,24 @@ const UserProfile = (match) => {
                 </ul>
               </div>
               <div className="mt-10 bg-white shadow-md p-3 border-t-4 border-primary">
+                <p className="uppercase mt-2 font-bold">{t("refUserName")}</p>
+                <div className="py-2">
+                  <ul>
+                    <li className="bg-white hover:bg-gray-50">
+                      <div className="py-2">
+                        <div className="text-base">
+                          <span className="">
+                            {data.refUserName}
+                            <br></br>
+                            <i className="text-xs">{data.refUserEmail}</i>
+                          </span>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div className="mt-10 bg-white shadow-md p-3 border-t-4 border-primary">
                 <p className="uppercase mt-2 font-bold">{t("oldParent")}</p>
                 {data.listOldParent.length > 0 && (
                   <div className="py-2">
@@ -775,9 +793,7 @@ const UserProfile = (match) => {
                         <div className="px-4">
                           <textarea
                             className="w-full px-4 py-1.5 rounded-md border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                            {...register("note", {
-                              required: t("note is required"),
-                            })}
+                            {...register("note")}
                             autoComplete="off"
                             rows="3"
                           />

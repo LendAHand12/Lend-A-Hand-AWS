@@ -47,7 +47,7 @@ router.route("/treeNode").post(protectRoute, getChildsOfUserForTree);
 router.route("/changeSystem").post(protectRoute, isAdmin, changeSystem);
 router
   .route("/getAllUsersForExport")
-  .get(protectRoute, isAdmin, getAllUsersForExport);
+  .post(protectRoute, isAdmin, getAllUsersForExport);
 
 router
   .route("/getAllUsersWithKeyword")

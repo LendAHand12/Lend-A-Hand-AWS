@@ -145,8 +145,11 @@ Ràng buộc không trùng username 1tr => done
 - cms -> có tài liệu => 8tr
 - phân quyền -> có tài liệu => 3tr
 
-- filter show giao dịch theo từng tier
-- thêm settings ví hold cho từng tier
+- filter show giao dịch theo từng tier => 500 done
+- thêm settings ví hold cho từng tier => 1tr done
+
+- Hiển thị số user còn sống, user xám và % => 1tr5
+- Điều kiện user qua tier 3,4,5 => 1tr5
 
 // update parent
 db.users.update({
