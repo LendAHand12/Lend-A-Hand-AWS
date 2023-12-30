@@ -810,10 +810,10 @@ const getAllUsersForExport = asyncHandler(async (req, res) => {
           {
             $match: {
               $expr: {
-                $and: {
-                  $eq: ["$userId", { $toString: "$$userId" }],
-                  $eq: ["tier", 1],
-                },
+                $and: [
+                  { $eq: ["$userId", { $toString: "$$userId" }] },
+                  { $eq: ["$tier", 1] },
+                ],
               },
             },
           },
@@ -827,8 +827,19 @@ const getAllUsersForExport = asyncHandler(async (req, res) => {
     {
       $lookup: {
         from: "trees",
-        localField: "treeData.refId",
-        foreignField: "userId",
+        let: { parentId: "$treeData.refId" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$userId", { $toString: "$$parentId" }] },
+                  { $eq: ["$tier", 1] },
+                ],
+              },
+            },
+          },
+        ],
         as: "parent",
       },
     },
@@ -868,6 +879,7 @@ const getAllUsersForExport = asyncHandler(async (req, res) => {
         phone: 1,
         createdAt: 1,
         note: 1,
+        treeData: "$treeData",
         parent: "$parent",
         parentUser: "$parentUser",
       },
