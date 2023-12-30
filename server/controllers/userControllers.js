@@ -790,9 +790,11 @@ const getAllUsersForExport = asyncHandler(async (req, res) => {
   }
   if (req.body.toDate) {
     toDate = req.body.toDate.split("T")[0];
+    let endDate = new Date(new Date(toDate).valueOf() + 1000 * 3600 * 24);
+    endDate.setUTCHours(23, 59, 59, 999);
     match.createdAt = {
       ...match.createdAt,
-      $lte: new Date(new Date(toDate).valueOf() + 1000 * 3600 * 24),
+      $lte: endDate,
     };
   }
 
@@ -808,7 +810,10 @@ const getAllUsersForExport = asyncHandler(async (req, res) => {
           {
             $match: {
               $expr: {
-                $eq: ["$userId", { $toString: "$$userId" }], // Chuyển đổi userId từ ObjectId sang String
+                $and: {
+                  $eq: ["$userId", { $toString: "$$userId" }],
+                  $eq: ["tier", 1],
+                },
               },
             },
           },
@@ -1406,9 +1411,6 @@ const changeNextUserTier = asyncHandler(async (req, res) => {
 
 const checkUnPayUserOnTierUser = async (tier) => {
   const lastUserInTier = await Tree.findOne({ tier }).sort({ createdAt: -1 });
-  if (lastUserInTier.countPay > 0) {
-    return;
-  }
   const listTrans = await Transaction.find({
     userId: lastUserInTier.userId,
     tier,
