@@ -115,15 +115,22 @@ const Nav = () => {
             } mt-2 lg:mt-0 bg-inherit lg:bg-transparent text-black p-4 lg:p-0 z-20`}
           >
             <ul className="list-reset lg:flex justify-end flex-1 items-center">
-              <li className="mr-3">
-                <Link
-                  className={`inline-block ${
-                    hash.includes("#about") ? "font-bold" : ""
-                  } py-2 px-4 text-black no-underline`}
-                  to="/#about"
-                >
-                  {t("aboutUs")}
-                </Link>
+              <li className="mr-3 relative group cursor-pointer">
+                <span className="hidden lg:inline">{t("referral")}</span>
+                <div className="lg:absolute lg:p-2 lg:top-6 lg:w-40 lg:invisible lg:group-hover:visible lg:bg-gray-100 lg:rounded-md lg:shadow-lg flex flex-col">
+                  <Link
+                    className={`inline-block py-2 px-4 hover:text-gray-700 hover:text-underline`}
+                    to="/about"
+                  >
+                    {t("aboutUs")}
+                  </Link>
+                  <Link
+                    className={`inline-block py-2 px-4  hover:text-gray-700 hover:text-underline`}
+                    to="/member"
+                  >
+                    {t("ourTeam")}
+                  </Link>
+                </div>
               </li>
               <li className="mr-3">
                 <Link
@@ -145,16 +152,6 @@ const Nav = () => {
                   {t("contact")}
                 </Link>
               </li>
-              {/* <li className="mr-3">
-                <Link
-                  className={`inline-block ${
-                    pathname.includes("/login") ? "font-bold" : ""
-                  } text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4`}
-                  to="/login"
-                >
-                  Login
-                </Link>
-              </li> */}
               <li className="mr-3">
                 <Link
                   to="/login"
@@ -163,7 +160,6 @@ const Nav = () => {
                   {t("login")}
                 </Link>
               </li>
-
               <li className="">
                 <select
                   className="bg-inherit px-4 py-2 focus:outline-none active:outline-none"
