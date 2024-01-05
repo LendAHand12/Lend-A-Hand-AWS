@@ -1,7 +1,7 @@
 import Tree from "../models/treeModel.js";
 import User from "../models/userModel.js";
 
-const getParentWithCountPay = async (userId, countPay, tier) => {
+export const getParentWithCountPay = async (userId, countPay, tier) => {
   let tree = await Tree.findOne({ userId, tier });
   let countPayReal = countPay;
   let currentLevel = 0;
@@ -18,4 +18,21 @@ const getParentWithCountPay = async (userId, countPay, tier) => {
   return parent;
 };
 
-export default getParentWithCountPay;
+export const getLevelOfRefUser = async (userId, tier, userRefId) => {
+  let tree = await Tree.findOne({ userId, tier });
+  let countPayReal = 1;
+
+  while (tree && tree.parentId !== userRefId.toString()) {
+    if (tree.userId !== userRefId.toString()) {
+      countPayReal++;
+    }
+
+    if (tree.parentId) {
+      tree = await Tree.findOne({ userId: tree.parentId, tier });
+    } else {
+      break;
+    }
+  }
+
+  return countPayReal;
+};

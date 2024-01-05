@@ -486,6 +486,7 @@ const getTreeOfUser = asyncHandler(async (req, res) => {
 
 const getChildsOfUserForTree = asyncHandler(async (req, res) => {
   const { id, currentTier } = req.body;
+  const userRequest = req.user;
   const user = await User.findOne({ _id: id }).select("userId countChild");
   const treeOfUser = await Tree.findOne({
     userId: id,
@@ -501,6 +502,7 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
         const child = await User.findById(childId).select(
           "tier userId buyPackage countChild countPay fine status errLahCode"
         );
+        console.log({ child });
         tree.nodes.push({
           key: child._id,
           label: `${child.userId} (${child.countChild[currentTier - 1]} - ${
@@ -513,7 +515,12 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
               : child.countPay - 1
             // child.countPay <= 1 ? 0 : child.countPay - 1
           })`,
-          isGray: child.status === "LOCKED" ? true : false,
+          isGray:
+            child.status === "LOCKED"
+              ? userRequest.isAdmin || child.tier === 1
+                ? true
+                : false
+              : false,
           isRed:
             child.tier === 1 && child.countPay === 0
               ? true

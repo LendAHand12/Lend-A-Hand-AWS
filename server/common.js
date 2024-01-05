@@ -1,7 +1,7 @@
 import Transaction from "./models/transactionModel.js";
 import Tree from "./models/treeModel.js";
 import User from "./models/userModel.js";
-import getParentWithCountPay from "./utils/getParentWithCountPay.js";
+import { getParentWithCountPay } from "./utils/getParentWithCountPay.js";
 import { findNextUser } from "./utils/methods.js";
 
 export const transferUserToTree = async () => {

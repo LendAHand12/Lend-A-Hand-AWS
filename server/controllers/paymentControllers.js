@@ -1,7 +1,10 @@
 import asyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
 import Transaction from "../models/transactionModel.js";
-import getParentWithCountPay from "../utils/getParentWithCountPay.js";
+import {
+  getParentWithCountPay,
+  getLevelOfRefUser,
+} from "../utils/getParentWithCountPay.js";
 import Refund from "../models/refundModel.js";
 import { getActiveLink } from "../utils/getLinksActive.js";
 import { sendActiveLink } from "../utils/sendMailCustom.js";
@@ -56,6 +59,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
   let haveParentNotPayEnough = false;
   let haveRefNotPayEnough = false;
   let parentWithCountPay;
+  let parentUser;
 
   if (user) {
     if (user.countPay === 13) {
@@ -65,8 +69,35 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         throw new Error("You are not eligible for next step payment");
       }
     }
-    const parentUser = await getParentUser(user._id, user.tier);
     const refUser = await getRefParentUser(user._id, user.tier);
+    if (user.countPay === 0 && user.tier === 1) {
+      parentUser = refUser;
+      parentWithCountPay = refUser;
+    } else {
+      parentUser = await getParentUser(user._id, user.tier);
+      let levelOfRefUser = await getLevelOfRefUser(
+        user.id,
+        user.tier,
+        refUser._id
+      );
+      let withCountPay = user.countPay;
+
+      if (levelOfRefUser > user.countPay) {
+        if (user.countPay === 1) {
+          withCountPay = 0;
+        } else {
+          withCountPay = levelOfRefUser - user.countPay;
+        }
+      } else if (levelOfRefUser === user.countPay) {
+        withCountPay = user.countPay;
+      }
+      parentWithCountPay = await getParentWithCountPay(
+        user.id,
+        withCountPay,
+        user.tier,
+        refUser._id
+      );
+    }
 
     if (!parentUser || !refUser) {
       res.status(404);
@@ -78,12 +109,6 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
     let directCommissionFee = 5 * user.tier;
     let referralCommissionWallet = "";
     let referralCommissionFee = 10 * user.tier;
-
-    parentWithCountPay = await getParentWithCountPay(
-      user.id,
-      user.countPay,
-      user.tier
-    );
 
     if (user.tier >= 2 || user.buyPackage === "A") {
       if (user.countPay === 0) {
