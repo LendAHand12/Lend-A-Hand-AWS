@@ -7,13 +7,13 @@ const transporter = nodemailer.createTransport({
   // port: 465,
   // secure: true, // use TLS
 
-  // host: "sv3.tmail.vn", AMERITEC
-  // port: 587,
-  // secure: false,
+  host: "sv3.tmail.vn", // AMERITEC
+  port: 587,
+  secure: false,
 
-  host: "mail92211.maychuemail.com",
-  port: 465,
-  secure: true,
+  // host: "mail92211.maychuemail.com", // REAL
+  // port: 465,
+  // secure: true,
   auth: {
     user: process.env.EMAIL,
     pass: process.env.EMAIL_PASS,
