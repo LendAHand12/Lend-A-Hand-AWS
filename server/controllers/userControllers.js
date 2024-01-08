@@ -502,7 +502,6 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
         const child = await User.findById(childId).select(
           "tier userId buyPackage countChild countPay fine status errLahCode"
         );
-        console.log({ child });
         tree.nodes.push({
           key: child._id,
           label: `${child.userId} (${child.countChild[currentTier - 1]} - ${
@@ -517,7 +516,7 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
           })`,
           isGray:
             child.status === "LOCKED"
-              ? userRequest.isAdmin || child.tier === 1
+              ? currentTier === 1 || userRequest.isAdmin
                 ? true
                 : false
               : false,
