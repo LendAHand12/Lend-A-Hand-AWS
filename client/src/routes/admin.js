@@ -20,6 +20,8 @@ const ListUserNextTier = lazy(() => import("@/pages/Admin/ListUserNextTier"));
 const RemoveLastUserTier = lazy(() =>
   import("@/pages/Admin/RemoveLastUserTier")
 );
+const CMSPage = lazy(() => import("@/pages/Admin/CMS"));
+const EditCMSPage = lazy(() => import("@/pages/Admin/EditCMS"));
 
 const routes = [
   {
@@ -99,6 +101,15 @@ const routes = [
   {
     path: "/lastUserTier",
     component: RemoveLastUserTier,
+  },
+  {
+    path: "/cms",
+    title: "CMS",
+    component: CMSPage,
+  },
+  {
+    path: "/cms/:page",
+    component: EditCMSPage,
   },
 ];
 

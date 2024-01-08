@@ -365,5 +365,9 @@
 
   "refUserEmail": "Email người giới thiệu",
 
-  "ourTeam": "Đội ngũ của chúng tôi"
+  "ourTeam": "Đội ngũ của chúng tôi",
+
+  "admin-dashboard": "ADMIN - Thống kê",
+  "admin-user": "ADMIN - Người dùng",
+  "homepage": "Trang chủ"
 }

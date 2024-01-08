@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import Layout from "@/containers/layout";
-import HomePageContent from "@/components/HomePageContent";
 
 import "./index.less";
 import { useLocation } from "react-router-dom";
+import MemberPageContent from "../../components/MemberPageContent";
 
 const MemberPage = () => {
   const location = useLocation();
@@ -18,7 +18,7 @@ const MemberPage = () => {
   }, [location.hash]);
   return (
     <Layout>
-      <HomePageContent />
+      <MemberPageContent />
     </Layout>
   );
 };

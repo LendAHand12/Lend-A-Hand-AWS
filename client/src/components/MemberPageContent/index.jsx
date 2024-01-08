@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import "./index.css";
 
-const AboutPageContent = () => {
+const MemberPageContent = () => {
   const { t } = useTranslation();
 
   return (
@@ -50,12 +50,78 @@ const AboutPageContent = () => {
       <section className="bg-white py-8">
         <div className="container mx-auto flex flex-wrap pt-4 pb-12">
           <h2 className="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800">
-            {t("aboutUs")}
+            {t("ourTeam")}
           </h2>
           <div className="w-full mb-4">
             <div className="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
           </div>
-          <div className="w-full mt-10"></div>
+          <div className="w-full mt-10">
+            <div className="grid grid-cols-5 gap-10">
+              <div className="text-black text-center">
+                <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/6-1536x1536-1-pvlu4g64435abnb55wleum3jtxzaset0cokskbypbc.png" />
+                <div className="mt-2">
+                  <div className="uppercase font-semibold text-lg">
+                    PIERRE NGUYEN
+                  </div>
+                  <div className="text-gray-600">President - American</div>
+                </div>
+              </div>
+              <div className="text-black text-center">
+                <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/8-1536x1536-1-pvlu4f89x94001cibe6sa4c38k3xkppa0jxb3203hk.png" />
+                <div className="mt-2">
+                  <div className="uppercase font-semibold text-lg">
+                    SONYA DANG
+                  </div>
+                  <div className="text-gray-600">Vice President - American</div>
+                </div>
+              </div>
+              <div className="text-black text-center">
+                <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/6-1536x1536-1-pvlu4g64435abnb55wleum3jtxzaset0cokskbypbc.png" />
+                <div className="mt-2">
+                  <div className="uppercase font-semibold text-lg">
+                    PIERRE NGUYEN
+                  </div>
+                  <div className="text-gray-600">President - American</div>
+                </div>
+              </div>
+              <div className="text-black text-center">
+                <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/6-1536x1536-1-pvlu4g64435abnb55wleum3jtxzaset0cokskbypbc.png" />
+                <div className="mt-2">
+                  <div className="uppercase font-semibold text-lg">
+                    PIERRE NGUYEN
+                  </div>
+                  <div className="text-gray-600">President - American</div>
+                </div>
+              </div>
+              <div className="text-black text-center">
+                <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/6-1536x1536-1-pvlu4g64435abnb55wleum3jtxzaset0cokskbypbc.png" />
+                <div className="mt-2">
+                  <div className="uppercase font-semibold text-lg">
+                    PIERRE NGUYEN
+                  </div>
+                  <div className="text-gray-600">President - American</div>
+                </div>
+              </div>
+              <div className="text-black text-center">
+                <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/6-1536x1536-1-pvlu4g64435abnb55wleum3jtxzaset0cokskbypbc.png" />
+                <div className="mt-2">
+                  <div className="uppercase font-semibold text-lg">
+                    PIERRE NGUYEN
+                  </div>
+                  <div className="text-gray-600">President - American</div>
+                </div>
+              </div>
+              <div className="text-black text-center">
+                <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/6-1536x1536-1-pvlu4g64435abnb55wleum3jtxzaset0cokskbypbc.png" />
+                <div className="mt-2">
+                  <div className="uppercase font-semibold text-lg">
+                    PIERRE NGUYEN
+                  </div>
+                  <div className="text-gray-600">President - American</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
       <svg
@@ -92,4 +158,4 @@ const AboutPageContent = () => {
   );
 };
 
-export default AboutPageContent;
+export default MemberPageContent;

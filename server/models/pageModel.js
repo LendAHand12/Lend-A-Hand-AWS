@@ -13,6 +13,19 @@ const pageSchema = mongoose.Schema(
       require: true,
       unique: true,
     },
+    pathEdit: {
+      type: String,
+      require: false,
+    },
+    content: {
+      type: String,
+      require: false,
+    },
+    type: {
+      type: String,
+      require: true,
+      enum: ["admin", "user", "cms"],
+    },
     actions: [
       { type: String, enum: ["read", "update", "delete", "approve", "export"] },
     ],

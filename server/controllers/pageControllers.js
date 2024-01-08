@@ -23,4 +23,13 @@ const createPage = asyncHandler(async (req, res) => {
   }
 });
 
-export { getAllPages, createPage };
+const getPageDetailsPageName = asyncHandler(async (req, res) => {
+  const pageName = req.params.pageName;
+  const page = await Page.findOne({ pageName });
+
+  res.json({
+    page,
+  });
+});
+
+export { getAllPages, createPage, getPageDetailsPageName };

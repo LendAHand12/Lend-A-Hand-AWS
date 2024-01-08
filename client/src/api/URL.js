@@ -12,3 +12,4 @@ export const URL_API_PAYMENT = "/api/payment";
 export const URL_API_PACKAGE = "/api/package";
 export const URL_API_WALLET = "/api/wallet";
 export const URL_API_CHANGE_USER = "/api/changeUser";
+export const URL_API_PAGE = "/api/page";
