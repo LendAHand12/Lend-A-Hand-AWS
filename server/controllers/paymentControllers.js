@@ -83,7 +83,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       let withCountPay = user.countPay;
 
       if (levelOfRefUser > user.countPay) {
-        if (user.countPay === 1) {
+        if (user.countPay <= 1) {
           withCountPay = 0;
         } else {
           withCountPay = levelOfRefUser - user.countPay;
