@@ -1,67 +1,39 @@
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import { Component } from "react";
-import { CloudinaryImageUploadAdapter } from "ckeditor-cloudinary-uploader-adapter";
-import {
-  Image,
-  ImageCaption,
-  ImageStyle,
-  ImageToolbar,
-  ImageUpload,
-} from "@ckeditor/ckeditor5-image";
+import { useRef } from "react";
+import SunEditor, { buttonList } from "suneditor-react";
+import "suneditor/dist/css/suneditor.min.css"; // Import Sun Editor's CSS File
 
-class TextEditor extends Component {
-  render() {
-    const { data, onChangeHandle } = this.props; // <- Dont mind this, just handling objects from props because Im using this as a shared component.
+const TextEditor = (props) => {
+  const editor = useRef();
 
-    const custom_config = {
-      extraPlugins: [MyCustomUploadAdapterPlugin],
-      mediaEmbed: { previewsInData: true },
-      toolbar: [
-        "heading",
-        "|",
-        "bold",
-        "italic",
-        "link",
-        "bulletedList",
-        "numberedList",
-        "|",
-        "blockQuote",
-        "insertTable",
-        "|",
-        "imageUpload",
-        "undo",
-        "redo",
-      ],
-      image: {
-        toolbar: [
-          "imageTextAlternative",
-          "toggleImageCaption",
-          "imageStyle:inline",
-          "imageStyle:block",
-          "imageStyle:side",
-        ],
-      },
-      table: {
-        contentToolbar: ["tableColumn", "tableRow", "mergeTableCells"],
-      },
-    };
-
-    return (
-      <CKEditor
-        editor={ClassicEditor}
-        config={custom_config}
-        data={data}
-        onChange={onChangeHandle}
-      />
-    );
-  }
-}
-
-function MyCustomUploadAdapterPlugin(editor) {
-  editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
-    return new CloudinaryImageUploadAdapter(loader, "dhqggkmto", "sdblmpca");
+  const getSunEditorInstance = (sunEditor) => {
+    editor.current = sunEditor;
   };
-}
 
+  const handleImageUpload = (
+    targetImgElement,
+    index,
+    state,
+    imageInfo,
+    remainingFilesCount
+  ) => {
+    console.log(targetImgElement, index, state, imageInfo, remainingFilesCount);
+  };
+
+  return (
+    <SunEditor
+      {...props}
+      setAllPlugins={false}
+      placeholder="Vui lòng nhập nội dung..."
+      getSunEditorInstance={getSunEditorInstance}
+      height="100%"
+      onImageUpload={handleImageUpload}
+      setOptions={{
+        height: 200,
+        buttonList: buttonList.formatting, // Or Array of button list, eg. [['font', 'align'], ['image']]
+        // plugins: [font] set plugins, all plugins are set by default
+        // Other option
+      }}
+    />
+  );
+};
 export default TextEditor;

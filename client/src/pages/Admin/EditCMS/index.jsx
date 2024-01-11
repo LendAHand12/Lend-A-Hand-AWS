@@ -5,11 +5,12 @@ import { toast } from "react-toastify";
 import TextEditor from "../../../components/TextEditor";
 import { useForm } from "react-hook-form";
 import UploadMultiImage from "../../../components/UploadMultiImage";
+import Loading from "@/components/Loading";
 
 const EditCMSPage = ({ match }) => {
   const pageName = match.params?.page ? match.params.page : "";
   const { t } = useTranslation();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [pageData, setPageData] = useState(null);
   const [files, setFile] = useState([]);
 
@@ -65,50 +66,52 @@ const EditCMSPage = ({ match }) => {
         <div>
           <h1 className="text-2xl font-bold">CMS - {t(pageName)}</h1>
         </div>
-        <div className="mt-10">
-          {pageData?.haveImage && (
+        {loading ? (
+          <Loading />
+        ) : (
+          <div className="mt-10">
+            {pageData?.haveImage && (
+              <div className="mb-10">
+                <span className="mb-2 block text-lg font-semibold text-gray-900">
+                  Hình ảnh :
+                </span>
+                <div>
+                  <UploadMultiImage files={files} setFile={setFile} />
+                </div>
+              </div>
+            )}
             <div className="mb-10">
               <span className="mb-2 block text-lg font-semibold text-gray-900">
-                Hình ảnh :
+                Nội dung tiếng Việt :
               </span>
-              <div>
-                <UploadMultiImage files={files} setFile={setFile} />
-              </div>
+              <TextEditor
+                defaultValue={pageData.content_vn}
+                onChange={(content) => {
+                  console.log({ dataVn: content });
+                  setValue("content_vn", content);
+                }}
+              />
             </div>
-          )}
-          <div className="mb-10">
-            <span className="mb-2 block text-lg font-semibold text-gray-900">
-              Nội dung tiếng Việt :
-            </span>
-            <TextEditor
-              data={pageData?.content_vn}
-              onChangeHandle={(event, editor) => {
-                const data = editor.getData();
-                console.log({ dataVn: data });
-                setValue("content_vn", data);
-              }}
-            />
+            <div className="mb-10">
+              <span className="mb-2 block text-lg font-semibold text-gray-900">
+                Nội dung tiếng Anh :
+              </span>
+              <TextEditor
+                defaultValue={pageData.content_en}
+                onChange={(content) => {
+                  console.log({ dataEn: content });
+                  setValue("content_en", content);
+                }}
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+            >
+              {t("update")}
+            </button>
           </div>
-          <div className="mb-10">
-            <span className="mb-2 block text-lg font-semibold text-gray-900">
-              Nội dung tiếng Anh :
-            </span>
-            <TextEditor
-              data={pageData?.content_en}
-              onChangeHandle={(event, editor) => {
-                const data = editor.getData();
-                console.log({ dataEn: data });
-                setValue("content_en", data);
-              }}
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-          >
-            {t("update")}
-          </button>
-        </div>
+        )}
       </form>
     </>
   );
