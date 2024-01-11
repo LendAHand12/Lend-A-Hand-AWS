@@ -1,17 +1,42 @@
 import { useTranslation } from "react-i18next";
 import "./index.css";
+import { useEffect, useState } from "react";
+import Page from "../../api/Page";
+import { toast } from "react-toastify";
 
 const AboutPageContent = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const pageName = "aboutUs";
+  const [loading, setLoading] = useState(false);
+  const [pageData, setPageData] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      await Page.getPageDetailByPageName(pageName)
+        .then((response) => {
+          console.log({ data: response.data });
+          setPageData(response.data.page);
+          setLoading(false);
+        })
+        .catch((error) => {
+          let message =
+            error.response && error.response.data.message
+              ? error.response.data.message
+              : error.message;
+          toast.error(t(message));
+          setLoading(false);
+        });
+    })();
+  }, []);
 
   return (
     <>
       <div className="relative pt-24 z-20">
         <div className="container mt-10 mx-auto flex justify-center">
           <img
-            className="w-full rounded-2xl"
-            src="https://picsum.photos/1024/500"
-            alt=""
+            className="w-full rounded-2xl max-h-96 object-cover "
+            src={pageData?.images[0]}
+            alt="about-us-banner"
           />
         </div>
         <div className="">
@@ -55,7 +80,16 @@ const AboutPageContent = () => {
           <div className="w-full mb-4">
             <div className="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
           </div>
-          <div className="w-full mt-10"></div>
+          <div className="w-full mt-10 text-gray-900">
+            <div
+              dangerouslySetInnerHTML={{
+                __html:
+                  i18n.language === "vi"
+                    ? pageData?.content_vn
+                    : pageData?.content_en,
+              }}
+            />
+          </div>
         </div>
       </section>
       <svg

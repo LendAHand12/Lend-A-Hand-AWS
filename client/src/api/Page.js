@@ -8,8 +8,8 @@ const Page = {
   getPageDetailByPageName: (pageName) => {
     return API.get(`${URL_API_PAGE}/${pageName}`);
   },
-  updatePage: (body) => {
-    return API.post(URL_API_PAGE, body);
+  updatePage: (pageName, body) => {
+    return API.put(`${URL_API_PAGE}/${pageName}`, body);
   },
 };
 

@@ -17,7 +17,11 @@ const pageSchema = mongoose.Schema(
       type: String,
       require: false,
     },
-    content: {
+    content_vn: {
+      type: String,
+      require: false,
+    },
+    content_en: {
       type: String,
       require: false,
     },
@@ -29,6 +33,13 @@ const pageSchema = mongoose.Schema(
     actions: [
       { type: String, enum: ["read", "update", "delete", "approve", "export"] },
     ],
+    images: {
+      type: Array,
+    },
+    haveImage: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

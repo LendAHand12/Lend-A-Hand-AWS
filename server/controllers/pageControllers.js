@@ -32,4 +32,22 @@ const getPageDetailsPageName = asyncHandler(async (req, res) => {
   });
 });
 
-export { getAllPages, createPage, getPageDetailsPageName };
+const updatePageDetailsPageName = asyncHandler(async (req, res) => {
+  const body = req.body;
+  const { pageName } = req.params;
+  const newPage = await Page.findOneAndUpdate({ pageName }, { $set: body });
+
+  if (newPage) {
+    res.status(200).json({
+      message: "Update successful",
+      newPage,
+    });
+  }
+});
+
+export {
+  getAllPages,
+  createPage,
+  getPageDetailsPageName,
+  updatePageDetailsPageName,
+};

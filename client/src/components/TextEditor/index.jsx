@@ -2,6 +2,13 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import { Component } from "react";
 import { CloudinaryImageUploadAdapter } from "ckeditor-cloudinary-uploader-adapter";
+import {
+  Image,
+  ImageCaption,
+  ImageStyle,
+  ImageToolbar,
+  ImageUpload,
+} from "@ckeditor/ckeditor5-image";
 
 class TextEditor extends Component {
   render() {
@@ -10,22 +17,29 @@ class TextEditor extends Component {
     const custom_config = {
       extraPlugins: [MyCustomUploadAdapterPlugin],
       mediaEmbed: { previewsInData: true },
-      toolbar: {
-        items: [
-          "heading",
-          "|",
-          "bold",
-          "italic",
-          "link",
-          "bulletedList",
-          "numberedList",
-          "|",
-          "blockQuote",
-          "insertTable",
-          "|",
-          "imageUpload",
-          "undo",
-          "redo",
+      toolbar: [
+        "heading",
+        "|",
+        "bold",
+        "italic",
+        "link",
+        "bulletedList",
+        "numberedList",
+        "|",
+        "blockQuote",
+        "insertTable",
+        "|",
+        "imageUpload",
+        "undo",
+        "redo",
+      ],
+      image: {
+        toolbar: [
+          "imageTextAlternative",
+          "toggleImageCaption",
+          "imageStyle:inline",
+          "imageStyle:block",
+          "imageStyle:side",
         ],
       },
       table: {
@@ -46,7 +60,7 @@ class TextEditor extends Component {
 
 function MyCustomUploadAdapterPlugin(editor) {
   editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
-    return new CloudinaryImageUploadAdapter(loader, "dnpqbyw6x", "sdblmpca");
+    return new CloudinaryImageUploadAdapter(loader, "dhqggkmto", "sdblmpca");
   };
 }
 

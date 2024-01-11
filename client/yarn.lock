@@ -432,7 +432,7 @@
   dependencies:
     ckeditor5 "40.2.0"
 
-"@ckeditor/ckeditor5-image@40.2.0":
+"@ckeditor/ckeditor5-image@40.2.0", "@ckeditor/ckeditor5-image@^40.2.0":
   version "40.2.0"
   resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-image/-/ckeditor5-image-40.2.0.tgz#790b23af7d2e86faee848df273eaab735a8a9240"
   integrity sha512-0Dunw1o5k2+5Q5XiWLDG1r8k9awosfIFuDZwqKJGWtDaNE4QQbJ9+iJSwiiRw2QjcGr7D3JdH7xwJZFra7kYmA==

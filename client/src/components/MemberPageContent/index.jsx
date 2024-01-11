@@ -1,17 +1,42 @@
 import { useTranslation } from "react-i18next";
 import "./index.css";
+import { toast } from "react-toastify";
+import Page from "../../api/Page";
+import { useEffect, useState } from "react";
 
 const MemberPageContent = () => {
   const { t } = useTranslation();
+  const pageName = "member";
+  const [loading, setLoading] = useState(false);
+  const [pageData, setPageData] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      await Page.getPageDetailByPageName(pageName)
+        .then((response) => {
+          console.log({ data: response.data });
+          setPageData(response.data.page);
+          setLoading(false);
+        })
+        .catch((error) => {
+          let message =
+            error.response && error.response.data.message
+              ? error.response.data.message
+              : error.message;
+          toast.error(t(message));
+          setLoading(false);
+        });
+    })();
+  }, []);
 
   return (
     <>
       <div className="relative pt-24 z-20">
         <div className="container mt-10 mx-auto flex justify-center">
           <img
-            className="w-full rounded-2xl"
-            src="https://picsum.photos/1024/500"
-            alt=""
+            className="w-full rounded-2xl max-h-96 object-cover "
+            src={pageData?.images[0]}
+            alt="about-us-banner"
           />
         </div>
         <div className="">
