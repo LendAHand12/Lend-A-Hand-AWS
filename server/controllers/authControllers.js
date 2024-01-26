@@ -221,7 +221,7 @@ const authUser = asyncHandler(async (req, res) => {
     }
 
     const listDirectUser = [];
-    const listRefIdOfUser = await Tree.find({ refId: user._id });
+    const listRefIdOfUser = await Tree.find({ refId: user._id, tier: 1 });
     if (listRefIdOfUser && listRefIdOfUser.length > 0) {
       for (let refId of listRefIdOfUser) {
         const refedUser = await User.findById(refId.userId).select(

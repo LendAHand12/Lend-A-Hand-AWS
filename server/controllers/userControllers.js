@@ -96,11 +96,10 @@ const getAllUsersWithKeyword = asyncHandler(async (req, res) => {
 
 const getUserById = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id).select("-password");
-  console.log({ user });
 
   if (user) {
     const listDirectUser = [];
-    const listRefIdOfUser = await Tree.find({ refId: user._id });
+    const listRefIdOfUser = await Tree.find({ refId: user._id, tier: 1 });
     if (listRefIdOfUser && listRefIdOfUser.length > 0) {
       for (let refId of listRefIdOfUser) {
         const refedUser = await User.findById(refId.userId).select(
@@ -216,9 +215,10 @@ const updateUser = asyncHandler(async (req, res) => {
     }
     const updatedUser = await user.save();
     if (updatedUser) {
-      const listDirectUser = await User.find({ refId: user._id }).select(
-        "userId email walletAddress"
-      );
+      const listDirectUser = await User.find({
+        refId: user._id,
+        tier: 1,
+      }).select("userId email walletAddress");
       const packages = await getActivePackages();
       res.status(200).json({
         message: "Update successful",
