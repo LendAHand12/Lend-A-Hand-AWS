@@ -1,17 +1,26 @@
 import express from "express";
 import {
-  getPermissions,
+  getAllPermissions,
+  getPermissionsById,
   createPermission,
   updatePermission,
 } from "../controllers/permissionControllers.js";
-import { isAdmin, protectRoute } from "../middleware/authMiddleware.js";
+import {
+  checkPermission,
+  isAdmin,
+  protectRoute,
+} from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 router
   .route("/")
-  .get(getPermissions)
-  .post(createPermission)
-  .put(updatePermission);
+  .get(protectRoute, getAllPermissions)
+  .post(protectRoute, createPermission);
+
+router
+  .route("/:id")
+  .get(protectRoute, getPermissionsById)
+  .put(protectRoute, updatePermission);
 
 export default router;

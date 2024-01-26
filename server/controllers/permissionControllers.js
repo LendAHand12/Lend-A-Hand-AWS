@@ -1,6 +1,14 @@
 import asyncHandler from "express-async-handler";
 import Permission from "../models/permissionModel.js";
 
+const getAllPermissions = asyncHandler(async (req, res) => {
+  const permissions = await Permission.find();
+
+  res.json({
+    permissions,
+  });
+});
+
 const getPermissions = asyncHandler(async (req, res) => {
   const { role } = req.user;
   const permissions = await Permission.findOne({ role });
@@ -12,6 +20,7 @@ const getPermissions = asyncHandler(async (req, res) => {
 
 const createPermission = asyncHandler(async (req, res) => {
   const { role, pagePermissions } = req.body;
+  console.log({ role, pagePermissions });
 
   try {
     await Permission.create({ role, pagePermissions });
@@ -25,14 +34,17 @@ const createPermission = asyncHandler(async (req, res) => {
 });
 
 const updatePermission = asyncHandler(async (req, res) => {
+  const { id } = req.params;
   const { role, pagePermissions } = req.body;
+  console.log({ role, pagePermissions });
 
   try {
-    const permission = await Permission.findOne({ role });
+    const permission = await Permission.findById(id);
+    permission.role = role;
     permission.pagePermissions = pagePermissions;
     await permission.save();
     res.status(200).json({
-      message: "Updated permissions",
+      message: "Update successful",
     });
   } catch (error) {
     res.status(400);
@@ -40,4 +52,21 @@ const updatePermission = asyncHandler(async (req, res) => {
   }
 });
 
-export { getPermissions, createPermission, updatePermission };
+const getPermissionsById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const permission = await Permission.findById(id).populate(
+    "pagePermissions.page"
+  );
+
+  res.json({
+    permission,
+  });
+});
+
+export {
+  getAllPermissions,
+  getPermissions,
+  createPermission,
+  updatePermission,
+  getPermissionsById,
+};

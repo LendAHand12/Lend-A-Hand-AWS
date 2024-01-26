@@ -12,18 +12,29 @@ import User from "@/api/User";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { UPDATE_USER_INFO, LOGOUT } from "@/slices/authSlice";
+import { useLocation } from "react-router-dom";
 
 const AppLayout = () => {
   const { t } = useTranslation();
   const history = useHistory();
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
+  const location = useLocation();
+  const { pathname } = location;
+
   var routes = [];
   if (!userInfo) {
     history.push("/login");
   } else {
-    if (userInfo.isAdmin) {
-      routes = AdminRoutes;
+    const { permissions } = userInfo;
+    if (userInfo.role !== "user") {
+      routes = AdminRoutes.filter((route) => {
+        let currentRoute = `/admin${route.path}`;
+        let page = permissions.find((ele) => ele.page?.path === currentRoute);
+        if (page && page.actions.includes("read")) {
+          return route;
+        }
+      });
     } else {
       routes = UserRoutes.filter((route) => {
         if (route.permissionWithStatus.includes(userInfo.status)) {
@@ -56,7 +67,14 @@ const AppLayout = () => {
     <>
       <div className="leading-normal tracking-normal">
         <AppNav />
-        <div className="container mx-auto py-32 min-h-screen bg-white">
+
+        <div
+          className={`${
+            pathname.includes("preview")
+              ? ""
+              : "container mx-auto py-32 min-h-screen bg-white"
+          }`}
+        >
           <Suspense fallback={<FallbackLoading />}>
             <Switch>
               {routes.map((route, i) => {
@@ -64,7 +82,7 @@ const AppLayout = () => {
                   <Route
                     key={i}
                     exact={true}
-                    path={`${userInfo.isAdmin ? "/admin" : "/user"}${
+                    path={`${userInfo.role !== "user" ? "/admin" : "/user"}${
                       route.path
                     }`}
                     render={(props) => <route.component {...props} />}

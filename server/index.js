@@ -18,7 +18,10 @@ import packageRoutes from "./routes/packageRoutes.js";
 import walletRoutes from "./routes/walletRoutes.js";
 import changeUserRoutes from "./routes/changeUserRoutes.js";
 import pageRoutes from "./routes/pageRoutes.js";
+import pagePreviewRoutes from "./routes/pagePreviewRoutes.js";
 import permissionRoutes from "./routes/permissionRoutes.js";
+import emailRoutes from "./routes/emailRoutes.js";
+import postsRoutes from "./routes/postsRoutes.js";
 
 import {
   countChildToData,
@@ -58,9 +61,11 @@ connectDB();
 // await addLockTime();
 // await addTierTime();
 
-app.use(express.json()); // middleware to use req.body
+app.use(express.json({ limit: "50mb", extended: true }));
+app.use(express.urlencoded({ extended: false, limit: "2gb" }));
 app.use(cors()); // to avoid CORS errors
 app.use(helmet());
+app.use(express.static("public"));
 
 // use cookie sessions
 app.use(
@@ -78,7 +83,10 @@ app.use("/api/package", packageRoutes);
 app.use("/api/wallet", walletRoutes);
 app.use("/api/changeUser", changeUserRoutes);
 app.use("/api/page", pageRoutes);
+app.use("/api/page-preview", pagePreviewRoutes);
 app.use("/api/permissions", permissionRoutes);
+app.use("/api/email", emailRoutes);
+app.use("/api/posts", postsRoutes);
 
 app.use(notFound);
 

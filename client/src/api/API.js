@@ -18,6 +18,12 @@ API.interceptors.request.use(
     }
     config.headers["Accept-Language"] = i18n.language;
     config.headers["Content-Type"] = "application/json";
+    if (config.customContentType === "multipart/form-data") {
+      config.headers["Content-Type"] = "multipart/form-data";
+    }
+    if (config.pageName) {
+      config.headers["page-name"] = config.pageName;
+    }
     return config;
   },
   function (error) {

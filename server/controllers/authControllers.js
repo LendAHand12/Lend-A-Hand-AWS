@@ -8,6 +8,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import Tree from "../models/treeModel.js";
 import { getActivePackages } from "./packageControllers.js";
+import Permission from "../models/permissionModel.js";
 
 const checkLinkRef = asyncHandler(async (req, res) => {
   const { ref, receiveId } = req.body;
@@ -202,10 +203,8 @@ const authUser = asyncHandler(async (req, res) => {
       { status: { $ne: "DELETED" } },
     ],
   });
-  // if the passwords are matching, then check if a refresh token exists for this user
+
   if (user && (await user.matchPassword(password))) {
-    // if no refresh token available, create one and store it in the db
-    // generate both the access and the refresh tokens
     const accessToken = generateToken(user._id, "access");
     const refreshToken = generateToken(user._id, "refresh");
 
@@ -232,6 +231,10 @@ const authUser = asyncHandler(async (req, res) => {
     }
 
     const packages = await getActivePackages();
+
+    const permissions = await Permission.findOne({ role: user.role }).populate(
+      "pagePermissions.page"
+    );
 
     res.status(200).json({
       userInfo: {
@@ -261,6 +264,8 @@ const authUser = asyncHandler(async (req, res) => {
         openLah: user.openLah,
         closeLah: user.closeLah,
         tierDate: user.tierDate,
+        role: user.role,
+        permissions: permissions ? permissions.pagePermissions : null,
       },
       accessToken,
       refreshToken,

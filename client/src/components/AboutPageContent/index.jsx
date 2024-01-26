@@ -3,16 +3,23 @@ import "./index.css";
 import { useEffect, useState } from "react";
 import Page from "../../api/Page";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 
 const AboutPageContent = () => {
   const { t, i18n } = useTranslation();
-  const pageName = "aboutUs";
+  const pageName = "cms-aboutUs";
   const [loading, setLoading] = useState(false);
   const [pageData, setPageData] = useState(null);
+  const { userInfo } = useSelector((state) => state.auth);
+  const location = useLocation();
+  const { pathname } = location;
+  const mode =
+    pathname.includes("preview") && userInfo?.role !== "user" ? "preview" : "";
 
   useEffect(() => {
     (async () => {
-      await Page.getPageDetailByPageName(pageName)
+      await Page.getPageDetailByPageName(pageName, mode)
         .then((response) => {
           console.log({ data: response.data });
           setPageData(response.data.page);
@@ -27,7 +34,7 @@ const AboutPageContent = () => {
           setLoading(false);
         });
     })();
-  }, []);
+  }, [mode]);
 
   return (
     <>

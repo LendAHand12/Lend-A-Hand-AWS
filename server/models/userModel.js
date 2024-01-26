@@ -172,7 +172,7 @@ const userSchema = mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["USER", "ADMIN", "ADMIN1", "ADMIN2"],
+      // enum: ["USER", "ADMIN", "ADMIN1", "ADMIN2"],
     },
   },
   {

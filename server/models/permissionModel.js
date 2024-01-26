@@ -5,13 +5,15 @@ const permissionSchema = mongoose.Schema(
   {
     role: {
       type: String,
-      enum: ["USER", "ADMIN", "ADMIN1", "ADMIN2"],
       require: true,
       unique: true,
     },
     pagePermissions: [
       {
-        pageName: { type: String },
+        page: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Page",
+        },
         actions: [{ type: String }],
       },
     ],

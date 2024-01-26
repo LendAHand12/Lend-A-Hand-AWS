@@ -15,7 +15,6 @@ const EditCMSPage = ({ match }) => {
   const [files, setFile] = useState([]);
 
   const {
-    register,
     handleSubmit,
     formState: { errors },
     setValue,
@@ -42,9 +41,9 @@ const EditCMSPage = ({ match }) => {
   }, []);
 
   const onSubmit = useCallback(
-    async (values) => {
+    async (values, mode) => {
       values.images = files;
-      await Page.updatePage(pageName, values)
+      await Page.updatePage(pageName, values, mode)
         .then((response) => {
           const { message } = response.data;
           toast.success(t(message));
@@ -62,9 +61,28 @@ const EditCMSPage = ({ match }) => {
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)} className="">
-        <div>
-          <h1 className="text-2xl font-bold">CMS - {t(pageName)}</h1>
+      <form
+        onSubmit={handleSubmit((values) => onSubmit(values, ""))}
+        className=""
+      >
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold">{t(pageName)}</h1>
+          <div className="flex items-center gap-6">
+            <button
+              onClick={handleSubmit((values) => onSubmit(values, "preview"))}
+              className="w-64 flex justify-center items-center hover:underline font-bold rounded-full my-6 py-4 px-8 border shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+            >
+              {t("saveDrap")}
+            </button>
+            <a
+              href={`/admin/cms/preview/${pageName}`}
+              target="_blank"
+              className="w-64 flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+              rel="noreferrer"
+            >
+              {t("preview")}
+            </a>
+          </div>
         </div>
         {loading ? (
           <Loading />

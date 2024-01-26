@@ -120,13 +120,13 @@ const Nav = () => {
                 <div className="lg:absolute lg:p-2 lg:top-6 lg:w-40 lg:invisible lg:group-hover:visible lg:bg-gray-100 lg:rounded-md lg:shadow-lg flex flex-col">
                   <Link
                     className={`inline-block py-2 px-4 hover:text-gray-700 hover:text-underline`}
-                    to="/about"
+                    to="/aboutUs"
                   >
                     {t("aboutUs")}
                   </Link>
                   <Link
                     className={`inline-block py-2 px-4  hover:text-gray-700 hover:text-underline`}
-                    to="/member"
+                    to="/ourTeam"
                   >
                     {t("ourTeam")}
                   </Link>
@@ -154,11 +154,31 @@ const Nav = () => {
               </li>
               <li className="mr-3">
                 <Link
+                  className={`inline-block ${
+                    pathname.includes("terms") ? "font-bold" : ""
+                  } text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4`}
+                  to="/terms"
+                >
+                  {t("legal")}
+                </Link>
+              </li>
+              <li className="mr-3">
+                <Link
                   to="/login"
                   className="block hover:underline bg-white text-gray-800 font-bold rounded-full lg:mt-0 py-4 px-8 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                 >
                   {t("login")}
                 </Link>
+              </li>
+              <li className="">
+                <select
+                  className="bg-inherit px-4 py-2 focus:outline-none active:outline-none"
+                  onChange={onChangeLanguage}
+                  defaultValue={i18n.language.includes("vi") ? "vi" : "en"}
+                >
+                  <option value="en">EN</option>
+                  <option value="vi">VI</option>
+                </select>
               </li>
               <li className="">
                 <select

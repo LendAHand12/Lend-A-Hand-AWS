@@ -13,3 +13,7 @@ export const URL_API_PACKAGE = "/api/package";
 export const URL_API_WALLET = "/api/wallet";
 export const URL_API_CHANGE_USER = "/api/changeUser";
 export const URL_API_PAGE = "/api/page";
+export const URL_API_PAGE_PREVIEW = "/api/page-preview";
+export const URL_API_EMAIL = "/api/email";
+export const URL_API_POSTS = "/api/posts";
+export const URL_API_PERMISSIONS = "/api/permissions";

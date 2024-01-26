@@ -193,3 +193,13 @@ $set: {
 {
 "multi": true
 })
+
+- Làm quen source code -> 3h
+- Redirect default sau khi login sang trang dashboard -> 0h
+- Sửa trang Discovery Hub -> 4h
+- Trang danh sách và chi tiết manga của user -> 6h
+- Trang danh sách manga -> 3h
+- Sửa trang profile -> 1h
+
+db.users.updateMany({isAdmin: false}, {$set: {role: "user"}})
+db.users.updateMany({isAdmin: true}, {$set: {role: "admin"}})

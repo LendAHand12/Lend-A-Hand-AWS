@@ -14,6 +14,7 @@ import { findNextUser, findRootLayer } from "../utils/methods.js";
 import generateGravatar from "../utils/generateGravatar.js";
 import { areArraysEqual } from "../cronJob/index.js";
 import { sendMailUserCanInceaseTierToAdmin } from "../utils/sendMailCustom.js";
+import Permission from "../models/permissionModel.js";
 
 dotenv.config();
 
@@ -96,7 +97,6 @@ const getAllUsersWithKeyword = asyncHandler(async (req, res) => {
 
 const getUserById = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id).select("-password");
-  console.log({ user });
 
   if (user) {
     const listDirectUser = [];
@@ -169,6 +169,7 @@ const getUserById = asyncHandler(async (req, res) => {
       changeUser,
       refUserName: refUser ? refUser.userId : "",
       refUserEmail: refUser ? refUser.email : "",
+      role: user.role,
       listOldParent,
     });
   } else {
@@ -597,6 +598,10 @@ const getUserProfile = asyncHandler(async (req, res) => {
     }
     const packages = await getActivePackages();
 
+    const permissions = await Permission.findOne({ role: user.role }).populate(
+      "pagePermissions.page"
+    );
+
     res.json({
       id: user._id,
       email: user.email,
@@ -637,6 +642,8 @@ const getUserProfile = asyncHandler(async (req, res) => {
       tier4Time: user.tier4Time,
       tier5Time: user.tier5Time,
       hold: user.hold,
+      role: user.role,
+      permissions: permissions ? permissions.pagePermissions : null,
     });
   } else {
     res.status(400);

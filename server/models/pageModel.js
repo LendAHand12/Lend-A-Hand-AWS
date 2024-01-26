@@ -11,11 +11,6 @@ const pageSchema = mongoose.Schema(
     path: {
       type: String,
       require: true,
-      unique: true,
-    },
-    pathEdit: {
-      type: String,
-      require: false,
     },
     content_vn: {
       type: String,

@@ -31,15 +31,17 @@ const CMSPage = () => {
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-        {listPages.map((page) => (
-          <Link
-            key={page.pageName}
-            to={page.pathEdit}
-            className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full  py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-          >
-            {t(page.pageName)}
-          </Link>
-        ))}
+        {listPages
+          .filter((ele) => ele.pageName.startsWith("cms"))
+          .map((page) => (
+            <Link
+              key={page.pageName}
+              to={`/admin/cms/${page.pageName}`}
+              className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full  py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+            >
+              {t(page.pageName)}
+            </Link>
+          ))}
       </div>
     </>
   );

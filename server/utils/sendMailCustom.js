@@ -122,3 +122,42 @@ export const sendMailUserCanInceaseTierToAdmin = async (u) => {
   // send a promise since nodemailer is async
   if (mailSent) return Promise.resolve(1);
 };
+
+export const sendMailContactWithAdmin = async (mailInfo) => {
+  const { userName, phone, email, message } = mailInfo;
+
+  const mailOptions = {
+    from: process.env.EMAIL,
+    to: process.env.CC_MAIL,
+    subject: "THÔNG TIN NGƯỜI DÙNG CẦN TƯ VẤN",
+    html: `
+    <div>
+    <h1>
+     Thông tin người cần tư vấn
+    </h1>
+    <p>
+    <strong>Họ và tên :</strong> ${userName}
+    </p><p>
+    <strong>Số điện thoại :</strong> ${phone}
+    </p>
+    <p>
+    <strong>Email :</strong> ${email}
+    </p>
+    <p style="max-width: 70%">
+    <strong>Nội dung :</strong> ${message}
+    </p>
+    </div>
+			`,
+  };
+
+  const mailSent = await transporter.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(info);
+    }
+  });
+
+  // send a promise since nodemailer is async
+  if (mailSent) return Promise.resolve(1);
+};

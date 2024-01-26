@@ -23,6 +23,19 @@ const RemoveLastUserTier = lazy(() =>
 const CMSPage = lazy(() => import("@/pages/Admin/CMS"));
 const EditCMSPage = lazy(() => import("@/pages/Admin/EditCMS"));
 
+const PreviewHomePage = lazy(() => import("@/pages/HomePage"));
+const PreviewAboutUsPage = lazy(() => import("@/pages/AboutPage"));
+const PostsPage = lazy(() => import("@/pages/Admin/Posts"));
+const CreatePostsPage = lazy(() => import("@/pages/Admin/Posts/Create"));
+const EditPostsPage = lazy(() => import("@/pages/Admin/Posts/Edit"));
+const PermissionsPage = lazy(() => import("@/pages/Admin/Permissions"));
+const PermissionsDetailsPage = lazy(() =>
+  import("@/pages/Admin/Permissions/Details")
+);
+const PermissionsCreatePage = lazy(() =>
+  import("@/pages/Admin/Permissions/Create")
+);
+
 const routes = [
   {
     path: "/dashboard",
@@ -110,6 +123,42 @@ const routes = [
   {
     path: "/cms/:page",
     component: EditCMSPage,
+  },
+  {
+    path: "/cms/preview/cms-homepage",
+    component: PreviewHomePage,
+  },
+  {
+    path: "/cms/preview/cms-aboutUs",
+    component: PreviewAboutUsPage,
+  },
+  {
+    path: "/cms/preview/cms-ourTeam",
+    component: PreviewAboutUsPage,
+  },
+  {
+    path: "/posts",
+    component: PostsPage,
+  },
+  {
+    path: "/posts/create",
+    component: CreatePostsPage,
+  },
+  {
+    path: "/posts/edit",
+    component: EditPostsPage,
+  },
+  {
+    path: "/permissions",
+    component: PermissionsPage,
+  },
+  {
+    path: "/permissions/create",
+    component: PermissionsCreatePage,
+  },
+  {
+    path: "/permissions/:id",
+    component: PermissionsDetailsPage,
   },
 ];
 

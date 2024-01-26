@@ -20,8 +20,15 @@ const AppNav = () => {
   const [showMenu, setShowMenu] = useState(false);
   const ref = useRef();
   const auth = useSelector((state) => state.auth);
-  if (auth.userInfo.isAdmin) {
-    routes = AdminRoutes;
+  const { permissions } = auth.userInfo;
+  if (auth.userInfo.role !== "user") {
+    routes = AdminRoutes.filter((route) => {
+      let currentRoute = `/admin${route.path}`;
+      let page = permissions.find((ele) => ele.page?.path === currentRoute);
+      if (page && page.actions.includes("read")) {
+        return route;
+      }
+    });
   } else {
     routes = UserRoutes.filter((route) => {
       if (route.permissionWithStatus.includes(auth.userInfo.status)) {
@@ -166,9 +173,9 @@ const AppNav = () => {
                       className={`inline-block py-2 px-4 text-black ${
                         pathname.includes(route.path) ? "font-bold" : ""
                       } no-underline`}
-                      to={`${auth.userInfo.isAdmin ? "/admin" : "/user"}${
-                        route.path
-                      }`}
+                      to={`${
+                        auth.userInfo.role !== "user" ? "/admin" : "/user"
+                      }${route.path}`}
                     >
                       {t(route.title)}
                     </Link>

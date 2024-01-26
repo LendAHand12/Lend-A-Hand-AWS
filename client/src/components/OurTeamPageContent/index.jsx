@@ -4,9 +4,9 @@ import { toast } from "react-toastify";
 import Page from "../../api/Page";
 import { useEffect, useState } from "react";
 
-const MemberPageContent = () => {
-  const { t } = useTranslation();
-  const pageName = "member";
+const OurTeamPageContent = () => {
+  const { t, i18n } = useTranslation();
+  const pageName = "cms-ourTeam";
   const [loading, setLoading] = useState(false);
   const [pageData, setPageData] = useState(null);
 
@@ -14,7 +14,6 @@ const MemberPageContent = () => {
     (async () => {
       await Page.getPageDetailByPageName(pageName)
         .then((response) => {
-          console.log({ data: response.data });
           setPageData(response.data.page);
           setLoading(false);
         })
@@ -147,6 +146,16 @@ const MemberPageContent = () => {
               </div>
             </div>
           </div>
+          <div className="text-gray-800">
+            {/* <div
+              dangerouslySetInnerHTML={{
+                __html:
+                  i18n.language === "vi"
+                    ? pageData?.content_vn
+                    : pageData?.content_en,
+              }}
+            /> */}
+          </div>
         </div>
       </section>
       <svg
@@ -183,4 +192,4 @@ const MemberPageContent = () => {
   );
 };
 
-export default MemberPageContent;
+export default OurTeamPageContent;

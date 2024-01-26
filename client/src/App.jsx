@@ -14,7 +14,7 @@ const ForgotPassword = lazy(() => import("@/pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
 const TermsPage = lazy(() => import("@/pages/Terms"));
 const AboutPage = lazy(() => import("@/pages/AboutPage"));
-const MemberPage = lazy(() => import("@/pages/MemberPage"));
+const OurTeamPage = lazy(() => import("@/pages/OurTeamPage"));
 
 function App() {
   return (
@@ -27,8 +27,8 @@ function App() {
         <PublicRoute path="/confirm" component={ConfirmPage} exact />
         <PublicRoute path="/forgot-password" component={ForgotPassword} exact />
         <PublicRoute path="/reset-password" component={ResetPassword} exact />
-        <PublicRoute path="/about" component={AboutPage} exact />
-        <PublicRoute path="/member" component={MemberPage} exact />
+        <PublicRoute path="/aboutUs" component={AboutPage} exact />
+        <PublicRoute path="/ourTeam" component={OurTeamPage} exact />
 
         <PrivateRoute path="/user" component={AppLayout} />
         <PrivateRoute path="/admin" component={AppLayout} />
