@@ -103,9 +103,30 @@ const getUserById = asyncHandler(async (req, res) => {
     if (listRefIdOfUser && listRefIdOfUser.length > 0) {
       for (let refId of listRefIdOfUser) {
         const refedUser = await User.findById(refId.userId).select(
-          "userId email walletAddress"
+          "userId email walletAddress status countPay tier errLahCode buyPackage"
         );
-        listDirectUser.push(refedUser);
+        listDirectUser.push({
+          userId: refedUser.userId,
+          isGray:
+            refedUser.status === "LOCKED"
+              ? req.user.isAdmin
+                ? true
+                : false
+              : false,
+          isRed:
+            refedUser.tier === 1 && refedUser.countPay === 0
+              ? true
+              : refedUser.tier === 1 &&
+                refedUser.buyPackage === "B" &&
+                refedUser.countPay < 7
+              ? true
+              : refedUser.tier === 1 &&
+                refedUser.buyPackage === "A" &&
+                refedUser.countPay < 13
+              ? true
+              : false,
+          isYellow: refedUser.errLahCode === "OVER30",
+        });
       }
     }
     const listOldParent = [];
@@ -596,9 +617,30 @@ const getUserProfile = asyncHandler(async (req, res) => {
     if (listRefIdOfUser && listRefIdOfUser.length > 0) {
       for (let refId of listRefIdOfUser) {
         const refedUser = await User.findById(refId.userId).select(
-          "userId email walletAddress"
+          "userId email walletAddress status countPay tier errLahCode buyPackage"
         );
-        listDirectUser.push(refedUser);
+        listDirectUser.push({
+          userId: refedUser.userId,
+          isGray:
+            refedUser.status === "LOCKED"
+              ? req.user.isAdmin
+                ? true
+                : false
+              : false,
+          isRed:
+            refedUser.tier === 1 && refedUser.countPay === 0
+              ? true
+              : refedUser.tier === 1 &&
+                refedUser.buyPackage === "B" &&
+                refedUser.countPay < 7
+              ? true
+              : refedUser.tier === 1 &&
+                refedUser.buyPackage === "A" &&
+                refedUser.countPay < 13
+              ? true
+              : false,
+          isYellow: refedUser.errLahCode === "OVER30",
+        });
       }
     }
     const packages = await getActivePackages();

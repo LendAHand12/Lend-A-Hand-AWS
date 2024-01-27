@@ -252,30 +252,6 @@ const Profile = () => {
             <span className="block sm:inline">{t("infoAccountAlert")}</span>
           </div>
         )}
-
-        {/* {oldLayer.length < currentLayer.length && (
-          <div
-            className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-5"
-            role="alert"
-          >
-            <span className="block sm:inline">
-              {t("congrateTier")} {tier - 1}
-            </span>
-          </div>
-        )}
-
-        {oldLayer.length === currentLayer.length &&
-          oldLayer[tier - 1] < currentLayer[tier - 1] && (
-            <div
-              className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-5"
-              role="alert"
-            >
-              <span className="block sm:inline">
-                {t("congrateLayer")} {currentLayer}
-              </span>
-            </div>
-          )} */}
-
         <div className="md:flex no-wrap md:-mx-2 ">
           <div className="w-full lg:w-3/12 lg:mx-2 mb-4 lg:mb-0">
             <div className="bg-white shadow-md p-3 border-t-4 border-primary">
@@ -350,6 +326,39 @@ const Profile = () => {
                 </li>
               </ul>
             </div>
+            {status === "APPROVED" && (
+              <div className="mt-10 bg-white shadow-md p-3 border-t-4 border-primary">
+                <p className="uppercase mt-2 font-bold">{t("children")}</p>
+                <div className="py-2">
+                  <ul>
+                    {listDirectUser.map((ele) => (
+                      <li
+                        className="bg-white border-b hover:bg-gray-50"
+                        key={ele._id}
+                      >
+                        <div className="py-2">
+                          <div className="text-base">
+                            <span
+                              className={`${
+                                ele.isGray
+                                  ? "bg-[#8c8c8c]"
+                                  : ele.isRed
+                                  ? "bg-[#b91c1c]"
+                                  : ele.isYellow
+                                  ? "bg-[#F4B400]"
+                                  : "bg-[#16a34a]"
+                              } py-1 px-2 rounded text-white text-sm`}
+                            >
+                              {ele.userId}
+                            </span>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
           </div>
           <div className="w-full lg:w-9/12 lg:mx-2">
             <form
@@ -435,50 +444,10 @@ const Profile = () => {
                     <div className="px-4 py-2 font-semibold">Tier</div>
                     <div className="px-4 py-2">{tier}</div>
                   </div>
-                  {/* <div className="grid lg:grid-cols-2 grid-cols-1">
-                    <div className="px-4 py-2 font-semibold">
-                      {t("buyPackage")}
-                    </div>
-                    <div className="px-4 py-2">{buyPackage}</div>
-                  </div> */}
                   <div className="grid lg:grid-cols-2 grid-cols-1">
                     <div className="px-4 py-2 font-semibold">{t("fine")}</div>
                     <div className="px-4 py-2">{fine}</div>
                   </div>
-                  {status === "APPROVED" && listDirectUser.length > 0 && (
-                    <>
-                      <div className="grid lg:grid-cols-2 grid-cols-1">
-                        <div className="px-4 py-2 font-semibold">
-                          {t("children")}
-                        </div>
-                        <div className="px-4 py-2">
-                          <ul>
-                            {listDirectUser.map((ele) => (
-                              <li
-                                className="bg-white border-b hover:bg-gray-50"
-                                key={ele._id}
-                              >
-                                <div className="py-2">
-                                  <div className="text-base">
-                                    <span className="font-semibold">
-                                      {ele.userId}
-                                    </span>
-                                    {/* <br></br>
-                                    {ele._id}
-                                    <br></br>
-                                    {ele.email}
-                                    <br></br>
-                                    {ele.walletAddress}
-                                    <br></br> */}
-                                  </div>
-                                </div>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    </>
-                  )}
                   {status === "UNVERIFY" ? (
                     <>
                       <div className="flex justify-center my-4">
