@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 // store the refresh tokens in the db
-const pagePreviewSchema = mongoose.Schema(
+const pageReviewSchema = mongoose.Schema(
   {
     pageName: {
       type: String,
@@ -11,7 +11,6 @@ const pagePreviewSchema = mongoose.Schema(
     path: {
       type: String,
       require: true,
-      unique: true,
     },
     content_vn: {
       type: String,
@@ -32,6 +31,9 @@ const pagePreviewSchema = mongoose.Schema(
     images: {
       type: Array,
     },
+    group: {
+      type: String,
+    },
     haveImage: {
       type: Boolean,
       default: false,
@@ -40,6 +42,6 @@ const pagePreviewSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-const PagePreview = mongoose.model("PagePreview", pagePreviewSchema);
+const PageReview = mongoose.model("PageReview", pageReviewSchema);
 
-export default PagePreview;
+export default PageReview;
