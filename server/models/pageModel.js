@@ -31,6 +31,9 @@ const pageSchema = mongoose.Schema(
     images: {
       type: Array,
     },
+    group: {
+      type: String,
+    },
     haveImage: {
       type: Boolean,
       default: false,

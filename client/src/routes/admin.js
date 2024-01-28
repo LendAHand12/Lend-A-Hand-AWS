@@ -22,12 +22,14 @@ const RemoveLastUserTier = lazy(() =>
 );
 const CMSPage = lazy(() => import("@/pages/Admin/CMS"));
 const EditCMSPage = lazy(() => import("@/pages/Admin/EditCMS"));
-
 const PreviewHomePage = lazy(() => import("@/pages/HomePage"));
 const PreviewAboutUsPage = lazy(() => import("@/pages/AboutPage"));
+const PreviewOurTeamPage = lazy(() => import("@/pages/OurTeamPage"));
+
 const PostsPage = lazy(() => import("@/pages/Admin/Posts"));
 const CreatePostsPage = lazy(() => import("@/pages/Admin/Posts/Create"));
 const EditPostsPage = lazy(() => import("@/pages/Admin/Posts/Edit"));
+
 const PermissionsPage = lazy(() => import("@/pages/Admin/Permissions"));
 const PermissionsDetailsPage = lazy(() =>
   import("@/pages/Admin/Permissions/Details")
@@ -134,7 +136,7 @@ const routes = [
   },
   {
     path: "/cms/preview/cms-ourTeam",
-    component: PreviewAboutUsPage,
+    component: PreviewOurTeamPage,
   },
   {
     path: "/posts",

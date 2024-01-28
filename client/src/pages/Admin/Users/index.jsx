@@ -8,6 +8,7 @@ import NoContent from "@/components/NoContent";
 import Loading from "@/components/Loading";
 import { useHistory, useLocation } from "react-router-dom";
 import { PaginationControl } from "react-bootstrap-pagination-control";
+import { useSelector } from "react-redux";
 
 const Users = () => {
   const { t } = useTranslation();
@@ -25,6 +26,7 @@ const Users = () => {
   const [data, setData] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [searchKey, setSearchKey] = useState(key ? key : "");
+  const { userInfo } = useSelector((state) => state.auth);
 
   useEffect(() => {
     (async () => {
@@ -253,34 +255,39 @@ const Users = () => {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex gap-6">
-                      {ele.status === "PENDING" && (
-                        <button
-                          onClick={() => handleApprove(ele._id)}
-                          className="font-medium text-gray-500 hover:text-primary"
-                        >
-                          <svg
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                            id="check"
-                            data-name="Flat Line"
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="w-6 h-auto"
+                      {userInfo?.permissions
+                        .find((p) => p.page.pageName === "admin-users-details")
+                        ?.actions.includes("approve") &&
+                        ele.status === "PENDING" && (
+                          <button
+                            onClick={() => handleApprove(ele._id)}
+                            className="font-medium text-gray-500 hover:text-primary"
                           >
-                            <polyline
-                              id="primary"
-                              points="5 12 10 17 19 8"
-                              style={{
-                                fill: "none",
-                                stroke: "currentColor",
-                                strokeLinecap: "round",
-                                strokeLinejoin: "round",
-                                strokeWidth: 2,
-                              }}
-                            ></polyline>
-                          </svg>
-                        </button>
-                      )}
-                      {
+                            <svg
+                              fill="currentColor"
+                              viewBox="0 0 24 24"
+                              id="check"
+                              data-name="Flat Line"
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="w-6 h-auto"
+                            >
+                              <polyline
+                                id="primary"
+                                points="5 12 10 17 19 8"
+                                style={{
+                                  fill: "none",
+                                  stroke: "currentColor",
+                                  strokeLinecap: "round",
+                                  strokeLinejoin: "round",
+                                  strokeWidth: 2,
+                                }}
+                              ></polyline>
+                            </svg>
+                          </button>
+                        )}
+                      {userInfo?.permissions
+                        .find((p) => p.page.pageName === "admin-users-details")
+                        ?.actions.includes("read") && (
                         <button
                           onClick={() => handleDetail(ele._id)}
                           className="font-medium text-gray-500 hover:text-primary"
@@ -294,56 +301,59 @@ const Users = () => {
                             <path d="M21.92,11.6C19.9,6.91,16.1,4,12,4S4.1,6.91,2.08,11.6a1,1,0,0,0,0,.8C4.1,17.09,7.9,20,12,20s7.9-2.91,9.92-7.6A1,1,0,0,0,21.92,11.6ZM12,18c-3.17,0-6.17-2.29-7.9-6C5.83,8.29,8.83,6,12,6s6.17,2.29,7.9,6C18.17,15.71,15.17,18,12,18ZM12,8a4,4,0,1,0,4,4A4,4,0,0,0,12,8Zm0,6a2,2,0,1,1,2-2A2,2,0,0,1,12,14Z" />
                           </svg>
                         </button>
-                      }
-
-                      {ele.status === "APPROVED" && (
-                        <button
-                          onClick={() => handleTree(ele._id)}
-                          className="font-medium text-gray-500 hover:text-primary"
-                        >
-                          <svg
-                            className="w-6 h-auto"
-                            viewBox="0 0 48 48"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <rect
-                              width="48"
-                              height="48"
-                              fill="white"
-                              fillOpacity="0.01"
-                            />
-                            <path
-                              d="M13.0448 14C13.5501 8.3935 18.262 4 24 4C29.738 4 34.4499 8.3935 34.9552 14H35C39.9706 14 44 18.0294 44 23C44 27.9706 39.9706 32 35 32H13C8.02944 32 4 27.9706 4 23C4 18.0294 8.02944 14 13 14H13.0448Z"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M24 28L29 23"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M24 25L18 19"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M24 44V18"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </button>
                       )}
+
+                      {userInfo?.permissions
+                        .find((p) => p.page.pageName === "admin-tree")
+                        ?.actions.includes("read") &&
+                        ele.status === "APPROVED" && (
+                          <button
+                            onClick={() => handleTree(ele._id)}
+                            className="font-medium text-gray-500 hover:text-primary"
+                          >
+                            <svg
+                              className="w-6 h-auto"
+                              viewBox="0 0 48 48"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <rect
+                                width="48"
+                                height="48"
+                                fill="white"
+                                fillOpacity="0.01"
+                              />
+                              <path
+                                d="M13.0448 14C13.5501 8.3935 18.262 4 24 4C29.738 4 34.4499 8.3935 34.9552 14H35C39.9706 14 44 18.0294 44 23C44 27.9706 39.9706 32 35 32H13C8.02944 32 4 27.9706 4 23C4 18.0294 8.02944 14 13 14H13.0448Z"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                d="M24 28L29 23"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                d="M24 25L18 19"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                d="M24 44V18"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </button>
+                        )}
 
                       {/* {ele.countPay === 0 && ele.children.length === 0 && (
                         <button

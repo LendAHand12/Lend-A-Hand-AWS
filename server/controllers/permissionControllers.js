@@ -20,7 +20,6 @@ const getPermissions = asyncHandler(async (req, res) => {
 
 const createPermission = asyncHandler(async (req, res) => {
   const { role, pagePermissions } = req.body;
-  console.log({ role, pagePermissions });
 
   try {
     await Permission.create({ role, pagePermissions });
@@ -35,12 +34,10 @@ const createPermission = asyncHandler(async (req, res) => {
 
 const updatePermission = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { role, pagePermissions } = req.body;
-  console.log({ role, pagePermissions });
+  const { pagePermissions } = req.body;
 
   try {
     const permission = await Permission.findById(id);
-    permission.role = role;
     permission.pagePermissions = pagePermissions;
     await permission.save();
     res.status(200).json({

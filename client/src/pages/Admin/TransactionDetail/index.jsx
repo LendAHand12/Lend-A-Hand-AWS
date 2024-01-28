@@ -6,8 +6,10 @@ import { Link, useHistory, useLocation } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import Payment from "@/api/Payment";
 import { transfer, getAccount } from "@/utils/smartContract.js";
+import { useSelector } from "react-redux";
 
 const TransactionDetail = () => {
+  const { userInfo } = useSelector((state) => state.auth);
   const history = useHistory();
   const { pathname } = useLocation();
   const transId = pathname.split("/")[3];
@@ -307,19 +309,27 @@ const TransactionDetail = () => {
                     </div>
                   </div>
                 </div>
-                {!trans.isHoldRefund && trans.type.includes("HOLD") && (
-                  <button
-                    onClick={changeToRefunded}
-                    className="w-xl flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-                  >
-                    {loadingChangeToRefunded && <Loading />}
-                    {t("changeToRefunded")}
-                  </button>
-                )}
+
+                {userInfo?.permissions
+                  .find((p) => p.page.pageName === "admin-transactions-details")
+                  ?.actions.includes("refund") &&
+                  !trans.isHoldRefund &&
+                  trans.type.includes("HOLD") && (
+                    <button
+                      onClick={changeToRefunded}
+                      className="w-xl flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                    >
+                      {loadingChangeToRefunded && <Loading />}
+                      {t("changeToRefunded")}
+                    </button>
+                  )}
                 {!trans.isHoldRefund &&
                   trans.type.includes("HOLD") &&
                   checkRefundMess !== "" && <p>{checkRefundMess}</p>}
-                {!trans.isHoldRefund &&
+                {userInfo?.permissions
+                  .find((p) => p.page.pageName === "admin-transactions-details")
+                  ?.actions.includes("refund") &&
+                  !trans.isHoldRefund &&
                   trans.type.includes("HOLD") &&
                   trans.userReceiveId !== "Unknow" &&
                   trans.userReceiveEmail !== "Unknow" && (
@@ -340,14 +350,17 @@ const TransactionDetail = () => {
                     {t("refund")}
                   </button>
                 )}
-
-                <button
-                  onClick={() => handRefund("B")}
-                  className="w-xl bg-red-600 text-white flex justify-center items-center hover:underline border font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-                >
-                  {loadingUntilRefund && <Loading />}
-                  {t("untilRefunds")}
-                </button>
+                {userInfo?.permissions
+                  .find((p) => p.page.pageName === "admin-transactions-details")
+                  ?.actions.includes("refund") && (
+                  <button
+                    onClick={() => handRefund("B")}
+                    className="w-xl bg-red-600 text-white flex justify-center items-center hover:underline border font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                  >
+                    {loadingUntilRefund && <Loading />}
+                    {t("untilRefunds")}
+                  </button>
+                )}
               </div>
             </div>
           </div>

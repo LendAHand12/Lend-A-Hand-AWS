@@ -428,5 +428,12 @@
   "admin-cms-preview-homepage": "ADMIN - Preview trang chủ",
   "admin-cms-preview-aboutUs": "ADMIN - Preview về chúng tôi",
   "admin-cms-preview-ourTeam": "ADMIN - Preview đội ngũ",
-  "admin-permissions-create": "ADMIN - Tạo mới phân quyền"
+  "admin-permissions-create": "ADMIN - Tạo mới phân quyền",
+  "posts": "Bài viết",
+  "cms": "CMS",
+  "admin-users-details": "ADMIN - Chi tiết người dùng",
+  "admin-posts-edit": "ADMIN - Chỉnh sửa bài viết",
+  "admin-posts-create": "ADMIN - Tạo mới bài viết",
+  "admin-tree": "ADMIN - Cây hệ thống",
+  "admin-transactions-details": "ADMIN - Chi tiết giao dịch"
 }

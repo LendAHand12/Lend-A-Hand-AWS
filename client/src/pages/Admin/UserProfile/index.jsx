@@ -14,9 +14,11 @@ import "./index.css";
 import { useHistory } from "react-router-dom";
 import Switch from "react-switch";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 const UserProfile = (match) => {
   const { id } = match.match.params;
+  const { userInfo } = useSelector((state) => state.auth);
   const history = useHistory();
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
@@ -981,16 +983,19 @@ const UserProfile = (match) => {
                     )}
                   </div>
                 </div>
-                {data.status === "PENDING" && (
-                  <>
-                    <div
-                      onClick={() => handleApprove(id)}
-                      className="w-full cursor-pointer flex justify-center items-center hover:underline bg-green-600 text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-                    >
-                      {t("accept")}
-                    </div>
-                  </>
-                )}
+                {userInfo?.permissions
+                  .find((p) => p.page.pageName === "admin-users-details")
+                  ?.actions.includes("approve") &&
+                  data.status === "PENDING" && (
+                    <>
+                      <div
+                        onClick={() => handleApprove(id)}
+                        className="w-full cursor-pointer flex justify-center items-center hover:underline bg-green-600 text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                      >
+                        {t("accept")}
+                      </div>
+                    </>
+                  )}
                 {isEditting && (
                   <>
                     <button
@@ -1009,7 +1014,10 @@ const UserProfile = (match) => {
                     </button>
                   </>
                 )}
-                {!isEditting &&
+                {userInfo?.permissions
+                  .find((p) => p.page.pageName === "admin-users-details")
+                  ?.actions.includes("update") &&
+                  !isEditting &&
                   data.status !== "UNVERIFY" &&
                   data.status !== "DELETED" && (
                     <button
@@ -1019,14 +1027,18 @@ const UserProfile = (match) => {
                       {t("edit")}
                     </button>
                   )}
-                {!isEditting && data.status !== "DELETED" && (
-                  <div
-                    onClick={handleDelete}
-                    className="w-full flex justify-center items-center cursor-pointer hover:underline border font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out bg-red-500 text-white"
-                  >
-                    {t("delete")}
-                  </div>
-                )}
+                {userInfo?.permissions
+                  .find((p) => p.page.pageName === "admin-users-details")
+                  ?.actions.includes("delete") &&
+                  !isEditting &&
+                  data.status !== "DELETED" && (
+                    <div
+                      onClick={handleDelete}
+                      className="w-full flex justify-center items-center cursor-pointer hover:underline border font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out bg-red-500 text-white"
+                    >
+                      {t("delete")}
+                    </div>
+                  )}
               </div>
             </div>
           </form>

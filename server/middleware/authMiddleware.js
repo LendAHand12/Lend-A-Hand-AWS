@@ -2,7 +2,6 @@ import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
 import Permission from "../models/permissionModel.js";
-import pagePermissions from "../constants/pagePermissions.js";
 
 const protectRoute = asyncHandler(async (req, res, next) => {
   let token;
@@ -33,7 +32,7 @@ const protectRoute = asyncHandler(async (req, res, next) => {
 });
 
 const isAdmin = asyncHandler((req, res, next) => {
-  if (req.user.isAdmin || (req.user && req.user.role === "admin")) next();
+  if (req.user.isAdmin || (req.user && req.user.role !== "user")) next();
   else {
     res.status(401);
     throw new Error("Not authorised admin");
@@ -42,7 +41,7 @@ const isAdmin = asyncHandler((req, res, next) => {
 
 const checkPermission = asyncHandler(async (req, res, next) => {
   const method = req.method;
-  const pageNameHeader = req.headers["page-name"];
+  const pageNameHeader = req.headers["page-path"];
   if (req.user && req.user.role) {
     const userRole = req.user.role;
     if (userRole === "admin") {

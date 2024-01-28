@@ -80,7 +80,7 @@ const OurTeamPageContent = () => {
             <div className="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
           </div>
           <div className="w-full mt-10">
-            <div className="grid grid-cols-5 gap-10">
+            <div className="grid xl:grid-cols-4 lg:grid-cols-3 grid-cols-2 gap-10">
               <div className="text-black text-center">
                 <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/6-1536x1536-1-pvlu4g64435abnb55wleum3jtxzaset0cokskbypbc.png" />
                 <div className="mt-2">
@@ -100,62 +100,123 @@ const OurTeamPageContent = () => {
                 </div>
               </div>
               <div className="text-black text-center">
-                <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/6-1536x1536-1-pvlu4g64435abnb55wleum3jtxzaset0cokskbypbc.png" />
+                <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/DAN-LEMKUIL-90-pbtb771bfe7lz50x1pppwdjkf1h1lhmbf3p0dw15hw-pwf8rmgj3ggzlap9o64rvw3lhmuneyizthexme58dk.jpeg" />
                 <div className="mt-2">
                   <div className="uppercase font-semibold text-lg">
-                    PIERRE NGUYEN
+                    DANIEL LEMKUIL
                   </div>
-                  <div className="text-gray-600">President - American</div>
+                  <div className="text-gray-600">
+                    Vice President / Legal Relations - American
+                  </div>
                 </div>
               </div>
               <div className="text-black text-center">
-                <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/6-1536x1536-1-pvlu4g64435abnb55wleum3jtxzaset0cokskbypbc.png" />
+                <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/l%C3%ACnh-pvlu4f89x94001cibe6sa4c38k3xkppa0jxb3203hk.jpg" />
                 <div className="mt-2">
                   <div className="uppercase font-semibold text-lg">
-                    PIERRE NGUYEN
+                    LINH DANG
                   </div>
-                  <div className="text-gray-600">President - American</div>
+                  <div className="text-gray-600">
+                    North America Operations Director - American
+                  </div>
                 </div>
               </div>
               <div className="text-black text-center">
-                <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/6-1536x1536-1-pvlu4g64435abnb55wleum3jtxzaset0cokskbypbc.png" />
+                <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/Giang-1536x1536-1-pvlu4g64435abnb55wleum3jtxzaset0cokskbypbc.jpg" />
                 <div className="mt-2">
                   <div className="uppercase font-semibold text-lg">
-                    PIERRE NGUYEN
+                    ĐẶNG TRƯỜNG GIANG
                   </div>
-                  <div className="text-gray-600">President - American</div>
+                  <div className="text-gray-600">
+                    HR / Marketing Director - American
+                  </div>
                 </div>
               </div>
               <div className="text-black text-center">
-                <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/6-1536x1536-1-pvlu4g64435abnb55wleum3jtxzaset0cokskbypbc.png" />
+                <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/Nguyen-Huu-Loc-2-pbtb7fhv4wj6vmomobdd0tepribcirjwg9kdpdolxw-pwf8v3h2cf84hfnoe665lijwhvqgupbamo6ig6zve0.jpeg" />
                 <div className="mt-2">
                   <div className="uppercase font-semibold text-lg">
-                    PIERRE NGUYEN
+                    NGUYEN HUU LOC
                   </div>
-                  <div className="text-gray-600">President - American</div>
+                  <div className="text-gray-600">
+                    Vice President of Sale - American
+                  </div>
                 </div>
               </div>
               <div className="text-black text-center">
-                <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/6-1536x1536-1-pvlu4g64435abnb55wleum3jtxzaset0cokskbypbc.png" />
+                <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/5-1536x1536-1-pvlu4g64435abnb55wleum3jtxzaset0cokskbypbc.png" />
                 <div className="mt-2">
                   <div className="uppercase font-semibold text-lg">
-                    PIERRE NGUYEN
+                    WILLIAM TRAN
                   </div>
-                  <div className="text-gray-600">President - American</div>
+                  <div className="text-gray-600">
+                    Director Of Intl. Business Development - American
+                  </div>
+                </div>
+              </div>
+              <div className="text-black text-center">
+                <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/dfaad925a2535e0d0742.jpg-2020-09-10-15-59-26-2020-09-10-16-04-03-pvlu4g64435abnb55wleum3jtxzaset0cokskbypbc.png" />
+                <div className="mt-2">
+                  <div className="uppercase font-semibold text-lg">
+                    TRUONG THANH VAN
+                  </div>
+                  <div className="text-gray-600">
+                    IT Chief Of Security Officer - American
+                  </div>
+                </div>
+              </div>
+              <div className="text-black text-center">
+                <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/4-1536x1536-1-pvlu4g64435abnb55wleum3jtxzaset0cokskbypbc.png" />
+                <div className="mt-2">
+                  <div className="uppercase font-semibold text-lg">
+                    NGUYEN HUYNH DUA
+                  </div>
+                  <div className="text-gray-600">
+                    IT Chief Of Staff Officer - American
+                  </div>
+                </div>
+              </div>
+              <div className="text-black text-center">
+                <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/z3715625155413_5ca9ef4132f1a479b2d65b5093bdd48e-pvlu4h3yax6kn99s0f01f3v0fbuo03wqot8a1lxb54.jpg" />
+                <div className="mt-2">
+                  <div className="uppercase font-semibold text-lg">
+                    LE THI KIM ANH
+                  </div>
+                  <div className="text-gray-600">VP Assistant - American</div>
+                </div>
+              </div>
+              <div className="text-black text-center">
+                <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/ke-toan-pwf8y97jbdjti92gy1c0h7uodi5vq2uteb49iob8h4.jpeg" />
+                <div className="mt-2">
+                  {/* <div className="uppercase font-semibold text-lg">
+                    WILLIAM TRAN
+                  </div> */}
+                  <div className="text-gray-600">
+                    Chief Accountant officer - American
+                  </div>
+                </div>
+              </div>
+              <div className="text-black text-center">
+                <img src="https://ameritecjsc.com.vn/wp-content/uploads/elementor/thumbs/IMG_8459.JPG-2020-09-09-16-48-42-pvlu4g64435abnb55wleum3jtxzaset0cokskbypbc.png" />
+                <div className="mt-2">
+                  <div className="uppercase font-semibold text-lg">
+                    DAO TRONG CHUONG
+                  </div>
+                  <div className="text-gray-600">IT Officer - American</div>
                 </div>
               </div>
             </div>
           </div>
-          <div className="text-gray-800">
-            {/* <div
+          {/* <div className="text-gray-800">
+            <div
               dangerouslySetInnerHTML={{
                 __html:
                   i18n.language === "vi"
                     ? pageData?.content_vn
                     : pageData?.content_en,
               }}
-            /> */}
-          </div>
+            />
+          </div> */}
         </div>
       </section>
       <svg

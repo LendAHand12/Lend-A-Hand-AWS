@@ -8,7 +8,7 @@ import UploadMultiImage from "../../../components/UploadMultiImage";
 import Loading from "@/components/Loading";
 
 const EditCMSPage = ({ match }) => {
-  const pageName = match.params?.page ? match.params.page : "";
+  const pageName = match?.params?.page ? match.params.page : "";
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [pageData, setPageData] = useState(null);

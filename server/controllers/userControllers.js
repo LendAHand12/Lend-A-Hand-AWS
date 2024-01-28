@@ -34,7 +34,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
         ],
       },
       {
-        isAdmin: false,
+        role: "user",
       },
       {
         status: { $regex: searchStatus, $options: "i" },
@@ -50,7 +50,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
         ],
       },
       {
-        isAdmin: false,
+        role: "user",
       },
       {
         status: { $regex: searchStatus, $options: "i" },

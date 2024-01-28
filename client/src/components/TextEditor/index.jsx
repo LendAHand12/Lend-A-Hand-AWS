@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import SunEditor from "suneditor-react";
 import "suneditor/dist/css/suneditor.min.css";
 import fontSize from "suneditor/src/plugins/submenu/fontSize";
 import font from "suneditor/src/plugins/submenu/font";
 import formatBlock from "suneditor/src/plugins/submenu/formatBlock";
 import image from "suneditor/src/plugins/dialog/image";
+import table from "suneditor/src/plugins/submenu/table";
+import template from "suneditor/src/plugins/submenu/template";
 
 const TextEditor = (props) => {
   const editor = useRef();
@@ -125,7 +127,7 @@ const TextEditor = (props) => {
       getSunEditorInstance={getSunEditorInstance}
       height="100%"
       setOptions={{
-        plugins: [fontSize, font, formatBlock, image],
+        plugins: [fontSize, font, formatBlock, image, table, template],
         font: [
           "Arial",
           "Comic Sans MS",
@@ -168,6 +170,7 @@ const TextEditor = (props) => {
             "table"),
           ],
           [
+            "template",
             "link",
             "image",
             "video",
