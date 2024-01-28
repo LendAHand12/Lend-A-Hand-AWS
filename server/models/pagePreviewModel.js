@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 // store the refresh tokens in the db
-const pageReviewSchema = mongoose.Schema(
+const pagePreviewSchema = mongoose.Schema(
   {
     pageName: {
       type: String,
@@ -42,6 +42,6 @@ const pageReviewSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-const PageReview = mongoose.model("PageReview", pageReviewSchema);
+const PagePreview = mongoose.model("PagePreview", pagePreviewSchema);
 
-export default PageReview;
+export default PagePreview;
