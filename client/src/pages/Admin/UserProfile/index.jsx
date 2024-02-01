@@ -543,6 +543,37 @@ const UserProfile = (match) => {
                 </ul>
               </div>
               <div className="mt-10 bg-white shadow-md p-3 border-t-4 border-primary">
+                <p className="uppercase mt-2 font-bold">{t("children")}</p>
+                <div className="py-2">
+                  <ul>
+                    {data.listDirectUser.map((ele) => (
+                      <li
+                        className="bg-white border-b hover:bg-gray-50"
+                        key={ele._id}
+                      >
+                        <div className="py-2">
+                          <div className="text-base">
+                            <span
+                              className={`${
+                                ele.isGray
+                                  ? "bg-[#8c8c8c]"
+                                  : ele.isRed
+                                  ? "bg-[#b91c1c]"
+                                  : ele.isYellow
+                                  ? "bg-[#F4B400]"
+                                  : "bg-[#16a34a]"
+                              } py-1 px-2 rounded text-white text-sm`}
+                            >
+                              {ele.userId}
+                            </span>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <div className="mt-10 bg-white shadow-md p-3 border-t-4 border-primary">
                 <p className="uppercase mt-2 font-bold">{t("refUserName")}</p>
                 <div className="py-2">
                   <ul>
@@ -807,34 +838,6 @@ const UserProfile = (match) => {
                         <div className="px-4 py-2">{data.note}</div>
                       )}
                     </div>
-
-                    {data.listDirectUser.length > 0 && (
-                      <>
-                        <div className="grid lg:grid-cols-2 grid-cols-1">
-                          <div className="px-4 py-2 font-semibold">
-                            {t("children")}
-                          </div>
-                          <div className="px-4 py-2">
-                            <ul>
-                              {data.listDirectUser.map((ele) => (
-                                <li
-                                  className="bg-white border-b hover:bg-gray-50"
-                                  key={ele._id}
-                                >
-                                  <div className="py-2">
-                                    <div className="text-base">
-                                      <span className="font-semibold">
-                                        {ele.userId}
-                                      </span>
-                                    </div>
-                                  </div>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                      </>
-                    )}
 
                     {isEditting ? (
                       <>

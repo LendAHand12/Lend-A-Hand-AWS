@@ -8,7 +8,12 @@ const userSchema = mongoose.Schema(
       required: true,
     },
     walletAddress: {
-      type: Array,
+      type: [
+        {
+          type: String,
+          unique: true,
+        },
+      ],
       required: true,
     },
     email: {
