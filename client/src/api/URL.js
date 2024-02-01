@@ -17,3 +17,4 @@ export const URL_API_PAGE_PREVIEW = "/api/page-preview";
 export const URL_API_EMAIL = "/api/email";
 export const URL_API_POSTS = "/api/posts";
 export const URL_API_PERMISSIONS = "/api/permissions";
+export const URL_API_PAGE_SETTING = "/api/page-settings";

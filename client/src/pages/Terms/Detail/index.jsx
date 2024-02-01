@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Posts from "@/api/Posts";
 import { toast } from "react-toastify";
 import { useHistory } from "react-router-dom";
+import Layout from "@/containers/layout";
 
 const NewsDetails = ({ match }) => {
   const id = match.params?.id ? match.params.id : "";
@@ -37,19 +38,19 @@ const NewsDetails = ({ match }) => {
   }, []);
 
   return (
-    <>
-      <section className="text-gray-600 body-font">
+    <Layout>
+      <section className="text-gray-600 body-font min-h-screen bg-white mt-32">
         <div className="container px-5 py-10 mx-auto">
           <div className="flex flex-wrap w-full mb-8">
             <div className="w-full flex justify-between items-center">
               <div className="w-full mb-6 lg:mb-0">
                 <h1 className="sm:text-4xl text-5xl font-medium title-font mb-2 text-gray-900">
-                  {t("news")}
+                  {t("legalCommon")}
                 </h1>
                 <div className="h-1 w-20 gradient rounded"></div>
               </div>
               <button
-                onClick={() => history.push("/user/news")}
+                onClick={() => history.push("/terms")}
                 className="px-8 py-4 w-40 text-center flex text-xs justify-center items-center hover:underline gradient text-white font-bold rounded-full shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
               >
                 {t("back")}
@@ -101,7 +102,7 @@ const NewsDetails = ({ match }) => {
           </div>
         </div>
       </section>
-    </>
+    </Layout>
   );
 };
 

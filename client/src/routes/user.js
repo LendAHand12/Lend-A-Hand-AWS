@@ -9,8 +9,7 @@ const Referral = lazy(() => import("@/pages/User/Referral"));
 const ChangeWallet = lazy(() => import("@/pages/User/ChangeWallet"));
 const ChangeUser = lazy(() => import("@/pages/User/ChangeUser"));
 const Legal = lazy(() => import("@/pages/User/Legal"));
-const News = lazy(() => import("@/pages/User/News"));
-const NewsDetails = lazy(() => import("@/pages/User/News/Details"));
+const LegalDetail = lazy(() => import("@/pages/User/Legal/Detail"));
 
 const routes = [
   {
@@ -63,21 +62,33 @@ const routes = [
     component: ChangeUser,
   },
   {
-    path: "/legal",
+    path: "/legal/COMMON",
     title: "legal",
+    permissionWithStatus: ["APPROVED"],
+    children: [
+      {
+        path: "/legal/COMMON",
+        title: "legalCommon",
+        permissionWithStatus: ["APPROVED"],
+        component: Legal,
+      },
+      {
+        path: "/legal/TIER1",
+        title: "legalTier",
+        permissionWithStatus: ["APPROVED"],
+        component: Legal,
+      },
+    ],
+  },
+  {
+    path: "/legal/:category",
     permissionWithStatus: ["APPROVED"],
     component: Legal,
   },
   {
-    path: "/news",
-    title: "news",
+    path: "/legal/:category/:id",
     permissionWithStatus: ["APPROVED"],
-    component: News,
-  },
-  {
-    path: "/news/:id",
-    permissionWithStatus: ["APPROVED"],
-    component: NewsDetails,
+    component: LegalDetail,
   },
 ];
 

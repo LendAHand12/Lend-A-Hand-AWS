@@ -16,11 +16,9 @@ const PostsPage = () => {
   const searchParams = new URLSearchParams(location.search);
   const key = searchParams.get("keyword");
   const page = searchParams.get("page");
-  const status = searchParams.get("status");
   const [pageNumber, setPageNumber] = useState(page ? page : 1);
   const [totalPage, setTotalPage] = useState(0);
   const [keyword, setKeyword] = useState(key ? key : "");
-  const [searchStatus, setSearchStatus] = useState(status ? status : "all");
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [refresh, setRefresh] = useState(false);
@@ -29,7 +27,7 @@ const PostsPage = () => {
   useEffect(() => {
     (async () => {
       setLoading(true);
-      await Posts.getAllPosts(pageNumber, searchKey, searchStatus)
+      await Posts.getAllPosts(pageNumber, searchKey, "")
         .then((response) => {
           const { list, pages } = response.data;
           setData(list);
@@ -52,7 +50,7 @@ const PostsPage = () => {
     (async () => {
       setLoading(true);
       setPageNumber(1);
-      await Posts.getAllPosts(pageNumber, searchKey, searchStatus)
+      await Posts.getAllPosts(pageNumber, searchKey, "")
         .then((response) => {
           const { list, pages } = response.data;
           setData(list);
@@ -69,7 +67,7 @@ const PostsPage = () => {
           setLoading(false);
         });
     })();
-  }, [searchStatus, searchKey]);
+  }, [searchKey]);
 
   // const onChangeStatus = (e) => setSearchStatus(e.target.value);
 

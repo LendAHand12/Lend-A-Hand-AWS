@@ -114,7 +114,7 @@ const AppNav = () => {
               <img src={LOGO} className="w-auto h-12 lg:h-20" />
             </Link>
           </div>
-          <div className="block lg:hidden pr-4">
+          <div className="block xl:hidden pr-4">
             <button
               onClick={toggleMenu}
               className="flex items-center p-1 text-gray-800 hover:text-gray-900 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
@@ -160,15 +160,15 @@ const AppNav = () => {
             </button>
           </div>
           <div
-            className={`w-full flex-grow lg:flex lg:items-center lg:w-auto ${
+            className={`w-full flex-grow xl:flex xl:items-center xl:w-auto ${
               showMenu ? "" : "hidden"
-            } mt-2 lg:mt-0 bg-inherit lg:bg-transparent text-black p-4 lg:p-0 z-20`}
+            } mt-2 lg:mt-0 bg-inherit xl:bg-transparent text-black p-4 lg:p-0 z-20`}
           >
-            <ul className="list-reset lg:flex justify-end flex-1 items-center">
+            <ul className="list-reset xl:flex justify-end flex-1 items-center">
               {routes
                 .filter((route) => !!route.title)
                 .map((route) => (
-                  <li className="mr-3" key={route.path}>
+                  <li className="mr-3 group relative" key={route.path}>
                     <Link
                       className={`inline-block py-2 px-4 text-black ${
                         pathname.includes(route.path) ? "font-bold" : ""
@@ -178,6 +178,26 @@ const AppNav = () => {
                       }${route.path}`}
                     >
                       {t(route.title)}
+                      {route.children && route.children.length > 0 && (
+                        <ul className="lg:absolute lg:p-2 lg:top-10 lg:w-56 lg:invisible lg:group-hover:visible lg:bg-gray-100 lg:rounded-md lg:shadow-lg flex flex-col">
+                          {route.children
+                            .filter((ele) => ele.title)
+                            .map((childRoute) => (
+                              <li key={childRoute.path}>
+                                <Link
+                                  className={`group1 inline-block font-normal py-2 px-4 hover:text-gray-700 hover:text-underline`}
+                                  to={`${
+                                    auth.userInfo.role !== "user"
+                                      ? "/admin"
+                                      : "/user"
+                                  }${childRoute.path}`}
+                                >
+                                  {t(childRoute.title)}
+                                </Link>
+                              </li>
+                            ))}
+                        </ul>
+                      )}
                     </Link>
                   </li>
                 ))}

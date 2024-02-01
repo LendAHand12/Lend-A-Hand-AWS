@@ -115,6 +115,16 @@ const Nav = () => {
             } mt-2 lg:mt-0 bg-inherit lg:bg-transparent text-black p-4 lg:p-0 z-20`}
           >
             <ul className="list-reset lg:flex justify-end flex-1 items-center">
+              <li className="mr-3">
+                <Link
+                  className={`inline-block ${
+                    !hash.includes("") ? "font-bold" : ""
+                  } text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4`}
+                  to="/"
+                >
+                  {t("homepage")}
+                </Link>
+              </li>
               <li className="mr-3 relative group cursor-pointer">
                 <span className="hidden lg:inline">{t("referral")}</span>
                 <div className="lg:absolute lg:p-2 lg:top-6 lg:w-40 lg:invisible lg:group-hover:visible lg:bg-gray-100 lg:rounded-md lg:shadow-lg flex flex-col">
@@ -135,19 +145,9 @@ const Nav = () => {
               <li className="mr-3">
                 <Link
                   className={`inline-block ${
-                    hash.includes("#features") ? "font-bold" : ""
-                  } text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4`}
-                  to="/#features"
-                >
-                  {t("features")}
-                </Link>
-              </li>
-              <li className="mr-3">
-                <Link
-                  className={`inline-block ${
                     hash.includes("#contact") ? "font-bold" : ""
                   } text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4`}
-                  to="/#contact"
+                  to="/contact"
                 >
                   {t("contact")}
                 </Link>
@@ -164,21 +164,21 @@ const Nav = () => {
               </li>
               <li className="mr-3">
                 <Link
+                  className={`inline-block ${
+                    pathname.includes("news") ? "font-bold" : ""
+                  } text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4`}
+                  to="/news"
+                >
+                  {t("news")}
+                </Link>
+              </li>
+              <li className="mr-3">
+                <Link
                   to="/login"
                   className="block hover:underline bg-white text-gray-800 font-bold rounded-full lg:mt-0 py-4 px-8 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                 >
                   {t("login")}
                 </Link>
-              </li>
-              <li className="">
-                <select
-                  className="bg-inherit px-4 py-2 focus:outline-none active:outline-none"
-                  onChange={onChangeLanguage}
-                  defaultValue={i18n.language.includes("vi") ? "vi" : "en"}
-                >
-                  <option value="en">EN</option>
-                  <option value="vi">VI</option>
-                </select>
               </li>
               <li className="">
                 <select

@@ -435,5 +435,15 @@
   "admin-posts-edit": "ADMIN - Chỉnh sửa bài viết",
   "admin-posts-create": "ADMIN - Tạo mới bài viết",
   "admin-tree": "ADMIN - Cây hệ thống",
-  "admin-transactions-details": "ADMIN - Chi tiết giao dịch"
+  "admin-transactions-details": "ADMIN - Chi tiết giao dịch",
+  "position": "Chức vụ",
+  "country": "Quốc gia",
+  "add": "Thêm mới",
+  "cms-footer": "CMS - Footer",
+  "facebook": "Facebook",
+  "map": "Google map",
+  "x": "X",
+  "zalo": "Zalo",
+  "homepage": "Trang chủ",
+  "legalTier": "Chính sách Tier"
 }

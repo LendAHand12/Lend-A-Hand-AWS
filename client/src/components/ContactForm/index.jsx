@@ -35,39 +35,6 @@ const ContactForm = () => {
   return (
     <section className="bg-white">
       <div className="py-8 lg:py-16 px-4 mx-auto max-w-screen-lg">
-        <p className="mb-8 lg:mb-16 font-light text-left text-gray-500 sm:text-xl">
-          <ul className="list-reset mb-6">
-            <li className="mt-2 inline-block mr-2 md:block md:mr-0">
-              <a
-                href="#"
-                className="no-underline hover:underline text-gray-800 hover:text-primary"
-              >
-                <span className="font-semibold">{t("address")}</span> :{" "}
-                {t(
-                  "29 Võ Văn Tần, Phường Võ Thị Sáu, Quận 3, TP Hồ Chí Minh, Việt Nam"
-                )}
-              </a>
-            </li>
-            <li className="mt-2 inline-block mr-2 md:block md:mr-0">
-              <a
-                href="#"
-                className="no-underline hover:underline text-gray-800 hover:text-primary"
-              >
-                <span className="font-semibold">{t("phone")}</span> : (+84-28)
-                2250.8166
-              </a>
-            </li>
-            <li className="mt-2 inline-block mr-2 md:block md:mr-0">
-              <a
-                href="#"
-                className="no-underline hover:underline text-gray-800 hover:text-primary"
-              >
-                <span className="font-semibold">{t("email")}</span> :
-                support@lah12.com
-              </a>
-            </li>
-          </ul>
-        </p>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <h1 className="text-2xl font-medium underline">
             {t("contactDirect")}

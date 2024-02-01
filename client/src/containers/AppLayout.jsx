@@ -2,7 +2,7 @@ import { Suspense, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 
-import AppFooter from "@/components/AppFooter";
+import Footer from "@/components/Footer";
 import FallbackLoading from "@/components/FallbackLoading";
 import AdminRoutes from "@/routes/admin";
 import UserRoutes from "@/routes/user";
@@ -96,7 +96,7 @@ const AppLayout = () => {
             </Switch>
           </Suspense>
         </div>
-        <AppFooter />
+        <Footer />
       </div>
     </>
   );

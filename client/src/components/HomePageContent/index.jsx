@@ -3,11 +3,10 @@ import animationData from "@/assets/img/dollars-tree.json";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import Page from "../../api/Page";
+import Page from "@/api/Page";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import ContactForm from "../ContactForm";
 
 const HomePageContent = () => {
   const { t, i18n } = useTranslation();
@@ -251,7 +250,7 @@ const HomePageContent = () => {
           Action!
         </button>
       </section>
-      <div className="relative -mt-12 lg:-mt-24">
+      {/* <div className="relative -mt-12 lg:-mt-24">
         <svg
           viewBox="0 0 1428 174"
           version="1.1"
@@ -286,30 +285,7 @@ const HomePageContent = () => {
             </g>
           </g>
         </svg>
-      </div>
-      <div className="bg-white py-8">
-        <h2 className="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800">
-          {t("contact")}
-        </h2>
-        <div className="w-full mb-4">
-          <div className="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
-        </div>
-        <div className="relative w-full h-96">
-          <iframe
-            className="absolute top-0 left-0 w-full h-full"
-            src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d12080.73732861526!2d-74.0059418!3d40.7127847!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zM40zMDA2JzEwLjAiTiA3NMKwMjUnMzcuNyJX!5e0!3m2!1sen!2sus!4v1648482801994!5m2!1sen!2sus"
-            frameBorder="0"
-            style={{ border: 0 }}
-            allowFullScreen=""
-            tabIndex="0"
-          ></iframe>
-        </div>
-        <div className="container mx-auto text-black">
-          <div>
-            <ContactForm />
-          </div>
-        </div>
-      </div>
+      </div> */}
     </>
   );
 };

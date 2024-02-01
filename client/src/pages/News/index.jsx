@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import NoContent from "@/components/NoContent";
 import Layout from "@/containers/layout";
 
-const TermsPage = () => {
+const News = () => {
   const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
@@ -15,7 +15,7 @@ const TermsPage = () => {
   useEffect(() => {
     (async () => {
       setLoading(true);
-      await Posts.getAllPosts(pageNumber, "", "COMMON", "")
+      await Posts.getAllPosts(pageNumber, "", "news", "")
         .then((response) => {
           const { list, pages } = response.data;
           setData(list);
@@ -49,7 +49,7 @@ const TermsPage = () => {
           <div className="flex flex-wrap w-full mb-8">
             <div className="w-full mb-6 lg:mb-0">
               <h1 className="sm:text-4xl text-2xl font-medium title-font mb-2 text-gray-900">
-                {t("legalCommon")}
+                {t("news")}
               </h1>
               <div className="h-1 w-20 gradient rounded"></div>
             </div>
@@ -58,7 +58,7 @@ const TermsPage = () => {
             {data.length > 0 &&
               data.map((news, i) => (
                 <a
-                  href={`/terms/${news._id}`}
+                  href={`/news/${news._id}`}
                   key={i}
                   className="relative gradient w-full p-2 mx-auto border-blue-100 rounded-lg cursor-pointer hover:bg-blue-200"
                 >
@@ -154,4 +154,4 @@ const TermsPage = () => {
   );
 };
 
-export default TermsPage;
+export default News;

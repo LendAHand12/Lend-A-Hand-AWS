@@ -1,9 +1,33 @@
 import { Link } from "react-router-dom";
 import LOGO from "@/assets/img/logo-vertical.png";
 import { useTranslation } from "react-i18next";
+import PageSetting from "../../api/PageSetting";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 const Footer = () => {
   const { t } = useTranslation();
+  const [loading, setLoading] = useState(false);
+  const [pageData, setPageData] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      await PageSetting.getAllPageSetting()
+        .then((response) => {
+          setPageData(response.data.settings);
+          setLoading(false);
+        })
+        .catch((error) => {
+          let message =
+            error.response && error.response.data.message
+              ? error.response.data.message
+              : error.message;
+          toast.error(t(message));
+          setLoading(false);
+        });
+    })();
+  }, []);
+
   return (
     <footer id="contact" className="bg-white border-t">
       <div className="container mx-auto px-8">
@@ -25,9 +49,10 @@ const Footer = () => {
                   className="no-underline hover:underline text-gray-800 hover:text-primary"
                 >
                   <strong>{t("address")}</strong> :{" "}
-                  {t(
-                    "29 Võ Văn Tần, Phường Võ Thị Sáu, Quận 3, TP Hồ Chí Minh, Việt Nam"
-                  )}
+                  {!loading &&
+                    pageData &&
+                    pageData.length > 0 &&
+                    pageData.find((ele) => ele.name === "address").val_vn}
                 </a>
               </li>
               <li className="mt-2 inline-block mr-2 md:block md:mr-0">
@@ -35,7 +60,11 @@ const Footer = () => {
                   href="#"
                   className="no-underline hover:underline text-gray-800 hover:text-primary"
                 >
-                  <strong>{t("phone")}</strong> : (+84-28) 2250.8166
+                  <strong>{t("phone")}</strong> :{" "}
+                  {!loading &&
+                    pageData &&
+                    pageData.length > 0 &&
+                    pageData.find((ele) => ele.name === "phone").val_vn}
                 </a>
               </li>
               <li className="mt-2 inline-block mr-2 md:block md:mr-0">
@@ -43,7 +72,11 @@ const Footer = () => {
                   href="#"
                   className="no-underline hover:underline text-gray-800 hover:text-primary"
                 >
-                  <strong>{t("email")}</strong> : support@lah12.com
+                  <strong>{t("email")}</strong> :{" "}
+                  {!loading &&
+                    pageData &&
+                    pageData.length > 0 &&
+                    pageData.find((ele) => ele.name === "email").val_vn}
                 </a>
               </li>
             </ul>
@@ -83,6 +116,14 @@ const Footer = () => {
                   {t("legal")}
                 </a>
               </li>
+              <li className="mt-2 inline-block mr-2 md:block md:mr-0">
+                <a
+                  href="/news"
+                  className="no-underline hover:underline text-gray-800 hover:text-primary"
+                >
+                  {t("news")}
+                </a>
+              </li>
             </ul>
           </div>
           <div className="flex-1 mr-10">
@@ -90,7 +131,12 @@ const Footer = () => {
             <ul className="list-reset mb-6">
               <li className="mt-2 inline-block mr-2 md:block md:mr-0">
                 <a
-                  href="#"
+                  href={
+                    !loading &&
+                    pageData &&
+                    pageData.length > 0 &&
+                    pageData.find((ele) => ele.name === "facebook").val_vn
+                  }
                   className="no-underline hover:underline text-gray-800 hover:text-primary"
                 >
                   Facebook
@@ -98,7 +144,12 @@ const Footer = () => {
               </li>
               <li className="mt-2 inline-block mr-2 md:block md:mr-0">
                 <a
-                  href="#"
+                  href={
+                    !loading &&
+                    pageData &&
+                    pageData.length > 0 &&
+                    pageData.find((ele) => ele.name === "zalo").val_vn
+                  }
                   className="no-underline hover:underline text-gray-800 hover:text-primary"
                 >
                   Zalo
@@ -106,7 +157,12 @@ const Footer = () => {
               </li>
               <li className="mt-2 inline-block mr-2 md:block md:mr-0">
                 <a
-                  href="#"
+                  href={
+                    !loading &&
+                    pageData &&
+                    pageData.length > 0 &&
+                    pageData.find((ele) => ele.name === "x").val_vn
+                  }
                   className="no-underline hover:underline text-gray-800 hover:text-primary"
                 >
                   X
