@@ -7,14 +7,16 @@ const createPosts = async (req, res) => {
   const files = req.files;
 
   try {
-    var filename_vn = "";
-    if (files.file_vn) {
-      filename_vn = files.file_vn[0].filename;
-    }
+    if (files) {
+      var filename_vn = "";
+      if (files.file_vn) {
+        filename_vn = files.file_vn[0].filename;
+      }
 
-    var filename_en = "";
-    if (files.file_en) {
-      filename_en = files.file_en[0].filename;
+      var filename_en = "";
+      if (files.file_en) {
+        filename_en = files.file_en[0].filename;
+      }
     }
 
     await Post.create({
@@ -42,7 +44,6 @@ const createPosts = async (req, res) => {
 const getAllPosts = asyncHandler(async (req, res) => {
   const { pageNumber, keyword, category } = req.query;
   const page = Number(pageNumber) || 1;
-  const searchStatus = category === "all" ? "" : category;
 
   const pageSize = 20;
 
@@ -55,7 +56,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
         ],
       },
       {
-        category: { $regex: searchStatus, $options: "i" },
+        category: { $regex: category, $options: "i" },
       },
     ],
   });
@@ -68,7 +69,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
         ],
       },
       {
-        category: { $regex: searchStatus, $options: "i" },
+        category: { $regex: category, $options: "i" },
       },
     ],
   })

@@ -12,7 +12,7 @@ const router = express.Router();
 
 router
   .route("/")
-  .get(protectRoute, getAllPosts)
+  .get(getAllPosts)
   .post(
     uploadLocal.fields([
       { name: "file_vn", maxCount: 1 },
@@ -26,7 +26,7 @@ router
 
 router
   .route("/:id")
-  .get(protectRoute, getPostById)
+  .get(getPostById)
   .put(
     uploadLocal.fields([
       { name: "file_vn", maxCount: 1 },

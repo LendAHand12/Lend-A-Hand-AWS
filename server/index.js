@@ -22,6 +22,7 @@ import pagePreviewRoutes from "./routes/pagePreviewRoutes.js";
 import permissionRoutes from "./routes/permissionRoutes.js";
 import emailRoutes from "./routes/emailRoutes.js";
 import postsRoutes from "./routes/postsRoutes.js";
+import pageSettingRoutes from "./routes/pageSettingRoutes.js";
 
 import {
   countChildToData,
@@ -87,6 +88,7 @@ app.use("/api/page-preview", pagePreviewRoutes);
 app.use("/api/permissions", permissionRoutes);
 app.use("/api/email", emailRoutes);
 app.use("/api/posts", postsRoutes);
+app.use("/api/page-settings", pageSettingRoutes);
 
 app.use(notFound);
 
@@ -149,14 +151,14 @@ const cron8 = new CronJob("30 23 * * *", async () => {
   console.log("Check block children done");
 });
 
-cron1.start();
-cron2.start();
-cron3.start();
-cron4.start();
-cron5.start();
-cron6.start();
-cron7.start();
-cron8.start();
+// cron1.start();
+// cron2.start();
+// cron3.start();
+// cron4.start();
+// cron5.start();
+// cron6.start();
+// cron7.start();
+// cron8.start();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
