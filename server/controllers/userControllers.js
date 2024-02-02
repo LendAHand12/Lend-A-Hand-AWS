@@ -1412,7 +1412,6 @@ const findNextUserTierInDB = async (tier) => {
 const getUsersWithTier = asyncHandler(async (req, res) => {
   const { pageNumber, searchKey, tier, childLength } = req.body;
   const page = Number(pageNumber) || 1;
-  const size = Number(childLength) || 0;
 
   const pageSize = 10;
 
@@ -1422,7 +1421,7 @@ const getUsersWithTier = asyncHandler(async (req, res) => {
       {
         tier,
       },
-      { children: { $size: size } },
+      { children: { $not: { $size: 3 } } },
     ],
   });
   const allUsers = await Tree.find({
@@ -1431,7 +1430,7 @@ const getUsersWithTier = asyncHandler(async (req, res) => {
       {
         tier,
       },
-      { children: { $size: size } },
+      { children: { $not: { $size: 3 } } },
     ],
   })
     .limit(pageSize)
@@ -1542,7 +1541,6 @@ const removeLastUserInTier = asyncHandler(async (req, res) => {
     status: "SUCCESS",
   });
   const lastUser = await Tree.findOne({ userId, tier });
-  console.log({ listTrans: listTrans.length });
   if (listTrans.length === 0) {
     let user = await User.findById(userId);
     if (!user.havePaid) {
