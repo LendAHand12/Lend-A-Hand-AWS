@@ -5,4 +5,5 @@ export default [
   { title: "cms", name: "cms" },
   { title: "posts", name: "posts" },
   { title: "tree", name: "tree" },
+  { title: "ADMIN", name: "admin" },
 ];

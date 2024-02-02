@@ -445,5 +445,10 @@
   "x": "X",
   "zalo": "Zalo",
   "homepage": "Trang chủ",
-  "legalTier": "Chính sách Tier"
+  "legalTier": "Chính sách Tier",
+  "delete successful": "Đã xoá thành công",
+  "createAdmin": "Tạo Admin",
+  "admin-create-admin": "Admin - Tạo Admin",
+  "list admin": "Danh sách Admin",
+  "admin-admin": "Admin - Danh sách Admin"
 }

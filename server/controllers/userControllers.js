@@ -1589,6 +1589,173 @@ const removeLastUserInTier = asyncHandler(async (req, res) => {
   }
 });
 
+const createAdmin = asyncHandler(async (req, res) => {
+  const { userId, walletAddress, email, password, phone, role } = req.body;
+
+  const userExistsUserId = await User.findOne({
+    userId: { $regex: userId, $options: "i" },
+  });
+  const userExistsEmail = await User.findOne({
+    email: { $regex: email, $options: "i" },
+  });
+  const userExistsPhone = await User.findOne({
+    $and: [{ phone: { $ne: "" } }, { phone }],
+  });
+  const userExistsWalletAddress = await User.findOne({
+    walletAddress: { $in: [walletAddress] },
+  });
+
+  if (userExistsUserId) {
+    let message = "duplicateInfoUserId";
+    res.status(400);
+    throw new Error(message);
+  } else if (userExistsEmail) {
+    let message = "duplicateInfoEmail";
+    res.status(400);
+    throw new Error(message);
+  } else if (userExistsPhone) {
+    let message = "Dupplicate phone";
+    res.status(400);
+    throw new Error(message);
+  } else if (userExistsIdCode) {
+    let message = "duplicateInfoIdCode";
+    res.status(400);
+    throw new Error(message);
+  } else if (userExistsWalletAddress) {
+    let message = "Dupplicate wallet address";
+    res.status(400);
+    throw new Error(message);
+  } else {
+    const avatar = generateGravatar(email);
+
+    await User.create({
+      userId,
+      email,
+      phone,
+      password,
+      avatar,
+      walletAddress: [walletAddress],
+      imgBack: "",
+      imgFront: "",
+      tier: 5,
+      countPay: 100,
+      createBy: "ADMIN",
+      status: "APPROVED",
+      role,
+    });
+
+    let message = "createUserSuccessful";
+
+    res.status(201).json({
+      message,
+    });
+  }
+});
+
+const getListAdmin = asyncHandler(async (req, res) => {
+  const { pageNumber, keyword } = req.query;
+  const page = Number(pageNumber) || 1;
+
+  const pageSize = 20;
+
+  const count = await User.countDocuments({
+    $and: [
+      {
+        $or: [
+          { userId: { $regex: keyword, $options: "i" } }, // Tìm theo userId
+          { email: { $regex: keyword, $options: "i" } }, // Tìm theo email
+        ],
+      },
+      {
+        role: { $ne: "user" },
+      },
+    ],
+  });
+  const allUsers = await User.find({
+    $and: [
+      {
+        $or: [
+          { userId: { $regex: keyword, $options: "i" } }, // Tìm theo userId
+          { email: { $regex: keyword, $options: "i" } }, // Tìm theo email
+        ],
+      },
+      {
+        role: { $ne: "user" },
+      },
+    ],
+  })
+    .limit(pageSize)
+    .skip(pageSize * (page - 1))
+    .sort("-createdAt")
+    .select("-password");
+
+  res.json({
+    admins: allUsers,
+    pages: Math.ceil(count / pageSize),
+  });
+});
+
+const updateAdmin = asyncHandler(async (req, res) => {
+  const { walletAddress, email, phone, role } = req.body;
+  const user = await User.findOne({ _id: req.params.id }).select("-password");
+
+  const userHavePhone = await User.find({
+    $and: [{ phone }, { email: { $ne: user.email } }],
+  });
+
+  const userHaveWalletAddress = await User.find({
+    $and: [{ walletAddress: { $in: [walletAddress] } }],
+  });
+
+  const userHaveEmail = await User.find({
+    $and: [{ email }],
+  });
+
+  if (
+    userHavePhone.length >= 1 ||
+    userHaveWalletAddress.length > 1 ||
+    userHaveEmail.length > 1
+  ) {
+    res.status(400).json({ error: "duplicateInfo" });
+  }
+
+  if (user) {
+    user.phone = phone || user.phone;
+    user.email = email || user.email;
+    user.role = role || user.role;
+    user.walletAddress =
+      [walletAddress, ...user.walletAddress] || user.walletAddress;
+
+    await user.save();
+
+    res.json({
+      message: "Update successful",
+    });
+  } else {
+    res.status(400).json({ error: "User not found" });
+  }
+});
+
+const deleteAdmin = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  await User.deleteOne({ _id: id });
+
+  res.json({
+    message: "delete successful",
+  });
+});
+
+const getAdminById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const admin = await User.findById(id);
+
+  res.json({
+    admin,
+  });
+});
+
 export {
   getUserProfile,
   getAllUsers,
@@ -1618,4 +1785,9 @@ export {
   changeNextUserTier,
   getLastUserInTier,
   removeLastUserInTier,
+  createAdmin,
+  getListAdmin,
+  updateAdmin,
+  deleteAdmin,
+  getAdminById,
 };

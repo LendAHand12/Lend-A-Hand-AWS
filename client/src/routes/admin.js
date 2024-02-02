@@ -37,6 +37,7 @@ const PermissionsDetailsPage = lazy(() =>
 const PermissionsCreatePage = lazy(() =>
   import("@/pages/Admin/Permissions/Create")
 );
+const AdminPage = lazy(() => import("@/pages/Admin/Admin"));
 
 const routes = [
   {
@@ -161,6 +162,10 @@ const routes = [
   {
     path: "/permissions/:id",
     component: PermissionsDetailsPage,
+  },
+  {
+    path: "/admin",
+    component: AdminPage,
   },
 ];
 

@@ -2,7 +2,7 @@ import { Suspense, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 
-import Footer from "@/components/Footer";
+import Footer from "@/components/AppFooter";
 import FallbackLoading from "@/components/FallbackLoading";
 import AdminRoutes from "@/routes/admin";
 import UserRoutes from "@/routes/user";

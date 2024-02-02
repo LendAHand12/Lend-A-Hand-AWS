@@ -115,6 +115,17 @@ const Dashboard = () => {
             {t("postManagement")}
           </Link>
         )}
+
+        {userInfo?.permissions
+          .find((p) => p.page.pageName === "admin-admin")
+          ?.actions.includes("read") && (
+          <Link
+            to="/admin/admin"
+            className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full  py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+          >
+            {t("createAdmin")}
+          </Link>
+        )}
       </div>
       <button
         onClick={handleLogout}

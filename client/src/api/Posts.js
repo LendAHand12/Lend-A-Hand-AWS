@@ -16,6 +16,9 @@ const Posts = {
   getPostsById: (id) => {
     return API.get(`${URL_API_POSTS}/${id}`);
   },
+  deletePostsById: (id) => {
+    return API.delete(`${URL_API_POSTS}/${id}`);
+  },
 };
 
 export default Posts;

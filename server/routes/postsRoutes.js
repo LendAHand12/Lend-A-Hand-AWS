@@ -4,6 +4,7 @@ import {
   getAllPosts,
   getPostById,
   updatePosts,
+  deletePostById,
 } from "../controllers/postControllers.js";
 import { isAdmin, protectRoute } from "../middleware/authMiddleware.js";
 import uploadLocal from "../middleware/uploadLocal.js";
@@ -36,6 +37,7 @@ router
     protectRoute,
     isAdmin,
     updatePosts
-  );
+  )
+  .delete(protectRoute, isAdmin, deletePostById);
 
 export default router;

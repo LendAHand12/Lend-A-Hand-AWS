@@ -34,7 +34,7 @@ const HomePageContent = () => {
   const getHomePageContent = async () => {
     await Page.getPageDetailByPageName(pageName, mode)
       .then((response) => {
-        setPageData(response.data.page);
+        setPageData(response.data.result);
         setLoading(false);
       })
       .catch((error) => {

@@ -39,6 +39,14 @@ const isAdmin = asyncHandler((req, res, next) => {
   }
 });
 
+const isSuperAdmin = asyncHandler((req, res, next) => {
+  if (req.user.isAdmin || (req.user && req.user.role === "admin")) next();
+  else {
+    res.status(401);
+    throw new Error("Not authorised admin");
+  }
+});
+
 const checkPermission = asyncHandler(async (req, res, next) => {
   const method = req.method;
   const pageNameHeader = req.headers["page-path"];
@@ -73,4 +81,4 @@ const checkPermission = asyncHandler(async (req, res, next) => {
   }
 });
 
-export { protectRoute, isAdmin, checkPermission };
+export { protectRoute, isAdmin, checkPermission, isSuperAdmin };

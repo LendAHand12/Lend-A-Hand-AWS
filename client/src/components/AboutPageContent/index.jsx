@@ -21,8 +21,7 @@ const AboutPageContent = () => {
     (async () => {
       await Page.getPageDetailByPageName(pageName, mode)
         .then((response) => {
-          console.log({ data: response.data });
-          setPageData(response.data.page);
+          setPageData(response.data.result);
           setLoading(false);
         })
         .catch((error) => {

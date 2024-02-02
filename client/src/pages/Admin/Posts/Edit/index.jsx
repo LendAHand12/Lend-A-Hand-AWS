@@ -14,6 +14,7 @@ const EditPostPage = () => {
   const queryParams = new URLSearchParams(location.search);
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
+  const [loadingDelete, setLoadingDelete] = useState(false);
   const history = useHistory();
 
   const id = queryParams.get("id");
@@ -75,6 +76,22 @@ const EditPostPage = () => {
     formData.append("file_en", values.file_en);
 
     await Posts.updatePost(id, formData)
+      .then((response) => {
+        const { message } = response.data;
+        toast.success(t(message));
+        history.push("/admin/posts");
+      })
+      .catch((error) => {
+        let message =
+          error.response && error.response.data.error
+            ? error.response.data.error
+            : error.message;
+        toast.error(t(message));
+      });
+  };
+
+  const handleDelete = async () => {
+    await Posts.deletePostsById(id)
       .then((response) => {
         const { message } = response.data;
         toast.success(t(message));
@@ -242,6 +259,16 @@ const EditPostPage = () => {
               className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
             >
               {t("update")}
+            </button>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                handleDelete();
+              }}
+              className="w-full flex justify-center items-center hover:underline bg-red-500 text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+            >
+              {loadingDelete && <Loading />}
+              {t("delete")}
             </button>
           </div>
         )}

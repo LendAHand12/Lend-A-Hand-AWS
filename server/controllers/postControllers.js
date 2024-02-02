@@ -58,6 +58,9 @@ const getAllPosts = asyncHandler(async (req, res) => {
       {
         category: { $regex: category, $options: "i" },
       },
+      {
+        status: "PUBLIC",
+      },
     ],
   });
   const allPosts = await Post.find({
@@ -70,6 +73,9 @@ const getAllPosts = asyncHandler(async (req, res) => {
       },
       {
         category: { $regex: category, $options: "i" },
+      },
+      {
+        status: "PUBLIC",
       },
     ],
   })
@@ -84,10 +90,25 @@ const getAllPosts = asyncHandler(async (req, res) => {
 });
 
 const getPostById = asyncHandler(async (req, res) => {
-  const post = await Post.findById(req.params.id);
+  const post = await Post.findOne({ _id: req.params.id, status: "PUBLIC" });
 
   if (post) {
     res.json(post);
+  } else {
+    res.status(404);
+    throw new Error("Posts does not exist");
+  }
+});
+
+const deletePostById = asyncHandler(async (req, res) => {
+  const post = await Post.findById(req.params.id);
+
+  if (post) {
+    post.status = "DELETED";
+    await post.save();
+    res.json({
+      message: "delete successful",
+    });
   } else {
     res.status(404);
     throw new Error("Posts does not exist");
@@ -134,4 +155,4 @@ const updatePosts = asyncHandler(async (req, res) => {
   }
 });
 
-export { createPosts, getAllPosts, getPostById, updatePosts };
+export { createPosts, getAllPosts, getPostById, updatePosts, deletePostById };

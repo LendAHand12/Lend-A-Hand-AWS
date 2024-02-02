@@ -124,6 +124,14 @@ const Footer = () => {
                   {t("news")}
                 </a>
               </li>
+              <li className="mt-2 inline-block mr-2 md:block md:mr-0">
+                <a
+                  href="/contact"
+                  className="no-underline hover:underline text-gray-800 hover:text-primary"
+                >
+                  {t("contact")}
+                </a>
+              </li>
             </ul>
           </div>
           <div className="flex-1 mr-10">

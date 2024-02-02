@@ -194,6 +194,9 @@ $set: {
 "multi": true
 })
 
+- Form tạo admin mới -> 1tr5
+- List thứ tự user sẽ nhận doanh số theo tier -> 1tr
+
 - Làm quen source code -> 3h
 - Redirect default sau khi login sang trang dashboard -> 0h
 - Sửa trang Discovery Hub -> 4h
