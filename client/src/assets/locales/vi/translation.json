@@ -369,7 +369,7 @@
 
   "admin-dashboard": "ADMIN - Thống kê",
   "admin-user": "ADMIN - Người dùng",
-  "cms-homepage": "CMS - Trang chủ",
+  "cms-homepage": "CMS - Banner",
   "saveDrap": "Lưu nháp",
   "preview": "Xem trước",
   "contactWithUs": "Liên hệ chúng tôi",
@@ -450,5 +450,12 @@
   "createAdmin": "Tạo Admin",
   "admin-create-admin": "Admin - Tạo Admin",
   "list admin": "Danh sách Admin",
-  "admin-admin": "Admin - Danh sách Admin"
+  "admin-admin": "Admin - Danh sách Admin",
+  "listAdmin": "Danh sách Admin",
+  "admin-admin-detail": "Admin - Chi tiết Admin",
+  "role": "Phân quyền",
+  "Are you sure to remove admin": "Vui lòng xác nhận xoá Admin này!",
+  "admin-admin-create": "Admin - Tạo mới Admin",
+  "cms-feature": "CMS - Chức năng",
+  "cms-call": "CMS - Kêu gọi"
 }

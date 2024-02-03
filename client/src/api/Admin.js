@@ -2,7 +2,10 @@ import API from "./API";
 import { URL_API_USER } from "./URL";
 
 const Admin = {
-  update: (userId, body) => {
+  createAdmin: (body) => {
+    return API.post(`${URL_API_USER}/admin`, body);
+  },
+  updateAdmin: (userId, body) => {
     return API.put(`${URL_API_USER}/admin/${userId}`, body);
   },
   getAllAdmins: (pageNumber, keyword) => {

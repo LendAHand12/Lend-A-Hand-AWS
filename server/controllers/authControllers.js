@@ -117,6 +117,7 @@ const registerUser = asyncHandler(async (req, res) => {
         avatar,
         walletAddress: [walletAddress],
         idCode,
+        role: "user",
       });
 
       const tree = await Tree.create({

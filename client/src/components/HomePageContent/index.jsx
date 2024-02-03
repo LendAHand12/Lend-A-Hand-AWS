@@ -1,7 +1,6 @@
 import Lottie from "react-lottie";
 import animationData from "@/assets/img/dollars-tree.json";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Page from "@/api/Page";
 import { toast } from "react-toastify";
@@ -10,10 +9,11 @@ import { useLocation } from "react-router-dom";
 
 const HomePageContent = () => {
   const { t, i18n } = useTranslation();
-  const pageName = "cms-homepage";
   const { userInfo } = useSelector((state) => state.auth);
   const [loading, setLoading] = useState(false);
-  const [pageData, setPageData] = useState(null);
+  const [pageDataHero, setPageDataHero] = useState(null);
+  const [pageDataFeature, setPageDataFeature] = useState(null);
+  const [pageDataCall, setPageDataCall] = useState(null);
   const location = useLocation();
   const { pathname } = location;
   const mode =
@@ -29,12 +29,44 @@ const HomePageContent = () => {
 
   useEffect(() => {
     getHomePageContent();
+    getHomePageFeature();
+    getHomePageCall();
   }, []);
 
   const getHomePageContent = async () => {
-    await Page.getPageDetailByPageName(pageName, mode)
+    await Page.getPageDetailByPageName("cms-homepage", mode)
       .then((response) => {
-        setPageData(response.data.result);
+        setPageDataHero(response.data.result);
+        setLoading(false);
+      })
+      .catch((error) => {
+        let message =
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message;
+        toast.error(t(message));
+        setLoading(false);
+      });
+  };
+  const getHomePageFeature = async () => {
+    await Page.getPageDetailByPageName("cms-feature", mode)
+      .then((response) => {
+        setPageDataFeature(response.data.result);
+        setLoading(false);
+      })
+      .catch((error) => {
+        let message =
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message;
+        toast.error(t(message));
+        setLoading(false);
+      });
+  };
+  const getHomePageCall = async () => {
+    await Page.getPageDetailByPageName("cms-call", mode)
+      .then((response) => {
+        setPageDataCall(response.data.result);
         setLoading(false);
       })
       .catch((error) => {
@@ -56,36 +88,10 @@ const HomePageContent = () => {
               dangerouslySetInnerHTML={{
                 __html:
                   i18n.language === "vi"
-                    ? pageData?.content_vn
-                    : pageData?.content_en,
+                    ? pageDataHero?.content_vn
+                    : pageDataHero?.content_en,
               }}
             />
-            {/* <p className="uppercase tracking-loose w-full">
-              {t("Đầu tư Chia sẻ Cộng đồng")}
-            </p>
-            <h1 className="my-4 text-5xl font-bold leading-tight">
-              {t("The power of United")}
-            </h1>
-            <p className="leading-normal text-2xl mb-8">
-              {t("Đầu tư vào Tương lai của bạn cùng với Lend A Hand")}
-            </p>
-            <p>
-              {t(
-                "Chào mừng bạn đến với Lend a Hand, Hệ thống đột phá để tích lũy tài sản thông qua sự hỗ trợ đồng lòng."
-              )}
-            </p>
-            <br></br>
-            <p>
-              {t(
-                "Với Lend a Hand, bạn có thể tham gia vào thành viên Land A Hand, một cộng đồng của những thành viên có chung mục tiêu giúp đỡ nhau phát triển tài chính. Là thành viên chủ động trên nền tảng của chúng tôi, bạn có thể tham gia vào một mạng lưới những người hào phóng, hỗ trợ lẫn nhau trong những thời điểm cần thiết."
-              )}
-            </p>
-            <br></br>
-            <p>
-              {t(
-                "Cho dù bạn đang đối mặt với một khoản chi không mong đợi, muốn đầu tư vào dự án kinh doanh mới, hay đơn giản chỉ muốn tiết kiệm cho tương lai, Lend a Hand có thể giúp bạn. Các thành viên của chúng tôi cùng nhau góp vốn và cung cấp sự hỗ trợ tài chính cho nhau, tạo nên một vòng xoay tích luỹ tài sản."
-              )}
-            </p> */}
           </div>
           <div className="w-full md:w-3/5 py-6 text-center">
             <div className="w-full md:w-4/5 z-50">
@@ -138,7 +144,7 @@ const HomePageContent = () => {
           <div className="w-full mb-4">
             <div className="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
           </div>
-          <div className="w-full md:w-1/3 p-6 flex flex-col flex-grow flex-shrink">
+          {/* <div className="w-full md:w-1/3 p-6 flex flex-col flex-grow flex-shrink">
             <div className="flex-1 bg-white rounded-t rounded-b-none overflow-hidden shadow">
               <Link
                 to="/login"
@@ -203,7 +209,16 @@ const HomePageContent = () => {
                 </button>
               </div>
             </div>
-          </div>
+          </div> */}
+          <div
+            className="text-gray-800"
+            dangerouslySetInnerHTML={{
+              __html:
+                i18n.language === "vi"
+                  ? pageDataFeature?.content_vn
+                  : pageDataFeature?.content_en,
+            }}
+          />
         </div>
       </section>
       <svg
@@ -244,7 +259,15 @@ const HomePageContent = () => {
           <div className="h-1 mx-auto bg-white w-1/6 opacity-25 my-0 py-0 rounded-t"></div>
         </div>
         <h3 className="max-w-xl text-center my-4 mx-auto text-xl leading-tight">
-          {t("actionTitle")}
+          {/* {t("actionTitle")} */}
+          <div
+            dangerouslySetInnerHTML={{
+              __html:
+                i18n.language === "vi"
+                  ? pageDataCall?.content_vn
+                  : pageDataCall?.content_en,
+            }}
+          />
         </h3>
         <button className="mx-auto lg:mx-0 hover:underline bg-white text-gray-800 font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
           Action!

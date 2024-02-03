@@ -38,6 +38,8 @@ const PermissionsCreatePage = lazy(() =>
   import("@/pages/Admin/Permissions/Create")
 );
 const AdminPage = lazy(() => import("@/pages/Admin/Admin"));
+const AdminDetailPage = lazy(() => import("@/pages/Admin/Admin/Detail"));
+const CreateAdminPage = lazy(() => import("@/pages/Admin/Admin/Create"));
 
 const routes = [
   {
@@ -166,6 +168,14 @@ const routes = [
   {
     path: "/admin",
     component: AdminPage,
+  },
+  {
+    path: "/create-admin",
+    component: CreateAdminPage,
+  },
+  {
+    path: "/admin/:id",
+    component: AdminDetailPage,
   },
 ];
 

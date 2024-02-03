@@ -1,175 +1,230 @@
 import { useCallback, useEffect, useState } from "react";
 
-import Page from "@/api/Page";
 import Permissions from "@/api/Permissions";
 import Loading from "@/components/Loading";
+import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import Admin from "@/api/Admin";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 import { useHistory } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
-import permissionsGroup from "../../../../constants/permissionsGroup";
+import "./index.css";
 
-const PermissionsCreatePage = () => {
-  const { t } = useTranslation();
+const CreateAdmin = () => {
   const history = useHistory();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
-  const [pages, setPages] = useState([]);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
-  const [pagePers, setPagePers] = useState([]);
-  const [role, setRole] = useState("");
-  const [showErrorRole, setShowErrorRole] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [errorPhone, setErrPhone] = useState(false);
+  const [permissionsList, setPermissionsList] = useState([]);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
   useEffect(() => {
     (async () => {
-      setLoading(true);
-      await Page.getAllPages()
+      await Permissions.getAllPermissions()
         .then((response) => {
-          const { pages } = response.data;
-          setPages(pages);
           setLoading(false);
+          setPermissionsList(response.data.permissions);
         })
         .catch((error) => {
           let message =
-            error.response && error.response.data.error
-              ? error.response.data.error
+            error.response && error.response.data.message
+              ? error.response.data.message
               : error.message;
           toast.error(t(message));
-          setLoading(false);
         });
     })();
   }, []);
 
-  const handleChangeAction = useCallback(
-    (pageId, action) => {
-      const newPagePers = [...pagePers];
-
-      const pageIndex = newPagePers.findIndex(
-        (ele) => ele.page?._id === pageId
-      );
-
-      if (pageIndex > -1) {
-        const changingPage = newPagePers[pageIndex];
-        if (changingPage.actions.includes(action)) {
-          const updatedActions = changingPage.actions.filter(
-            (ele) => ele != action
-          );
-          changingPage.actions = updatedActions;
-        } else {
-          changingPage.actions.push(action);
-        }
-        newPagePers.splice(pageIndex, 1, changingPage);
-        setPagePers(newPagePers);
-      } else {
-        newPagePers.push({ page: { _id: pageId }, actions: [action] });
-        setPagePers(newPagePers);
+  const onSubmit = useCallback(
+    async (values) => {
+      if (phone === "") {
+        setErrPhone(true);
+        return;
       }
-    },
-    [pagePers]
-  );
 
-  const handleSubmit = useCallback(async () => {
-    if (!role || role === "") {
-      setShowErrorRole(true);
-      return;
-    }
-    setLoadingUpdate(true);
-    const body = {
-      role,
-      pagePermissions: pagePers,
-    };
-    await Permissions.createPermission(body)
-      .then((response) => {
-        toast.success(t(response.data.message));
-        setLoadingUpdate(false);
-        history.push("/admin/permissions");
-      })
-      .catch((error) => {
-        let message =
-          error.response && error.response.data.error
-            ? error.response.data.error
-            : error.message;
-        toast.error(t(message));
-        setLoadingUpdate(false);
-      });
-  }, [pagePers, role]);
+      values.phone = phone;
+      console.log({ values });
+      setLoadingUpdate(true);
+      await Admin.createAdmin(values)
+        .then((response) => {
+          setLoadingUpdate(false);
+          toast.success(t(response.data.message));
+          history.push("/admin/admin");
+        })
+        .catch((error) => {
+          let message =
+            error.response && error.response.data.message
+              ? error.response.data.message
+              : error.message;
+          toast.error(t(message));
+          setLoadingUpdate(false);
+        });
+    },
+    [phone]
+  );
 
   return (
     <div>
       <ToastContainer />
-      <div className="container">
-        <div className="mb-10">
-          <div className="flex gap-4">
-            <div className="font-bold text-2xl mt-2">Role - </div>
-            <div>
-              <input
-                type="text"
-                defaultValue={role}
-                onChange={(e) => {
-                  setShowErrorRole(false);
-                  setRole(e.target.value);
-                }}
-                className="p-2 rounded-md border border-gray-500 font-bold text-2xl"
-              />
-              {showErrorRole && (
-                <p className="error-message-text">{t("roleRequire")}</p>
-              )}
-            </div>
+      {!loading && (
+        <div className="container mx-auto p-5">
+          <div className="flex justify-between items-center mb-10">
+            <h1 className="text-2xl font-bold">{t("createAdmin")}</h1>
+            <button
+              onClick={() => history.push("/admin/admin")}
+              className="px-8 py-4 flex text-xs justify-center items-center hover:underline gradient text-white font-bold rounded-full shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+            >
+              {t("listAdmin")}
+            </button>
           </div>
-        </div>
-        <div className="flex flex-col gap-10">
-          {permissionsGroup.map((group) => (
-            <div key={group.title}>
-              <h1 className="font-bold text-xl mb-4 underline">
-                {t(group.title)}
-              </h1>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                {!loading & (pages.length > 0) &&
-                  pages
-                    .filter((ele) => ele.group === group.name)
-                    .map((page) => (
-                      <div
-                        key={page._id}
-                        className="mb-8 border p-3 rounded-lg"
-                      >
-                        <p className="font-medium mb-2">{t(page.pageName)}</p>
-                        {page.actions.map((action) => (
-                          <button
-                            className={`w-full flex items-center border px-4 py-2 mb-2 rounded-md focus:ring-blue-500 ${
-                              pagePers
-                                .find((ele) => ele.page._id === page._id)
-                                ?.actions.includes(action)
-                                ? "border-blue-500"
-                                : ""
-                            }`}
-                            onClick={() => handleChangeAction(page._id, action)}
-                            key={action}
-                          >
-                            {t(action)}
-                          </button>
-                        ))}
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="md:flex no-wrap md:-mx-2 "
+          >
+            <div className="w-full">
+              <div className="bg-white p-6 shadow-md rounded-sm border-t-4 border-primary">
+                <div className="text-gray-700">
+                  <div className="grid grid-cols-1 text-sm">
+                    <div className="grid lg:grid-cols-2 grid-cols-1">
+                      <div className="px-4 py-2 font-semibold">
+                        {t("user name")}
                       </div>
-                    ))}
+                      <div className="px-4">
+                        <input
+                          className="w-full px-4 py-1.5 rounded-md border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                          {...register("userId", {
+                            required: t("User ID is required"),
+                          })}
+                          autoComplete="off"
+                        />
+                        <p className="error-message-text">
+                          {errors.userId?.message}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="grid lg:grid-cols-2 grid-cols-1">
+                      <div className="px-4 py-2 font-semibold">Email</div>
+                      <div className="px-4">
+                        <input
+                          className="w-full px-4 py-1.5 rounded-md border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                          {...register("email", {
+                            required: t("Email is required"),
+                          })}
+                          autoComplete="off"
+                        />
+                        <p className="error-message-text">
+                          {errors.email?.message}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="grid lg:grid-cols-2 grid-cols-1">
+                      <div className="px-4 py-2 font-semibold">
+                        {t("phone")}
+                      </div>
+                      <div className="px-4 py-2">
+                        <PhoneInput
+                          defaultCountry="VN"
+                          placeholder={t("phone")}
+                          value={phone}
+                          onChange={setPhone}
+                        />
+                        <p className="error-message-text">
+                          {errorPhone && t("Phone is required")}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="grid lg:grid-cols-2 grid-cols-1">
+                      <div className="px-4 py-2 font-semibold">
+                        {t("walletAddress")}
+                      </div>
+                      <div className="px-4">
+                        <input
+                          className="w-full px-4 py-1.5 rounded-md border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                          {...register("walletAddress", {
+                            required: t("Wallet address is required"),
+                            pattern: {
+                              value: /^0x[a-fA-F0-9]{40}$/g,
+                              message: t(
+                                "Please enter the correct wallet format"
+                              ),
+                            },
+                          })}
+                          autoComplete="off"
+                        />
+                        <p className="error-message-text">
+                          {errors.walletAddress?.message}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="grid lg:grid-cols-2 grid-cols-1">
+                      <div className="px-4 py-2 font-semibold">{t("role")}</div>
+                      <div className="px-4">
+                        <select
+                          className="w-full px-4 py-1.5 rounded-md border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                          {...register("role", {
+                            required: t("role is required"),
+                          })}
+                        >
+                          {permissionsList.length > 0 &&
+                            permissionsList.map((p) => (
+                              <option key={p.role} value={p.role}>
+                                {p.role}
+                              </option>
+                            ))}
+                        </select>
+                        <p className="error-message-text">
+                          {errors.role?.message}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="grid lg:grid-cols-2 grid-cols-1">
+                      <div className="px-4 py-2 font-semibold">
+                        {t("password")}
+                      </div>
+                      <div className="px-4">
+                        <input
+                          className="w-full px-4 py-1.5 rounded-md border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                          {...register("password", {
+                            pattern: {
+                              value: /^(?=.*?[a-z])(?=.*?[0-9]).{8,}$/,
+                              message: t(
+                                "Password must contain at least 8 characters and a number"
+                              ),
+                            },
+                          })}
+                          autoComplete="off"
+                        />
+                        <p className="error-message-text">
+                          {errors.password?.message}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loadingUpdate}
+                  className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                >
+                  {loadingUpdate && <Loading />}
+                  {t("create")}
+                </button>
               </div>
             </div>
-          ))}
+          </form>
         </div>
-        <div>
-          <button
-            onClick={handleSubmit}
-            className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-          >
-            {loadingUpdate && <Loading />}
-            {t("update")}
-          </button>
-          <button
-            onClick={() => history.push("/admin/permissions")}
-            className="w-full flex justify-center items-center hover:underline border font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-          >
-            {t("cancel")}
-          </button>
-        </div>
-      </div>
+      )}
     </div>
   );
 };
 
-export default PermissionsCreatePage;
+export default CreateAdmin;

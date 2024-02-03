@@ -27,7 +27,7 @@ const getPageDetailsPageName = asyncHandler(async (req, res) => {
   const page = await PagePreview.findOne({ pageName });
 
   res.json({
-    page,
+    result: page,
   });
 });
 

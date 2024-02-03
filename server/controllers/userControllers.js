@@ -836,7 +836,7 @@ const getAllDeletedUsers = asyncHandler(async (req, res) => {
 const getAllUsersForExport = asyncHandler(async (req, res) => {
   let fromDate, toDate;
   const { limit, page } = req.body;
-  let match = { isAdmin: false };
+  let match = { role: "user" };
 
   if (req.body.fromDate) {
     fromDate = req.body.fromDate.split("T")[0];
@@ -1330,6 +1330,7 @@ const adminCreateUser = asyncHandler(async (req, res) => {
       tier3Time: tier === 3 ? new Date() : null,
       tier4Time: tier === 4 ? new Date() : null,
       tier5Time: tier === 5 ? new Date() : null,
+      role: "user",
     });
 
     await checkUnPayUserOnTierUser(tier);
@@ -1617,10 +1618,6 @@ const createAdmin = asyncHandler(async (req, res) => {
     let message = "Dupplicate phone";
     res.status(400);
     throw new Error(message);
-  } else if (userExistsIdCode) {
-    let message = "duplicateInfoIdCode";
-    res.status(400);
-    throw new Error(message);
   } else if (userExistsWalletAddress) {
     let message = "Dupplicate wallet address";
     res.status(400);
@@ -1641,6 +1638,7 @@ const createAdmin = asyncHandler(async (req, res) => {
       countPay: 100,
       createBy: "ADMIN",
       status: "APPROVED",
+      isConfirmed: true,
       role,
     });
 
@@ -1696,36 +1694,44 @@ const getListAdmin = asyncHandler(async (req, res) => {
 });
 
 const updateAdmin = asyncHandler(async (req, res) => {
-  const { walletAddress, email, phone, role } = req.body;
+  console.log({ data: req.body });
+  const { walletAddress, email, phone, role, password } = req.body;
   const user = await User.findOne({ _id: req.params.id }).select("-password");
 
-  const userHavePhone = await User.find({
-    $and: [{ phone }, { email: { $ne: user.email } }],
-  });
+  if (phone) {
+    const userHavePhone = await User.find({
+      $and: [{ phone }],
+    });
+    if (userHavePhone.length >= 1) {
+      res.status(400).json({ error: "duplicateInfo" });
+    }
+  }
 
-  const userHaveWalletAddress = await User.find({
-    $and: [{ walletAddress: { $in: [walletAddress] } }],
-  });
+  if (walletAddress) {
+    const userHaveWalletAddress = await User.find({
+      $and: [{ walletAddress: { $in: [walletAddress] } }],
+    });
+    if (userHaveWalletAddress.length > 1) {
+      res.status(400).json({ error: "duplicateInfo" });
+    }
+  }
 
-  const userHaveEmail = await User.find({
-    $and: [{ email }],
-  });
-
-  if (
-    userHavePhone.length >= 1 ||
-    userHaveWalletAddress.length > 1 ||
-    userHaveEmail.length > 1
-  ) {
-    res.status(400).json({ error: "duplicateInfo" });
+  if (email) {
+    const userHaveEmail = await User.find({
+      $and: [{ email }],
+    });
+    if (userHaveEmail.length > 1) {
+      res.status(400).json({ error: "duplicateInfo" });
+    }
   }
 
   if (user) {
-    user.phone = phone || user.phone;
-    user.email = email || user.email;
-    user.role = role || user.role;
-    user.walletAddress =
-      [walletAddress, ...user.walletAddress] || user.walletAddress;
-
+    if (phone) user.phone = phone;
+    if (email) user.email = email;
+    if (role) user.role = role;
+    if (walletAddress)
+      user.walletAddress = [walletAddress, ...user.walletAddress];
+    if (password) user.password = password;
     await user.save();
 
     res.json({
@@ -1751,9 +1757,21 @@ const getAdminById = asyncHandler(async (req, res) => {
 
   const admin = await User.findById(id);
 
-  res.json({
-    admin,
-  });
+  if (admin) {
+    const { userId, phone, email, _id, walletAddress, role } = admin;
+    res.json({
+      admin: {
+        userId,
+        phone,
+        email,
+        _id,
+        walletAddress: walletAddress[0],
+        role,
+      },
+    });
+  } else {
+    res.status(400).json({ error: "Admin not found" });
+  }
 });
 
 export {

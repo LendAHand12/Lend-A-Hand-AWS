@@ -1,7 +1,7 @@
 import API from "./API";
 import { URL_API_PERMISSIONS } from "./URL";
 
-const Posts = {
+const Permission = {
   getAllPermissions: () => {
     return API.get(`${URL_API_PERMISSIONS}`);
   },
@@ -16,4 +16,4 @@ const Posts = {
   },
 };
 
-export default Posts;
+export default Permission;
