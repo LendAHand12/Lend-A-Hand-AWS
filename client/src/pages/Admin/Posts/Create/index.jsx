@@ -8,8 +8,10 @@ import cmsCategory from "@/constants/cmsCategory";
 import UploadFile from "@/components/UploadFile";
 import Posts from "@/api/Posts";
 import { useHistory } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const CreatePostPage = () => {
+  const { userInfo } = useSelector((state) => state.auth);
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const history = useHistory();
@@ -26,26 +28,6 @@ const CreatePostPage = () => {
 
   const watchShowType = watch("type");
 
-  // useEffect(() => {
-  //   (async () => {
-  //     await Page.getPageDetailByPageName(pageName)
-  //       .then((response) => {
-  //         console.log({ data: response.data });
-  //         setPageData(response.data.page);
-  //         setFile(response.data.page.images);
-  //         setLoading(false);
-  //       })
-  //       .catch((error) => {
-  //         let message =
-  //           error.response && error.response.data.message
-  //             ? error.response.data.message
-  //             : error.message;
-  //         toast.error(t(message));
-  //         setLoading(false);
-  //       });
-  //   })();
-  // }, []);
-
   const onSubmit = async (values) => {
     var formData = new FormData();
 
@@ -57,11 +39,12 @@ const CreatePostPage = () => {
     formData.append("text_en", values.text_en ? values.text_en : "");
     formData.append("file_vn", values.file_vn);
     formData.append("file_en", values.file_en);
-
+    setLoading(true);
     await Posts.createPost(formData)
       .then((response) => {
         const { message } = response.data;
         toast.success(t(message));
+        setLoading(false);
         history.push("/admin/posts");
       })
       .catch((error) => {
@@ -70,6 +53,7 @@ const CreatePostPage = () => {
             ? error.response.data.error
             : error.message;
         toast.error(t(message));
+        setLoading(false);
       });
   };
 
@@ -96,137 +80,133 @@ const CreatePostPage = () => {
             </button>
           </div>
         </div>
-        {loading ? (
-          <Loading />
-        ) : (
-          <div className="mt-10">
-            <div className="mb-10">
-              <span className="mb-2 block text-lg font-semibold text-gray-900">
-                Tên bài viết tiếng việt :
-              </span>
-              <div>
-                <input
-                  id="title_vn"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
-                  {...register("title_vn", {
-                    required: t("required"),
-                  })}
-                ></input>
-                <p className="error-message-text">{errors.title_vn?.message}</p>
-              </div>
+        <div className="mt-10">
+          <div className="mb-10">
+            <span className="mb-2 block text-lg font-semibold text-gray-900">
+              Tên bài viết tiếng việt :
+            </span>
+            <div>
+              <input
+                id="title_vn"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                {...register("title_vn", {
+                  required: t("required"),
+                })}
+              ></input>
+              <p className="error-message-text">{errors.title_vn?.message}</p>
             </div>
-            <div className="mb-10">
-              <span className="mb-2 block text-lg font-semibold text-gray-900">
-                Tên bài viết tiếng anh :
-              </span>
-              <div>
-                <input
-                  id="title_en"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
-                  {...register("title_en", {
-                    required: t("required"),
-                  })}
-                ></input>
-                <p className="error-message-text">{errors.title_en?.message}</p>
-              </div>
+          </div>
+          <div className="mb-10">
+            <span className="mb-2 block text-lg font-semibold text-gray-900">
+              Tên bài viết tiếng anh :
+            </span>
+            <div>
+              <input
+                id="title_en"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                {...register("title_en", {
+                  required: t("required"),
+                })}
+              ></input>
+              <p className="error-message-text">{errors.title_en?.message}</p>
             </div>
-            <div className="mb-10">
-              <span className="mb-2 block text-lg font-semibold text-gray-900">
-                Loại bài viết :
-              </span>
-              <div>
-                <select
-                  id="type"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
-                  {...register("type", {
-                    required: t("required"),
-                  })}
-                >
-                  <option value="text">Text</option>
-                  <option value="file">File</option>
-                </select>
-                <p className="error-message-text">{errors.type?.message}</p>
-              </div>
+          </div>
+          <div className="mb-10">
+            <span className="mb-2 block text-lg font-semibold text-gray-900">
+              Loại bài viết :
+            </span>
+            <div>
+              <select
+                id="type"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                {...register("type", {
+                  required: t("required"),
+                })}
+              >
+                <option value="text">Text</option>
+                <option value="file">File</option>
+              </select>
+              <p className="error-message-text">{errors.type?.message}</p>
             </div>
-            <div className="mb-10">
-              <span className="mb-2 block text-lg font-semibold text-gray-900">
-                Phân loại :
-              </span>
-              <div>
-                <select
-                  id="category"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
-                  {...register("category", {
-                    required: t("required"),
-                  })}
-                >
-                  {cmsCategory.map((ele) => (
-                    <option key={ele.category} value={ele.category}>
-                      {t(ele.title)}
-                    </option>
-                  ))}
-                </select>
-                <p className="error-message-text">{errors.category?.message}</p>
-              </div>
+          </div>
+          <div className="mb-10">
+            <span className="mb-2 block text-lg font-semibold text-gray-900">
+              Phân loại :
+            </span>
+            <div>
+              <select
+                id="category"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                {...register("category", {
+                  required: t("required"),
+                })}
+              >
+                {cmsCategory.map((ele) => (
+                  <option key={ele.category} value={ele.category}>
+                    {t(ele.title)}
+                  </option>
+                ))}
+              </select>
+              <p className="error-message-text">{errors.category?.message}</p>
             </div>
-            {watchShowType === "file" ? (
-              <>
-                <div className="mb-10">
-                  <span className="mb-2 block text-lg font-semibold text-gray-900">
-                    File tiếng Việt :
-                  </span>
-                  <UploadFile
-                    onFileChange={(files) => setValue("file_vn", files[0])}
-                  />
-                </div>
-                <div className="mb-10">
-                  <span className="mb-2 block text-lg font-semibold text-gray-900">
-                    File tiếng Anh :
-                  </span>
-                  <UploadFile
-                    onFileChange={(files) => setValue("file_en", files[0])}
-                  />
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="mb-10">
-                  <span className="mb-2 block text-lg font-semibold text-gray-900">
-                    Nội dung tiếng Việt :
-                  </span>
-                  <TextEditor
-                    onChange={(content) => {
-                      setValue("text_vn", content);
-                    }}
-                  />
-                  <p className="error-message-text">
-                    {errors.text_vn?.message}
-                  </p>
-                </div>
-                <div className="mb-10">
-                  <span className="mb-2 block text-lg font-semibold text-gray-900">
-                    Nội dung tiếng Anh :
-                  </span>
-                  <TextEditor
-                    onChange={(content) => {
-                      setValue("text_en", content);
-                    }}
-                  />
-                  <p className="error-message-text">
-                    {errors.text_en?.message}
-                  </p>
-                </div>
-              </>
-            )}
+          </div>
+          {watchShowType === "file" ? (
+            <>
+              <div className="mb-10">
+                <span className="mb-2 block text-lg font-semibold text-gray-900">
+                  File tiếng Việt :
+                </span>
+                <UploadFile
+                  onFileChange={(files) => setValue("file_vn", files[0])}
+                />
+              </div>
+              <div className="mb-10">
+                <span className="mb-2 block text-lg font-semibold text-gray-900">
+                  File tiếng Anh :
+                </span>
+                <UploadFile
+                  onFileChange={(files) => setValue("file_en", files[0])}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="mb-10">
+                <span className="mb-2 block text-lg font-semibold text-gray-900">
+                  Nội dung tiếng Việt :
+                </span>
+                <TextEditor
+                  onChange={(content) => {
+                    setValue("text_vn", content);
+                  }}
+                />
+                <p className="error-message-text">{errors.text_vn?.message}</p>
+              </div>
+              <div className="mb-10">
+                <span className="mb-2 block text-lg font-semibold text-gray-900">
+                  Nội dung tiếng Anh :
+                </span>
+                <TextEditor
+                  onChange={(content) => {
+                    setValue("text_en", content);
+                  }}
+                />
+                <p className="error-message-text">{errors.text_en?.message}</p>
+              </div>
+            </>
+          )}
 
+          {userInfo?.permissions
+            .find((p) => p.page.pageName === "admin-posts-create")
+            ?.actions.includes("create") && (
             <button
               type="submit"
               className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
             >
-              {t("update")}
+              {loading ? <Loading /> : t("update")}
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </form>
     </>
   );

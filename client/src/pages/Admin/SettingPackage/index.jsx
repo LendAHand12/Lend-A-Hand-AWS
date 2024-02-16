@@ -5,9 +5,11 @@ import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import Switch from "react-switch";
+import { useSelector } from "react-redux";
 
 const SettingPage = () => {
   const { t } = useTranslation();
+  const { userInfo } = useSelector((state) => state.auth);
   const {
     register,
     handleSubmit,
@@ -103,13 +105,18 @@ const SettingPage = () => {
                     />
                   </div>
                 ))}
-                <button
-                  type="submit"
-                  className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-                >
-                  {loading && <Loading />}
-                  {t("confirm")}
-                </button>
+
+                {userInfo?.permissions
+                  .find((p) => p.page.pageName === "admin-setting-package")
+                  ?.actions.includes("update") && (
+                  <button
+                    type="submit"
+                    className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                  >
+                    {loading && <Loading />}
+                    {t("confirm")}
+                  </button>
+                )}
               </form>
             </div>
           </div>

@@ -7,8 +7,10 @@ import { exportToExcel } from "@/utils/export";
 import "./index.less";
 import { Controller, useForm } from "react-hook-form";
 import DatePicker from "react-datepicker";
+import { useSelector } from "react-redux";
 
 const ExportPaymentPage = () => {
+  const { userInfo } = useSelector((state) => state.auth);
   const { t } = useTranslation();
   const {
     handleSubmit,
@@ -210,12 +212,16 @@ const ExportPaymentPage = () => {
               {t("From date must be less than to date")}
             </p>
           )}
-          <button
-            type="submit"
-            className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-          >
-            {t("export users list")}
-          </button>
+          {userInfo?.permissions
+            .find((p) => p.page.pageName === "admin-export-user")
+            ?.actions.includes("export") && (
+            <button
+              type="submit"
+              className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+            >
+              {t("export users list")}
+            </button>
+          )}
         </form>
       </div>
     </>

@@ -8,8 +8,10 @@ import cmsCategory from "@/constants/cmsCategory";
 import UploadFile from "@/components/UploadFile";
 import Posts from "@/api/Posts";
 import { useHistory, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const EditPostPage = () => {
+  const { userInfo } = useSelector((state) => state.auth);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const { t } = useTranslation();
@@ -253,23 +255,30 @@ const EditPostPage = () => {
                 </div>
               </>
             )}
-
-            <button
-              type="submit"
-              className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-            >
-              {t("update")}
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                handleDelete();
-              }}
-              className="w-full flex justify-center items-center hover:underline bg-red-500 text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-            >
-              {loadingDelete && <Loading />}
-              {t("delete")}
-            </button>
+            {userInfo?.permissions
+              .find((p) => p.page.pageName === "admin-posts-edit")
+              ?.actions.includes("update") && (
+              <button
+                type="submit"
+                className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+              >
+                {t("update")}
+              </button>
+            )}
+            {userInfo?.permissions
+              .find((p) => p.page.pageName === "admin-posts-edit")
+              ?.actions.includes("delete") && (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleDelete();
+                }}
+                className="w-full flex justify-center items-center hover:underline bg-red-500 text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+              >
+                {loadingDelete && <Loading />}
+                {t("delete")}
+              </button>
+            )}
           </div>
         )}
       </form>

@@ -8,7 +8,9 @@ const Posts = {
     );
   },
   createPost: (body) => {
-    return API.post(`${URL_API_POSTS}`, body);
+    return API.post(`${URL_API_POSTS}`, body, {
+      customContentType: "multipart/form-data",
+    });
   },
   updatePost: (id, body) => {
     return API.put(`${URL_API_POSTS}/${id}`, body);

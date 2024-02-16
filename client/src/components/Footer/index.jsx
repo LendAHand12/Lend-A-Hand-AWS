@@ -94,7 +94,7 @@ const Footer = () => {
               </li>
               <li className="mt-2 inline-block mr-2 md:block md:mr-0">
                 <a
-                  href="/about"
+                  href="/aboutUs"
                   className="no-underline hover:underline text-gray-800 hover:text-primary"
                 >
                   {t("aboutUs")}
@@ -102,7 +102,7 @@ const Footer = () => {
               </li>
               <li className="mt-2 inline-block mr-2 md:block md:mr-0">
                 <a
-                  href="/member"
+                  href="/ourTeam"
                   className="no-underline hover:underline text-gray-800 hover:text-primary"
                 >
                   {t("ourTeam")}
