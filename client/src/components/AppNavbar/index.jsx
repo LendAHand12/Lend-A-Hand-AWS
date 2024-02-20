@@ -35,19 +35,19 @@ const AppNav = () => {
       }
     });
   }
-  const { address, isConnected } = useAccount();
-  const connector = new MetaMaskConnector({
-    chains: [bsc],
-  });
-  const { connect } = useConnect({
-    connector,
-  });
+  // const { address, isConnected } = useAccount();
+  // const connector = new MetaMaskConnector({
+  //   chains: [bsc],
+  // });
+  // const { connect } = useConnect({
+  //   connector,
+  // });
 
   const onClickOutside = () => setShowMenu(false);
 
-  useEffect(() => {
-    connect();
-  }, []);
+  // useEffect(() => {
+  //   connect();
+  // }, []);
 
   useLayoutEffect(() => {
     const handleScroll = () => {
@@ -81,13 +81,13 @@ const AppNav = () => {
     setShowMenu(false);
   }, [pathname]);
 
-  const connectWallet = () => {
-    if (!connector.ready) {
-      toast.error(t("Please install metamask"));
-    } else {
-      connect();
-    }
-  };
+  // const connectWallet = () => {
+  //   if (!connector.ready) {
+  //     toast.error(t("Please install metamask"));
+  //   } else {
+  //     connect();
+  //   }
+  // };
 
   return (
     <>
@@ -175,7 +175,7 @@ const AppNav = () => {
                   </li>
                 ))}
 
-              {auth.accessToken &&
+              {/* {auth.accessToken &&
                 (auth.userInfo.status === "APPROVED" ||
                   auth.userInfo.status === "LOCKED") &&
                 (isConnected ? (
@@ -215,7 +215,8 @@ const AppNav = () => {
                       Connect
                     </button>
                   </>
-                ))}
+                ))
+                } */}
               <li className="">
                 <select
                   className="bg-inherit px-4 py-2 focus:outline-none active:outline-none"
