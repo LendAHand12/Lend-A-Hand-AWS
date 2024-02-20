@@ -19,47 +19,6 @@ import Tree from "../models/treeModel.js";
 
 const getPaymentInfo = asyncHandler(async (req, res) => {
   const { user } = req;
-  const { continueWithBuyPackageB } = req.query;
-  const wallets = await Wallet.find();
-
-  const registerWallet = wallets.find((ele) => ele.type === "REGISTER");
-  const adminWallet = wallets.find((ele) => ele.type === "ADMIN");
-  const holdWallet1 = wallets.find((ele) => ele.type === "HOLD1");
-  const holdWallet2 = wallets.find((ele) => ele.type === "HOLD2");
-  const holdWallet3 = wallets.find((ele) => ele.type === "HOLD3");
-  const holdWallet4 = wallets.find((ele) => ele.type === "HOLD4");
-  const holdWallet5 = wallets.find((ele) => ele.type === "HOLD5");
-
-  const holdWallet = {
-    1: holdWallet1,
-    2: holdWallet2,
-    3: holdWallet3,
-    4: holdWallet4,
-    5: holdWallet5,
-  };
-
-  if (user.tier === 1) {
-    if (
-      continueWithBuyPackageB === "true" &&
-      user.buyPackage === "B" &&
-      user.countPay === 7
-    ) {
-      user.continueWithBuyPackageB = true;
-      await user.save();
-    } else if (
-      continueWithBuyPackageB === "false" &&
-      user.buyPackage === "B" &&
-      user.countPay === 7
-    ) {
-      user.continueWithBuyPackageB = false;
-      await user.save();
-    }
-  }
-
-  let haveParentNotPayEnough = false;
-  let haveRefNotPayEnough = false;
-  let parentWithCountPay;
-  let parentUser;
 
   if (user) {
     if (user.countPay === 13) {
@@ -69,46 +28,53 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         throw new Error("You are not eligible for next step payment");
       }
     }
-    const refUser = await getRefParentUser(user._id, user.tier);
-    if (user.countPay === 0 && user.tier === 1) {
-      parentUser = refUser;
-      parentWithCountPay = refUser;
-    } else {
-      parentUser = await getParentUser(user._id, user.tier);
-      let levelOfRefUser = await getLevelOfRefUser(
-        user.id,
-        user.tier,
-        refUser._id
-      );
-      let withCountPay = user.countPay;
 
-      if (levelOfRefUser > user.countPay) {
-        if (user.countPay <= 1) {
-          withCountPay = 0;
-        } else {
-          withCountPay = levelOfRefUser - user.countPay;
-        }
-      } else if (levelOfRefUser === user.countPay) {
-        withCountPay = user.countPay;
-      }
-      parentWithCountPay = await getParentWithCountPay(
-        user.id,
-        withCountPay,
-        user.tier,
-        refUser._id
-      );
-    }
+    const wallets = await Wallet.find();
 
-    if (!parentUser || !refUser) {
-      res.status(404);
-      throw new Error("Parent not found");
-    }
+    const registerWallet = wallets.find((ele) => ele.type === "REGISTER");
+    const adminWallet = wallets.find((ele) => ele.type === "ADMIN");
+    const adminTierWallets = await getAdminWallets();
+
+    const payments = [];
+    const paymentIds = [];
+
+    const refUser = await getRefParentUser(user.id, user.tier);
 
     let registerFee = user.countPay === 0 ? 7 * user.tier : 0;
     let directCommissionWallet = "";
     let directCommissionFee = 5 * user.tier;
-    let referralCommissionWallet = "";
     let referralCommissionFee = 10 * user.tier;
+
+    // delete pending trans
+    await Transaction.deleteMany({
+      $and: [
+        {
+          status: "PENDING",
+        },
+        { userId: user.id },
+      ],
+    });
+
+    if (user.countPay === 0) {
+      payments.push({
+        address: registerWallet.address,
+        amount: registerFee,
+      });
+      const transactionRegister = await Transaction.create({
+        userId: user.id,
+        amount: registerFee,
+        userCountPay: user.countPay,
+        address_ref: registerWallet.address,
+        address_from: user.walletAddress[0],
+        address_to: registerWallet.address,
+        tier: user.tier,
+        buyPackage: user.buyPackage,
+        hash: "",
+        type: "REGISTER",
+        status: "PENDING",
+      });
+      paymentIds.push(transactionRegister._id);
+    }
 
     if (user.tier >= 2 || user.buyPackage === "A") {
       if (user.countPay === 0) {
@@ -231,472 +197,759 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       }
     }
 
-    // delete pending trans
-    await Transaction.deleteMany({
-      $and: [
-        {
-          status: "PENDING",
-        },
-        { userId: user.id },
-      ],
-    });
+    const ancestors = await findAncestors(user.id, 13, user.tier);
 
-    if (user.countPay === 0) {
-      if (user.tier >= 2) {
-        if (refUser.closeLah) {
-          directCommissionWallet = holdWallet[user.tier].address;
-          haveRefNotPayEnough = true;
-        } else if (
-          refUser.openLah ||
-          refUser.adminChangeTier ||
-          refUser.createBy === "ADMIN"
-        ) {
-          directCommissionWallet = refUser.walletAddress[0];
-        } else {
-          if (
-            refUser.status === "LOCKED" ||
-            refUser.tier < user.tier ||
-            (refUser.tier === user.tier && refUser.countPay < user.countPay + 1)
-          ) {
-            directCommissionWallet = holdWallet[user.tier].address;
-            haveRefNotPayEnough = true;
-          } else {
-            directCommissionWallet = refUser.walletAddress[0];
-          }
-        }
-      }
-      if (parentUser.closeLah) {
-        referralCommissionWallet = holdWallet[user.tier].address;
-        haveParentNotPayEnough = true;
-      } else if (
-        parentUser.openLah ||
-        parentUser.adminChangeTier ||
-        parentUser.createBy === "ADMIN"
-      ) {
-        referralCommissionWallet = parentUser.walletAddress[0];
-      } else {
-        if (
-          parentUser.status === "LOCKED" ||
-          parentUser.errLahCode !== "" ||
-          parentUser.tier < user.tier ||
-          (parentUser.tier === user.tier &&
-            parentUser.countPay < user.countPay + 1)
-        ) {
-          referralCommissionWallet = holdWallet[user.tier].address;
-          haveParentNotPayEnough = true;
-        } else {
-          referralCommissionWallet = parentUser.walletAddress[0];
-        }
-      }
-    } else {
-      if (refUser.closeLah) {
-        directCommissionWallet = holdWallet[user.tier].address;
-        haveRefNotPayEnough = true;
-      } else if (
-        refUser.openLah ||
-        refUser.adminChangeTier ||
-        refUser.createBy === "ADMIN"
-      ) {
-        directCommissionWallet = refUser.walletAddress[0];
-      } else {
-        if (
-          refUser.status === "LOCKED" ||
-          refUser.tier < user.tier ||
-          (refUser.tier === user.tier && refUser.countPay < user.countPay + 1)
-        ) {
-          directCommissionWallet = holdWallet[user.tier].address;
-          haveRefNotPayEnough = true;
-        } else {
-          directCommissionWallet = refUser.walletAddress[0];
-        }
-      }
-
-      if (!parentWithCountPay) {
-        referralCommissionWallet = holdWallet[user.tier].address;
-      } else if (parentWithCountPay.closeLah) {
-        referralCommissionWallet = holdWallet[user.tier].address;
-        haveParentNotPayEnough = true;
-      } else if (
-        parentWithCountPay.openLah ||
-        parentWithCountPay.adminChangeTier ||
-        parentWithCountPay.createBy === "ADMIN"
-      ) {
-        referralCommissionWallet = parentWithCountPay.walletAddress[0];
-      } else if (
-        parentWithCountPay.status === "LOCKED" ||
-        parentWithCountPay.errLahCode !== "" ||
-        parentWithCountPay.tier < user.tier ||
-        (parentWithCountPay.tier === user.tier &&
-          parentWithCountPay.countPay < user.countPay + 1)
-      ) {
-        referralCommissionWallet = holdWallet[user.tier].address;
-        haveParentNotPayEnough = true;
-      } else {
-        referralCommissionWallet = parentWithCountPay.walletAddress[0];
-      }
+    for (let p of ancestors) {
+      console.log({ username: p.userName });
     }
 
-    let holdDirectCommission = false;
-    let holdReferralCommission = false;
-
-    if (
-      user.buyPackage === "B" &&
-      user.countPay === 0 &&
-      refUser.buyPackage === "C"
-    ) {
-      holdDirectCommission = true;
-    }
-
-    if (
-      user.buyPackage === "A" &&
-      (refUser.buyPackage === "B" || refUser.buyPackage === "C")
-    ) {
-      holdDirectCommission = true;
-    }
-
-    if (
-      user.tier === 1 &&
-      refUser.tier === 1 &&
-      ((refUser.buyPackage === "B" && refUser.countPay < 7) ||
-        (refUser.buyPackage === "A" && refUser.countPay < 13))
-    ) {
-      holdDirectCommission = true;
-    }
-
-    if (
-      user.tier === 1 &&
-      parentWithCountPay.tier === 1 &&
-      ((parentWithCountPay.buyPackage === "B" &&
-        parentWithCountPay.countPay < 7) ||
-        (parentWithCountPay.buyPackage === "A" &&
-          parentWithCountPay.countPay < 13))
-    ) {
-      holdReferralCommission = true;
-    }
-
-    if (
-      parentWithCountPay.hold !== "no" &&
-      parentWithCountPay.holdLevel !== "no"
-    ) {
-      if (
-        parentWithCountPay.hold.toString() === user.tier.toString() &&
-        parseInt(parentWithCountPay.holdLevel) <= parseInt(user.countPay)
-      ) {
-        holdReferralCommission = true;
-      }
-    } else if (
-      user.tier >= 2 &&
-      user.countPay >= 3 &&
-      parentWithCountPay.countChild[0] < 300
-    ) {
-      holdReferralCommission = true;
-    } else if (
-      user.tier >= 2 &&
-      user.countPay >= 3 &&
-      parentWithCountPay.countChild[0] >= 300
-    ) {
-      const checkRatioCountChild = await checkRatioCountChildOfUser(
-        parentWithCountPay._id
-      );
-      if (!checkRatioCountChild) holdReferralCommission = true;
-    }
-
-    if (holdDirectCommission) {
-      haveRefNotPayEnough = true;
-      directCommissionWallet = holdWallet[user.tier].address;
-    }
-
-    if (holdReferralCommission) {
-      referralCommissionWallet = holdWallet[user.tier].address;
-      haveParentNotPayEnough = true;
-    }
-
-    let transactionRegister = null;
-    let transactionDirect = null;
-    let transactionReferral = null;
-    let transactionFine = null;
-
-    const transIds = {};
-
-    const listTransSuccess = await Transaction.find({
-      $and: [
-        { tier: user.tier },
-        { userId: user.id },
-        { userCountPay: user.countPay },
-        { status: "SUCCESS" },
-        {
-          type: { $ne: "FINE" },
-        },
-      ],
-    });
-
-    let step = 0;
-    if (listTransSuccess.length === 0) {
-      if (user.countPay === 0) {
-        step = 1;
-        transactionRegister = await Transaction.create({
-          userId: user.id,
-          amount: registerFee,
-          userCountPay: user.countPay,
-          address_ref: registerWallet.address,
-          address_from: user.walletAddress[0],
-          address_to: registerWallet.address,
-          tier: user.tier,
-          buyPackage: user.buyPackage,
-          hash: "",
-          type: "REGISTER",
-          status: "PENDING",
-        });
-        transIds.register = transactionRegister._id;
-      } else {
-        step = 2;
-      }
-
-      transactionDirect = await Transaction.create({
-        userId: user.id,
-        amount: directCommissionFee,
-        userCountPay: user.countPay,
-        address_ref: refUser.walletAddress[0],
-        address_from: user.walletAddress[0],
-        address_to: directCommissionWallet,
-        tier: user.tier,
-        buyPackage: user.buyPackage,
-        hash: "",
-        type: haveRefNotPayEnough ? "DIRECTHOLD" : "DIRECT",
-        status: "PENDING",
-        refBuyPackage: refUser.buyPackage,
-      });
-      transIds.direct = transactionDirect._id;
-
-      await generatePackageTrans(
-        user,
-        refUser,
-        directCommissionWallet,
-        user.continueWithBuyPackageB
-      );
-
-      transactionReferral = await Transaction.create({
-        userId: user.id,
-        amount: referralCommissionFee,
-        userCountPay: user.countPay,
-        address_ref: parentWithCountPay.walletAddress[0],
-        address_from: user.walletAddress[0],
-        address_to: referralCommissionWallet,
-        tier: user.tier,
-        buyPackage: user.buyPackage,
-        hash: "",
-        type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
-        status: "PENDING",
-      });
-      transIds.referral = transactionReferral._id;
-    }
-    if (listTransSuccess.length === 1) {
-      if (user.countPay === 0) {
-        step = 2;
-        transIds.register = listTransSuccess[0]._id;
-        transactionDirect = await Transaction.create({
-          userId: user.id,
-          amount: directCommissionFee,
-          userCountPay: user.countPay,
-          address_ref: refUser.walletAddress[0],
-          address_from: user.walletAddress[0],
-          address_to: directCommissionWallet,
-          tier: user.tier,
-          buyPackage: user.buyPackage,
-          hash: "",
-          type: haveRefNotPayEnough ? "DIRECTHOLD" : "DIRECT",
-          status: "PENDING",
-          refBuyPackage: refUser.buyPackage,
-        });
-        transIds.direct = transactionDirect._id;
-
-        await generatePackageTrans(
-          user,
-          refUser,
-          directCommissionWallet,
-          user.continueWithBuyPackageB
-        );
-
-        transactionReferral = await Transaction.create({
-          userId: user.id,
-          amount: referralCommissionFee,
-          userCountPay: user.countPay,
-          address_ref: parentWithCountPay.walletAddress[0],
-          address_from: user.walletAddress[0],
-          address_to: referralCommissionWallet,
-          tier: user.tier,
-          buyPackage: user.buyPackage,
-          hash: "",
-          type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
-          status: "PENDING",
-        });
-        transIds.referral = transactionReferral._id;
-      } else {
-        step = 3;
-        const directTrans = listTransSuccess.find(
-          (ele) =>
-            ele.type === "DIRECT" ||
-            ele.type === "DIRECTHOLD" ||
-            ele.type === "PACKAGE"
-        );
-        if (directTrans.type === "PACKAGE") {
-          directCommissionFee = 0;
-        }
-        transIds.direct = directTrans._id;
-
-        await generatePackageTrans(
-          user,
-          refUser,
-          directCommissionWallet,
-          user.continueWithBuyPackageB
-        );
-
-        transactionReferral = await Transaction.create({
-          userId: user.id,
-          amount: referralCommissionFee,
-          userCountPay: user.countPay,
-          address_ref: parentWithCountPay.walletAddress[0],
-          address_from: user.walletAddress[0],
-          address_to: referralCommissionWallet,
-          tier: user.tier,
-          buyPackage: user.buyPackage,
-          hash: "",
-          type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
-          status: "PENDING",
-        });
-        transIds.referral = transactionReferral._id;
-      }
-    }
-    if (listTransSuccess.length === 2) {
-      if (user.countPay === 0) {
-        step = 3;
-        const registerTrans = listTransSuccess.find(
-          (ele) => ele.type === "REGISTER"
-        );
-        transIds.register = registerTrans._id;
-
-        const directTrans = listTransSuccess.find(
-          (ele) =>
-            ele.type === "DIRECT" ||
-            ele.type === "DIRECTHOLD" ||
-            ele.type === "PACKAGE"
-        );
-        if (directTrans.type === "PACKAGE") {
-          directCommissionFee = 0;
-        }
-        transIds.direct = directTrans._id;
-
-        await generatePackageTrans(
-          user,
-          refUser,
-          directCommissionWallet,
-          user.continueWithBuyPackageB
-        );
-
-        transactionReferral = await Transaction.create({
-          userId: user.id,
-          amount: referralCommissionFee,
-          userCountPay: user.countPay,
-          address_ref: parentWithCountPay.walletAddress[0],
-          address_from: user.walletAddress[0],
-          address_to: referralCommissionWallet,
-          tier: user.tier,
-          buyPackage: user.buyPackage,
-          hash: "",
-          type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
-          status: "PENDING",
-        });
-        transIds.referral = transactionReferral._id;
-      } else {
-        step = 4;
-        const directTrans = listTransSuccess.find(
-          (ele) =>
-            ele.type === "DIRECT" ||
-            ele.type === "DIRECTHOLD" ||
-            ele.buyPackage === "PACKAGE"
-        );
-        if (directTrans.type === "PACKAGE") {
-          directCommissionFee = 0;
-        }
-        transIds.direct = directTrans._id;
-
-        await generatePackageTrans(
-          user,
-          refUser,
-          directCommissionWallet,
-          user.continueWithBuyPackageB
-        );
-
-        const referral = listTransSuccess.find(
-          (ele) => ele.type === "REFERRAL" || ele.type === "REFERRALHOLD"
-        );
-        transIds.register = referral._id;
-      }
-    }
-    if (listTransSuccess.length === 3 && user.countPay === 0) {
-      step = 4;
-      const registerTrans = listTransSuccess.find(
-        (ele) => ele.type === "REGISTER"
-      );
-      transIds.register = registerTrans._id;
-
-      const directTrans = listTransSuccess.find(
-        (ele) =>
-          ele.type === "DIRECT" ||
-          ele.type === "DIRECTHOLD" ||
-          ele.type === "PACKAGE"
-      );
-      if (directTrans.type === "PACKAGE") {
-        directCommissionFee = 0;
-      }
-      transIds.direct = directTrans._id;
-
-      await generatePackageTrans(
-        user,
-        refUser,
-        directCommissionWallet,
-        user.continueWithBuyPackageB
-      );
-
-      const referral = listTransSuccess.find(
-        (ele) => ele.type === "REFERRAL" || ele.type === "REFERRALHOLD"
-      );
-      transIds.register = referral._id;
-    }
-
-    if (user.fine > 0) {
-      transactionFine = await Transaction.create({
-        userId: user.id,
-        amount: user.fine,
-        userCountPay: user.countPay,
-        address_ref: registerWallet.address,
-        address_from: user.walletAddress[0],
-        address_to: registerWallet.address,
-        tier: user.tier,
-        buyPackage: user.buyPackage,
-        hash: "",
-        type: "FINE",
-        status: "PENDING",
-      });
-    }
-
-    res.json({
-      countPay: user.countPay,
-      step,
-      registerFee,
-      registerWallet: registerWallet.address,
-      directCommissionWallet,
-      directCommissionFee,
-      referralCommissionWallet,
-      referralCommissionFee,
-      transIds,
-      transactionFine,
-    });
+    console.log({ payments, paymentIds });
   } else {
     res.status(404);
     throw new Error("User does not exist");
   }
 });
+
+// const getPaymentInfo = asyncHandler(async (req, res) => {
+//   const { user } = req;
+//   const { continueWithBuyPackageB } = req.query;
+//   const wallets = await Wallet.find();
+
+//   const registerWallet = wallets.find((ele) => ele.type === "REGISTER");
+//   const adminWallet = wallets.find((ele) => ele.type === "ADMIN");
+//   const holdWallet1 = wallets.find((ele) => ele.type === "HOLD1");
+//   const holdWallet2 = wallets.find((ele) => ele.type === "HOLD2");
+//   const holdWallet3 = wallets.find((ele) => ele.type === "HOLD3");
+//   const holdWallet4 = wallets.find((ele) => ele.type === "HOLD4");
+//   const holdWallet5 = wallets.find((ele) => ele.type === "HOLD5");
+
+//   const holdWallet = {
+//     1: holdWallet1,
+//     2: holdWallet2,
+//     3: holdWallet3,
+//     4: holdWallet4,
+//     5: holdWallet5,
+//   };
+
+//   if (user.tier === 1) {
+//     if (
+//       continueWithBuyPackageB === "true" &&
+//       user.buyPackage === "B" &&
+//       user.countPay === 7
+//     ) {
+//       user.continueWithBuyPackageB = true;
+//       await user.save();
+//     } else if (
+//       continueWithBuyPackageB === "false" &&
+//       user.buyPackage === "B" &&
+//       user.countPay === 7
+//     ) {
+//       user.continueWithBuyPackageB = false;
+//       await user.save();
+//     }
+//   }
+
+//   let haveParentNotPayEnough = false;
+//   let haveRefNotPayEnough = false;
+//   let parentWithCountPay;
+//   let parentUser;
+
+//   if (user) {
+//     if (user.countPay === 13) {
+//       const canIncreaseTier = await checkCanIncreaseNextTier(user);
+//       if (!canIncreaseTier) {
+//         res.status(404);
+//         throw new Error("You are not eligible for next step payment");
+//       }
+//     }
+//     const refUser = await getRefParentUser(user._id, user.tier);
+//     if (user.countPay === 0 && user.tier === 1) {
+//       parentUser = refUser;
+//       parentWithCountPay = refUser;
+//     } else {
+//       parentUser = await getParentUser(user._id, user.tier);
+//       let levelOfRefUser = await getLevelOfRefUser(
+//         user.id,
+//         user.tier,
+//         refUser._id
+//       );
+//       let withCountPay = user.countPay;
+
+//       if (levelOfRefUser > user.countPay) {
+//         if (user.countPay <= 1) {
+//           withCountPay = 0;
+//         } else {
+//           withCountPay = levelOfRefUser - user.countPay;
+//         }
+//       } else if (levelOfRefUser === user.countPay) {
+//         withCountPay = user.countPay;
+//       }
+//       parentWithCountPay = await getParentWithCountPay(
+//         user.id,
+//         withCountPay,
+//         user.tier,
+//         refUser._id
+//       );
+//     }
+
+//     if (!parentUser || !refUser) {
+//       res.status(404);
+//       throw new Error("Parent not found");
+//     }
+
+//     let registerFee = user.countPay === 0 ? 7 * user.tier : 0;
+//     let directCommissionWallet = "";
+//     let directCommissionFee = 5 * user.tier;
+//     let referralCommissionWallet = "";
+//     let referralCommissionFee = 10 * user.tier;
+
+//     if (user.tier >= 2 || user.buyPackage === "A") {
+//       if (user.countPay === 0) {
+//         directCommissionFee = 65 * user.tier;
+//         if (refUser.closeLah) {
+//           directCommissionWallet = holdWallet[user.tier].address;
+//           haveRefNotPayEnough = true;
+//         } else if (
+//           refUser.openLah ||
+//           refUser.adminChangeTier ||
+//           refUser.createBy === "ADMIN"
+//         ) {
+//           directCommissionWallet = refUser.walletAddress[0];
+//         } else {
+//           if (
+//             refUser.status === "LOCKED" ||
+//             refUser.tier < user.tier ||
+//             (refUser.tier === user.tier && refUser.countPay < 13)
+//           ) {
+//             directCommissionWallet = holdWallet[user.tier].address;
+//             haveRefNotPayEnough = true;
+//           } else {
+//             directCommissionWallet = refUser.walletAddress[0];
+//           }
+//         }
+//       } else {
+//         const pendingTransPackage = await Transaction.findOne({
+//           userId: user._id,
+//           tier: user.tier,
+//           type: "PACKAGE",
+//           userCountPay: user.countPay,
+//         });
+
+//         if (pendingTransPackage) {
+//           pendingTransPackage.status = "SUCCESS";
+//           await pendingTransPackage.save();
+//         }
+//       }
+//     } else if (user.tier === 1 && user.buyPackage === "B") {
+//       if (user.countPay === 0) {
+//         directCommissionFee = 35 * user.tier;
+//         if (refUser.closeLah) {
+//           directCommissionWallet = holdWallet[user.tier].address;
+//           haveRefNotPayEnough = true;
+//         } else if (
+//           refUser.openLah ||
+//           refUser.adminChangeTier ||
+//           refUser.createBy === "ADMIN"
+//         ) {
+//           directCommissionWallet = refUser.walletAddress[0];
+//         } else {
+//           if (
+//             refUser.status === "LOCKED" ||
+//             refUser.tier < user.tier ||
+//             (refUser.tier === user.tier && refUser.countPay < 7)
+//           ) {
+//             directCommissionWallet = holdWallet[user.tier].address;
+//             haveRefNotPayEnough = true;
+//           } else {
+//             directCommissionWallet = refUser.walletAddress[0];
+//           }
+//         }
+//       } else if (user.countPay === 7 && user.continueWithBuyPackageB) {
+//         directCommissionFee = 30 * user.tier;
+//         if (refUser.closeLah) {
+//           directCommissionWallet = holdWallet[user.tier].address;
+//           haveRefNotPayEnough = true;
+//         } else if (
+//           refUser.openLah ||
+//           refUser.adminChangeTier ||
+//           refUser.createBy === "ADMIN"
+//         ) {
+//           directCommissionWallet = refUser.walletAddress[0];
+//         } else {
+//           if (
+//             refUser.status === "LOCKED" ||
+//             refUser.tier < user.tier ||
+//             (refUser.tier === user.tier && refUser.countPay < 13)
+//           ) {
+//             directCommissionWallet = holdWallet[user.tier].address;
+//             haveRefNotPayEnough = true;
+//           } else {
+//             directCommissionWallet = refUser.walletAddress[0];
+//           }
+//         }
+//       } else {
+//         const pendingTransPackage = await Transaction.findOne({
+//           userId: user._id,
+//           tier: user.tier,
+//           type: "PACKAGE",
+//           userCountPay: user.countPay,
+//         });
+
+//         if (pendingTransPackage) {
+//           pendingTransPackage.status = "SUCCESS";
+//           await pendingTransPackage.save();
+//         }
+//       }
+//     } else if (user.tier === 1 && user.buyPackage === "C") {
+//       if (refUser.closeLah) {
+//         directCommissionWallet = holdWallet[user.tier].address;
+//         haveRefNotPayEnough = true;
+//       } else if (
+//         refUser.openLah ||
+//         refUser.adminChangeTier ||
+//         refUser.createBy === "ADMIN"
+//       ) {
+//         directCommissionWallet = refUser.walletAddress[0];
+//       } else {
+//         if (
+//           refUser.status === "LOCKED" ||
+//           refUser.tier < user.tier ||
+//           (refUser.tier === user.tier && refUser.countPay < user.countPay + 1)
+//         ) {
+//           directCommissionWallet = holdWallet[user.tier].address;
+//           haveRefNotPayEnough = true;
+//         } else {
+//           directCommissionWallet = refUser.walletAddress[0];
+//         }
+//       }
+//     }
+
+//     // delete pending trans
+//     await Transaction.deleteMany({
+//       $and: [
+//         {
+//           status: "PENDING",
+//         },
+//         { userId: user.id },
+//       ],
+//     });
+
+//     if (user.countPay === 0) {
+//       if (user.tier >= 2) {
+//         if (refUser.closeLah) {
+//           directCommissionWallet = holdWallet[user.tier].address;
+//           haveRefNotPayEnough = true;
+//         } else if (
+//           refUser.openLah ||
+//           refUser.adminChangeTier ||
+//           refUser.createBy === "ADMIN"
+//         ) {
+//           directCommissionWallet = refUser.walletAddress[0];
+//         } else {
+//           if (
+//             refUser.status === "LOCKED" ||
+//             refUser.tier < user.tier ||
+//             (refUser.tier === user.tier && refUser.countPay < user.countPay + 1)
+//           ) {
+//             directCommissionWallet = holdWallet[user.tier].address;
+//             haveRefNotPayEnough = true;
+//           } else {
+//             directCommissionWallet = refUser.walletAddress[0];
+//           }
+//         }
+//       }
+//       if (parentUser.closeLah) {
+//         referralCommissionWallet = holdWallet[user.tier].address;
+//         haveParentNotPayEnough = true;
+//       } else if (
+//         parentUser.openLah ||
+//         parentUser.adminChangeTier ||
+//         parentUser.createBy === "ADMIN"
+//       ) {
+//         referralCommissionWallet = parentUser.walletAddress[0];
+//       } else {
+//         if (
+//           parentUser.status === "LOCKED" ||
+//           parentUser.errLahCode !== "" ||
+//           parentUser.tier < user.tier ||
+//           (parentUser.tier === user.tier &&
+//             parentUser.countPay < user.countPay + 1)
+//         ) {
+//           referralCommissionWallet = holdWallet[user.tier].address;
+//           haveParentNotPayEnough = true;
+//         } else {
+//           referralCommissionWallet = parentUser.walletAddress[0];
+//         }
+//       }
+//     } else {
+//       if (refUser.closeLah) {
+//         directCommissionWallet = holdWallet[user.tier].address;
+//         haveRefNotPayEnough = true;
+//       } else if (
+//         refUser.openLah ||
+//         refUser.adminChangeTier ||
+//         refUser.createBy === "ADMIN"
+//       ) {
+//         directCommissionWallet = refUser.walletAddress[0];
+//       } else {
+//         if (
+//           refUser.status === "LOCKED" ||
+//           refUser.tier < user.tier ||
+//           (refUser.tier === user.tier && refUser.countPay < user.countPay + 1)
+//         ) {
+//           directCommissionWallet = holdWallet[user.tier].address;
+//           haveRefNotPayEnough = true;
+//         } else {
+//           directCommissionWallet = refUser.walletAddress[0];
+//         }
+//       }
+
+//       if (!parentWithCountPay) {
+//         referralCommissionWallet = holdWallet[user.tier].address;
+//       } else if (parentWithCountPay.closeLah) {
+//         referralCommissionWallet = holdWallet[user.tier].address;
+//         haveParentNotPayEnough = true;
+//       } else if (
+//         parentWithCountPay.openLah ||
+//         parentWithCountPay.adminChangeTier ||
+//         parentWithCountPay.createBy === "ADMIN"
+//       ) {
+//         referralCommissionWallet = parentWithCountPay.walletAddress[0];
+//       } else if (
+//         parentWithCountPay.status === "LOCKED" ||
+//         parentWithCountPay.errLahCode !== "" ||
+//         parentWithCountPay.tier < user.tier ||
+//         (parentWithCountPay.tier === user.tier &&
+//           parentWithCountPay.countPay < user.countPay + 1)
+//       ) {
+//         referralCommissionWallet = holdWallet[user.tier].address;
+//         haveParentNotPayEnough = true;
+//       } else {
+//         referralCommissionWallet = parentWithCountPay.walletAddress[0];
+//       }
+//     }
+
+//     let holdDirectCommission = false;
+//     let holdReferralCommission = false;
+
+//     if (
+//       user.buyPackage === "B" &&
+//       user.countPay === 0 &&
+//       refUser.buyPackage === "C"
+//     ) {
+//       holdDirectCommission = true;
+//     }
+
+//     if (
+//       user.buyPackage === "A" &&
+//       (refUser.buyPackage === "B" || refUser.buyPackage === "C")
+//     ) {
+//       holdDirectCommission = true;
+//     }
+
+//     if (
+//       user.tier === 1 &&
+//       refUser.tier === 1 &&
+//       ((refUser.buyPackage === "B" && refUser.countPay < 7) ||
+//         (refUser.buyPackage === "A" && refUser.countPay < 13))
+//     ) {
+//       holdDirectCommission = true;
+//     }
+
+//     if (
+//       user.tier === 1 &&
+//       parentWithCountPay.tier === 1 &&
+//       ((parentWithCountPay.buyPackage === "B" &&
+//         parentWithCountPay.countPay < 7) ||
+//         (parentWithCountPay.buyPackage === "A" &&
+//           parentWithCountPay.countPay < 13))
+//     ) {
+//       holdReferralCommission = true;
+//     }
+
+//     if (
+//       parentWithCountPay.hold !== "no" &&
+//       parentWithCountPay.holdLevel !== "no"
+//     ) {
+//       if (
+//         parentWithCountPay.hold.toString() === user.tier.toString() &&
+//         parseInt(parentWithCountPay.holdLevel) <= parseInt(user.countPay)
+//       ) {
+//         holdReferralCommission = true;
+//       }
+//     } else if (
+//       user.tier >= 2 &&
+//       user.countPay >= 3 &&
+//       parentWithCountPay.countChild[0] < 300
+//     ) {
+//       holdReferralCommission = true;
+//     } else if (
+//       user.tier >= 2 &&
+//       user.countPay >= 3 &&
+//       parentWithCountPay.countChild[0] >= 300
+//     ) {
+//       const checkRatioCountChild = await checkRatioCountChildOfUser(
+//         parentWithCountPay._id
+//       );
+//       if (!checkRatioCountChild) holdReferralCommission = true;
+//     }
+
+//     if (holdDirectCommission) {
+//       haveRefNotPayEnough = true;
+//       directCommissionWallet = holdWallet[user.tier].address;
+//     }
+
+//     if (holdReferralCommission) {
+//       referralCommissionWallet = holdWallet[user.tier].address;
+//       haveParentNotPayEnough = true;
+//     }
+
+//     let transactionRegister = null;
+//     let transactionDirect = null;
+//     let transactionReferral = null;
+//     let transactionFine = null;
+
+//     const transIds = {};
+
+//     const listTransSuccess = await Transaction.find({
+//       $and: [
+//         { tier: user.tier },
+//         { userId: user.id },
+//         { userCountPay: user.countPay },
+//         { status: "SUCCESS" },
+//         {
+//           type: { $ne: "FINE" },
+//         },
+//       ],
+//     });
+
+//     let step = 0;
+//     if (listTransSuccess.length === 0) {
+//       if (user.countPay === 0) {
+//         step = 1;
+//         transactionRegister = await Transaction.create({
+//           userId: user.id,
+//           amount: registerFee,
+//           userCountPay: user.countPay,
+//           address_ref: registerWallet.address,
+//           address_from: user.walletAddress[0],
+//           address_to: registerWallet.address,
+//           tier: user.tier,
+//           buyPackage: user.buyPackage,
+//           hash: "",
+//           type: "REGISTER",
+//           status: "PENDING",
+//         });
+//         transIds.register = transactionRegister._id;
+//       } else {
+//         step = 2;
+//       }
+
+//       transactionDirect = await Transaction.create({
+//         userId: user.id,
+//         amount: directCommissionFee,
+//         userCountPay: user.countPay,
+//         address_ref: refUser.walletAddress[0],
+//         address_from: user.walletAddress[0],
+//         address_to: directCommissionWallet,
+//         tier: user.tier,
+//         buyPackage: user.buyPackage,
+//         hash: "",
+//         type: haveRefNotPayEnough ? "DIRECTHOLD" : "DIRECT",
+//         status: "PENDING",
+//         refBuyPackage: refUser.buyPackage,
+//       });
+//       transIds.direct = transactionDirect._id;
+
+//       await generatePackageTrans(
+//         user,
+//         refUser,
+//         directCommissionWallet,
+//         user.continueWithBuyPackageB
+//       );
+
+//       transactionReferral = await Transaction.create({
+//         userId: user.id,
+//         amount: referralCommissionFee,
+//         userCountPay: user.countPay,
+//         address_ref: parentWithCountPay.walletAddress[0],
+//         address_from: user.walletAddress[0],
+//         address_to: referralCommissionWallet,
+//         tier: user.tier,
+//         buyPackage: user.buyPackage,
+//         hash: "",
+//         type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
+//         status: "PENDING",
+//       });
+//       transIds.referral = transactionReferral._id;
+//     }
+//     if (listTransSuccess.length === 1) {
+//       if (user.countPay === 0) {
+//         step = 2;
+//         transIds.register = listTransSuccess[0]._id;
+//         transactionDirect = await Transaction.create({
+//           userId: user.id,
+//           amount: directCommissionFee,
+//           userCountPay: user.countPay,
+//           address_ref: refUser.walletAddress[0],
+//           address_from: user.walletAddress[0],
+//           address_to: directCommissionWallet,
+//           tier: user.tier,
+//           buyPackage: user.buyPackage,
+//           hash: "",
+//           type: haveRefNotPayEnough ? "DIRECTHOLD" : "DIRECT",
+//           status: "PENDING",
+//           refBuyPackage: refUser.buyPackage,
+//         });
+//         transIds.direct = transactionDirect._id;
+
+//         await generatePackageTrans(
+//           user,
+//           refUser,
+//           directCommissionWallet,
+//           user.continueWithBuyPackageB
+//         );
+
+//         transactionReferral = await Transaction.create({
+//           userId: user.id,
+//           amount: referralCommissionFee,
+//           userCountPay: user.countPay,
+//           address_ref: parentWithCountPay.walletAddress[0],
+//           address_from: user.walletAddress[0],
+//           address_to: referralCommissionWallet,
+//           tier: user.tier,
+//           buyPackage: user.buyPackage,
+//           hash: "",
+//           type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
+//           status: "PENDING",
+//         });
+//         transIds.referral = transactionReferral._id;
+//       } else {
+//         step = 3;
+//         const directTrans = listTransSuccess.find(
+//           (ele) =>
+//             ele.type === "DIRECT" ||
+//             ele.type === "DIRECTHOLD" ||
+//             ele.type === "PACKAGE"
+//         );
+//         if (directTrans.type === "PACKAGE") {
+//           directCommissionFee = 0;
+//         }
+//         transIds.direct = directTrans._id;
+
+//         await generatePackageTrans(
+//           user,
+//           refUser,
+//           directCommissionWallet,
+//           user.continueWithBuyPackageB
+//         );
+
+//         transactionReferral = await Transaction.create({
+//           userId: user.id,
+//           amount: referralCommissionFee,
+//           userCountPay: user.countPay,
+//           address_ref: parentWithCountPay.walletAddress[0],
+//           address_from: user.walletAddress[0],
+//           address_to: referralCommissionWallet,
+//           tier: user.tier,
+//           buyPackage: user.buyPackage,
+//           hash: "",
+//           type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
+//           status: "PENDING",
+//         });
+//         transIds.referral = transactionReferral._id;
+//       }
+//     }
+//     if (listTransSuccess.length === 2) {
+//       if (user.countPay === 0) {
+//         step = 3;
+//         const registerTrans = listTransSuccess.find(
+//           (ele) => ele.type === "REGISTER"
+//         );
+//         transIds.register = registerTrans._id;
+
+//         const directTrans = listTransSuccess.find(
+//           (ele) =>
+//             ele.type === "DIRECT" ||
+//             ele.type === "DIRECTHOLD" ||
+//             ele.type === "PACKAGE"
+//         );
+//         if (directTrans.type === "PACKAGE") {
+//           directCommissionFee = 0;
+//         }
+//         transIds.direct = directTrans._id;
+
+//         await generatePackageTrans(
+//           user,
+//           refUser,
+//           directCommissionWallet,
+//           user.continueWithBuyPackageB
+//         );
+
+//         transactionReferral = await Transaction.create({
+//           userId: user.id,
+//           amount: referralCommissionFee,
+//           userCountPay: user.countPay,
+//           address_ref: parentWithCountPay.walletAddress[0],
+//           address_from: user.walletAddress[0],
+//           address_to: referralCommissionWallet,
+//           tier: user.tier,
+//           buyPackage: user.buyPackage,
+//           hash: "",
+//           type: haveParentNotPayEnough ? "REFERRALHOLD" : "REFERRAL",
+//           status: "PENDING",
+//         });
+//         transIds.referral = transactionReferral._id;
+//       } else {
+//         step = 4;
+//         const directTrans = listTransSuccess.find(
+//           (ele) =>
+//             ele.type === "DIRECT" ||
+//             ele.type === "DIRECTHOLD" ||
+//             ele.buyPackage === "PACKAGE"
+//         );
+//         if (directTrans.type === "PACKAGE") {
+//           directCommissionFee = 0;
+//         }
+//         transIds.direct = directTrans._id;
+
+//         await generatePackageTrans(
+//           user,
+//           refUser,
+//           directCommissionWallet,
+//           user.continueWithBuyPackageB
+//         );
+
+//         const referral = listTransSuccess.find(
+//           (ele) => ele.type === "REFERRAL" || ele.type === "REFERRALHOLD"
+//         );
+//         transIds.register = referral._id;
+//       }
+//     }
+//     if (listTransSuccess.length === 3 && user.countPay === 0) {
+//       step = 4;
+//       const registerTrans = listTransSuccess.find(
+//         (ele) => ele.type === "REGISTER"
+//       );
+//       transIds.register = registerTrans._id;
+
+//       const directTrans = listTransSuccess.find(
+//         (ele) =>
+//           ele.type === "DIRECT" ||
+//           ele.type === "DIRECTHOLD" ||
+//           ele.type === "PACKAGE"
+//       );
+//       if (directTrans.type === "PACKAGE") {
+//         directCommissionFee = 0;
+//       }
+//       transIds.direct = directTrans._id;
+
+//       await generatePackageTrans(
+//         user,
+//         refUser,
+//         directCommissionWallet,
+//         user.continueWithBuyPackageB
+//       );
+
+//       const referral = listTransSuccess.find(
+//         (ele) => ele.type === "REFERRAL" || ele.type === "REFERRALHOLD"
+//       );
+//       transIds.register = referral._id;
+//     }
+
+//     if (user.fine > 0) {
+//       transactionFine = await Transaction.create({
+//         userId: user.id,
+//         amount: user.fine,
+//         userCountPay: user.countPay,
+//         address_ref: registerWallet.address,
+//         address_from: user.walletAddress[0],
+//         address_to: registerWallet.address,
+//         tier: user.tier,
+//         buyPackage: user.buyPackage,
+//         hash: "",
+//         type: "FINE",
+//         status: "PENDING",
+//       });
+//     }
+
+//     res.json({
+//       countPay: user.countPay,
+//       step,
+//       registerFee,
+//       registerWallet: registerWallet.address,
+//       directCommissionWallet,
+//       directCommissionFee,
+//       referralCommissionWallet,
+//       referralCommissionFee,
+//       transIds,
+//       transactionFine,
+//     });
+//   } else {
+//     res.status(404);
+//     throw new Error("User does not exist");
+//   }
+// });
+
+const getAdminWallets = async () => {
+  const wallets = await Wallet.find();
+
+  const holdWallet1 = wallets.find((ele) => ele.type === "HOLD1");
+  const holdWallet2 = wallets.find((ele) => ele.type === "HOLD2");
+  const holdWallet3 = wallets.find((ele) => ele.type === "HOLD3");
+  const holdWallet4 = wallets.find((ele) => ele.type === "HOLD4");
+  const holdWallet5 = wallets.find((ele) => ele.type === "HOLD5");
+
+  return {
+    1: holdWallet1.address,
+    2: holdWallet2.address,
+    3: holdWallet3.address,
+    4: holdWallet4.address,
+    5: holdWallet5.address,
+  };
+};
+
+const findAncestors = async (userId, limit, tier) => {
+  let ancestors = [];
+  let currentUserId = userId;
+  let currentParent;
+
+  const tree = await Tree.findOne({ userId, tier });
+  const refTree = await Tree.findOne({ userId: tree.refId, tier });
+  if (!refTree) {
+    throw new Error("Ref user does not exist");
+  }
+  ancestors.push(refTree);
+
+  while (ancestors.length < limit) {
+    const treeOfUser = await Tree.findOne({ userId: currentUserId, tier });
+    if (!treeOfUser) throw new Error("User does not exist");
+
+    const parentId = treeOfUser.parentId;
+
+    if (!parentId) {
+      ancestors.push(currentParent);
+      continue;
+    }
+
+    if (parentId && parentId === tree.refId) {
+      currentUserId = parentId;
+      continue;
+    }
+
+    const parent = await Tree.findOne({ userId: parentId, tier });
+    if (!parent) {
+      ancestors.push(currentParent);
+      continue;
+    }
+
+    currentParent = parent;
+    ancestors.push(currentParent);
+    currentUserId = parentId;
+  }
+
+  return ancestors;
+};
 
 const generatePackageTrans = async (
   user,
