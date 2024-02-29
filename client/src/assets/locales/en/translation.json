@@ -357,5 +357,15 @@
   "holdLevel": "Hold level (above)",
   "level": "Level",
 
-  "refUserEmail": "Referer email"
+  "refUserEmail": "Referer email",
+
+  "Please enter OTP code from your email": "Please enter OTP code from your email",
+  "We sent the code to your email": "We sent the code to your email",
+  "Didn't receive the code?": "Didn't receive the code?",
+  "Resend": "Resend code",
+  "Please wait a moment": "Please pay in a few minutes",
+  "otp is required": "Please fill in the otp code",
+  "Money transfer successful!": "Payment successful",
+  "system updated successfully": "System updated successfully",
+  "Insufficient balance": "Insufficient balance"
 }

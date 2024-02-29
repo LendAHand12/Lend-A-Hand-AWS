@@ -30,6 +30,7 @@
     "react-hook-form": "^7.44.3",
     "react-i18next": "^12.3.1",
     "react-lottie": "^1.2.3",
+    "react-modal": "^3.16.1",
     "react-multi-date-picker": "^4.4.1",
     "react-organizational-chart": "^2.2.1",
     "react-phone-number-input": "^3.3.0",

@@ -363,5 +363,15 @@
   "holdLevel": "Hold tầng (trở lên)",
   "level": "Tầng",
 
-  "refUserEmail": "Email người giới thiệu"
+  "refUserEmail": "Email người giới thiệu",
+
+  "Please input OTP code from your email": "Vui lòng nhập mã OTP từ email của Bạn",
+  "We have sent a code to your email": "Chúng tôi đã gửi mã tới email của bạn",
+  "Didn't recieve code?": "Không nhận được mã?",
+  "Resend": "Gửi lại mã",
+  "Please wait a moment": "Vui lòng thanh toán sau ít phút",
+  "otp is required": "Vui lòng điền mã otp",
+  "Money transfer successful!": "Thanh toán thành công",
+  "system update successful": "Update hệ thống thành công",
+  "Insufficient balance": "Không đủ số dư"
 }

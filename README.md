@@ -151,6 +151,21 @@ Ràng buộc không trùng username 1tr => done
 - Hiển thị số user còn sống, user xám và % => 1tr5
 - Điều kiện user qua tier 3,4,5 => 1tr5
 
+- (web) landing page + form contact + carousel -> 20h
+- (web) show list blog + detail -> 6h
+- (admin) phần login admin làm đơn giản (hard id, password) -> không tính
+- (admin) list email + detail email contact -> 4h
+- (admin) list + create + edit + detail blog -> 16h
+
+- chuyển sang dùng gói cấu hình aws cao hơn -> 500
+- đánh số thứ tự cho user trên cây hệ thống (tier 2 trở đi) -> 1tr
+- đổi thuật toán lấy người được hưởng doanh số tiếp theo (tier 2 trở đi) -> 700
+- lưu lại lịch sử filter trang danh sách để back về (trang list user và giao dịch) -> 1tr
+- bỏ logic cho quỹ lah bị hold nếu chưa đủ 3 ID con -> 500
+
+- tạo lệnh chờ xoá user không hoạt động hoặc bị xoá trong 2 tháng
+- tạo lênh chờ xoá hình ảnh CCCD không tồn tại trong database
+
 // update parent
 db.users.update({
 $and: [

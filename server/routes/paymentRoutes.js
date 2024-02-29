@@ -10,6 +10,7 @@ import {
   onAdminDoneRefund,
   getParentWithCount,
   getAllTransForExport,
+  onDonePayment,
 } from "../controllers/paymentControllers.js";
 import { protectRoute, isAdmin } from "../middleware/authMiddleware.js";
 
@@ -26,6 +27,8 @@ router
   .route("/")
   .get(protectRoute, getPaymentsOfUser)
   .post(protectRoute, addPayment);
+
+router.route("/done").post(protectRoute, onDonePayment);
 
 router.route("/:id").get(protectRoute, isAdmin, getPaymentDetail);
 router
