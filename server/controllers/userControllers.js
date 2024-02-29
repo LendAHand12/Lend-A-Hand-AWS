@@ -11,6 +11,7 @@ import dotenv from "dotenv";
 import Tree from "../models/treeModel.js";
 import { getActivePackages } from "./packageControllers.js";
 import {
+  checkSerepayWallet,
   findNextUser,
   findNextUserNotIncludeNextUserTier,
   findRootLayer,
@@ -194,6 +195,7 @@ const getUserById = asyncHandler(async (req, res) => {
       refUserName: refUser ? refUser.userId : "",
       refUserEmail: refUser ? refUser.email : "",
       listOldParent,
+      isSerepayWallet: await checkSerepayWallet(user.walletAddress[0]),
     });
   } else {
     res.status(404);
@@ -689,6 +691,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
       tier4Time: user.tier4Time,
       tier5Time: user.tier5Time,
       hold: user.hold,
+      isSerepayWallet: await checkSerepayWallet(user.walletAddress[0]),
     });
   } else {
     res.status(400);

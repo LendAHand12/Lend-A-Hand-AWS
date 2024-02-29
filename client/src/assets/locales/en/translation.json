@@ -367,5 +367,7 @@
   "otp is required": "Please fill in the otp code",
   "Money transfer successful!": "Payment successful",
   "system updated successfully": "System updated successfully",
-  "Insufficient balance": "Insufficient balance"
+  "Insufficient balance": "Insufficient balance",
+  "isNotSerepayWalletAlert": "Please switch to using Serepay wallet. Documents download link: ",
+  "download": "Download"
 }

@@ -2,6 +2,7 @@ import moment from "moment";
 import NextUserTier from "../models/nextUserTierModel.js";
 import Tree from "../models/treeModel.js";
 import User from "../models/userModel.js";
+import axios from "axios";
 
 export const getParentUser = async (userId, tier) => {
   const tree = await Tree.findOne({ userId, tier });
@@ -224,4 +225,22 @@ export const checkRatioCountChildOfUser = async (userId) => {
       return false;
     }
   }
+};
+
+export const checkSerepayWallet = async (walletAddress) => {
+  return axios
+    .post(`${process.env.SEREPAY_HOST}/api/user/checkwallet`, {
+      wallet: walletAddress,
+    })
+    .then(async (response) => {
+      return response.data.status;
+    })
+    .catch((error) => {
+      return false;
+      // let message =
+      //   error.response && error.response.data.message
+      //     ? error.response.data.message
+      //     : error.message;
+      // throw new Error(message);
+    });
 };

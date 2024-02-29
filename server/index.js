@@ -61,6 +61,7 @@ connectDB();
 app.use(express.json()); // middleware to use req.body
 app.use(cors()); // to avoid CORS errors
 app.use(helmet());
+app.use(express.static("public"));
 
 // use cookie sessions
 app.use(
@@ -141,14 +142,14 @@ const cron8 = new CronJob("30 23 * * *", async () => {
   console.log("Check block children done");
 });
 
-// cron1.start();
-// cron2.start();
-// cron3.start();
-// cron4.start();
-// cron5.start();
-// cron6.start();
-// cron7.start();
-// cron8.start();
+cron1.start();
+cron2.start();
+cron3.start();
+cron4.start();
+cron5.start();
+cron6.start();
+cron7.start();
+cron8.start();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>

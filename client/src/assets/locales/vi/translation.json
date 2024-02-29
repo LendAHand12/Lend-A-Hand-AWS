@@ -373,5 +373,7 @@
   "otp is required": "Vui lòng điền mã otp",
   "Money transfer successful!": "Thanh toán thành công",
   "system update successful": "Update hệ thống thành công",
-  "Insufficient balance": "Không đủ số dư"
+  "Insufficient balance": "Không đủ số dư",
+  "isNotSerepayWalletAlert": "Vui lòng chuyển sang sử dụng ví Serepay. Link tải tài liệu hướng dẫn : ",
+  "download": "Tải xuống"
 }

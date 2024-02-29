@@ -43,6 +43,7 @@ const Profile = () => {
     tier3Time,
     tier4Time,
     tier5Time,
+    isSerepayWallet,
   } = userInfo;
   const [imgFront, setImgFront] = useState("");
   const [imgBack, setImgBack] = useState("");
@@ -250,6 +251,27 @@ const Profile = () => {
             role="alert"
           >
             <span className="block sm:inline">{t("infoAccountAlert")}</span>
+          </div>
+        )}
+
+        {!isSerepayWallet && (
+          <div
+            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-5"
+            role="alert"
+          >
+            <span className="block sm:inline">
+              {t("isNotSerepayWalletAlert")}{" "}
+              <span className="underline">
+                <a
+                  download
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  href={`${import.meta.env.VITE_API_URL}/documents/SEREPAY_DOCUMENT.pdf`}
+                >
+                  {t("download")}
+                </a>
+              </span>
+            </span>
           </div>
         )}
         <div className="md:flex no-wrap md:-mx-2 ">

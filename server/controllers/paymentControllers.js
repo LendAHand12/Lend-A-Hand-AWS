@@ -12,6 +12,7 @@ import {
   checkRatioCountChildOfUser,
   getParentUser,
   getRefParentUser,
+  checkSerepayWallet,
 } from "../utils/methods.js";
 import { checkCanIncreaseNextTier } from "./userControllers.js";
 import Wallet from "../models/walletModel.js";
@@ -89,7 +90,8 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       let registerFee = user.countPay === 0 ? 7 * user.tier : 0;
       let directCommissionWallet = "";
       let directCommissionFee = 5 * user.tier;
-      let referralCommissionFee = 10 * user.tier;
+      // let referralCommissionFee = 10 * user.tier;
+      let referralCommissionFee = 1 * user.tier;
 
       // delete pending trans
       await Transaction.deleteMany({
@@ -129,7 +131,8 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
 
       if (user.tier >= 2 || user.buyPackage === "A") {
         if (user.countPay === 0) {
-          directCommissionFee = 65 * user.tier;
+          // directCommissionFee = 65 * user.tier;
+          directCommissionFee = 6 * user.tier;
           if (refUser.closeLah) {
             directCommissionWallet = holdWallet[user.tier];
             haveRefNotPayEnough = true;
@@ -350,6 +353,16 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
 
         if (haveParentNotPayEnough) {
           referralCommissionWallet = holdWallet[user.tier];
+        }
+
+        if (referralCommissionWallet === receiveUser.walletAddress[0]) {
+          const isSerepayWallet = await checkSerepayWallet(
+            receiveUser.walletAddress[0]
+          );
+          if (!isSerepayWallet) {
+            referralCommissionWallet = holdWallet[user.tier];
+          }
+          console.log({ isSerepayWallet });
         }
 
         payments.push({
@@ -1577,6 +1590,7 @@ const checkCanRefundPayment = asyncHandler(async (req, res) => {
     const userReceive = await User.findOne({
       walletAddress: { $in: [address_ref] },
     });
+    const isSerepayWallet = await checkSerepayWallet(userReceive.walletAddress);
     if (userReceive) {
       if (userReceive.status === "LOCKED") {
         res.status(404);
@@ -1584,6 +1598,8 @@ const checkCanRefundPayment = asyncHandler(async (req, res) => {
       } else if (userReceive.closeLah) {
         res.status(404);
         throw new Error(`User is being blocked from trading`);
+      } else if (!isSerepayWallet) {
+        throw new Error(`The wallet received is not a Serepay wallet`);
       } else if (userReceive.countPay - 1 < userCountPay) {
         res.status(404);
         throw new Error(

@@ -41,7 +41,6 @@ const PaymentPage = () => {
     await Payment.getPaymentInfo(continueWithBuyPackageB)
       .then((response) => {
         const { payments, paymentIds } = response.data;
-        console.log({ payments, paymentIds });
         const totalPayment = paymentIds.reduce(
           (accumulator, currentValue) => accumulator + currentValue.amount,
           0
