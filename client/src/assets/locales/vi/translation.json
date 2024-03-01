@@ -375,5 +375,6 @@
   "system update successful": "Update hệ thống thành công",
   "Insufficient balance": "Không đủ số dư",
   "isNotSerepayWalletAlert": "Vui lòng chuyển sang sử dụng ví Serepay. Link tải tài liệu hướng dẫn : ",
-  "download": "Tải xuống"
+  "download": "Tải xuống",
+  "The wallet address does not exist in the Serepay system": "Địa chỉ ví không tồn tại trong hệ thống Serepay"
 }
