@@ -22,14 +22,12 @@ const ListUserNextTierPage = () => {
   const [totalPage, setTotalPage] = useState(0);
   const [currentChooseTier, setCurrentChooseTier] = useState(0);
   const [keyword, setKeyword] = useState("");
-  const [childLength, setChildLenght] = useState(0);
 
   useEffect(() => {
     (async () => {
       setLoading(true);
       await User.getListNextUserTier()
         .then((response) => {
-          console.log({ data: response.data });
           setData(response.data);
           setLoading(false);
         })
@@ -48,41 +46,37 @@ const ListUserNextTierPage = () => {
     setCurrentChooseTier(tier);
   };
 
-  const getUserWithTier = useCallback(
-    (tier, pageNumber, searchKey, childLength) => {
-      (async () => {
-        setLoading(true);
-        await User.getUsersWithTier({
-          tier,
-          pageNumber,
-          searchKey,
-          childLength,
-        })
-          .then((response) => {
-            const { users, pages } = response.data;
-            setUsers(users);
-            setTotalPage(pages);
+  const getUserWithTier = useCallback((tier, pageNumber, searchKey) => {
+    (async () => {
+      setLoading(true);
+      await User.getUsersWithTier({
+        tier,
+        pageNumber,
+        searchKey,
+      })
+        .then((response) => {
+          const { users, pages } = response.data;
+          setUsers(users);
+          setTotalPage(pages);
 
-            setLoading(false);
-          })
-          .catch((error) => {
-            let message =
-              error.response && error.response.data.error
-                ? error.response.data.error
-                : error.message;
-            toast.error(t(message));
-            setLoading(false);
-          });
-      })();
-    },
-    []
-  );
+          setLoading(false);
+        })
+        .catch((error) => {
+          let message =
+            error.response && error.response.data.error
+              ? error.response.data.error
+              : error.message;
+          toast.error(t(message));
+          setLoading(false);
+        });
+    })();
+  }, []);
 
   useEffect(() => {
     if (currentChooseTier !== 0) {
-      getUserWithTier(currentChooseTier, pageNumber, searchKey, childLength);
+      getUserWithTier(currentChooseTier, pageNumber, searchKey);
     }
-  }, [currentChooseTier, pageNumber, searchKey, childLength]);
+  }, [currentChooseTier, pageNumber, searchKey]);
 
   const handleChangePage = (page) => {
     setPageNumber(page);
@@ -114,7 +108,6 @@ const ListUserNextTierPage = () => {
                     const { message } = response.data;
                     setRefresh(!refresh);
                     setCurrentChooseTier(0);
-                    setChildLenght(0);
                     toast.success(t(message));
                   })
                   .catch((error) => {
@@ -135,8 +128,6 @@ const ListUserNextTierPage = () => {
     },
     [currentChooseTier]
   );
-
-  const onChangeChildLength = (e) => setChildLenght(e.target.value);
 
   return (
     <div>
@@ -219,19 +210,6 @@ const ListUserNextTierPage = () => {
             {t("chooseNextUserForTier")} {currentChooseTier}
           </h1>
           <div className="flex items-center justify-between pb-4 bg-white">
-            <div className="flex items-center gap-4">
-              <p>{t("countChild")} :</p>
-              <select
-                className="block p-2 pr-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none active:outline-none"
-                onChange={onChangeChildLength}
-                value={childLength}
-                disabled={loading}
-              >
-                <option value={0}>0</option>
-                <option value={1}>1</option>
-                <option value={2}>2</option>
-              </select>
-            </div>
             <label htmlFor="table-search" className="sr-only">
               Search
             </label>

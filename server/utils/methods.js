@@ -35,55 +35,6 @@ export const getRefParentUser = async (userId, tier) => {
   return parentUser;
 };
 
-// Hàm tìm người sẽ được lắp tiếp theo
-
-// export const findNextUser = async (tier) => {
-//   const newAllTrees = await Tree.find({ tier }).sort({ createdAt: 1 });
-
-//   for (let tree of newAllTrees) {
-//     console.log({
-//       name: tree.userName,
-//       id: tree.userId,
-//       length: tree.children.length,
-//     });
-//   }
-
-//   const list3Child = newAllTrees.filter((tree) => tree.children.length === 3);
-//   if (list3Child.length === newAllTrees.length) return newAllTrees[0].userId;
-//   const list2Child = newAllTrees.filter((tree) => tree.children.length === 2);
-//   if (list2Child.length === newAllTrees.length) return newAllTrees[0].userId;
-//   const list1Child = newAllTrees.filter((tree) => tree.children.length === 1);
-//   if (list1Child.length === newAllTrees.length) return newAllTrees[0].userId;
-//   const list0Child = newAllTrees.filter((tree) => tree.children.length === 0);
-//   if (list0Child.length === newAllTrees.length) return newAllTrees[0].userId;
-
-//   const max = findMax(newAllTrees.map((item) => item.children.length));
-//   console.log({ max });
-
-//   for (let i = 0; i < newAllTrees.length; i++) {
-//     if (newAllTrees[i].children.length < 3) {
-//       const listAe = await Tree.find({
-//         $and: [
-//           { parentId: newAllTrees[i].userId },
-//           { tier },
-//           { userName: { $ne: newAllTrees[i].userName } },
-//         ],
-//       }).sort({ createdAt: 1 });
-//       if (listAe.length > 0) {
-//         for (let ae of listAe) {
-//           if (ae.children.length < newAllTrees[i].children.length) {
-//             return ae.userId;
-//           }
-//         }
-//       }
-//       if (newAllTrees[i].children.length < max) {
-//         if (newAllTrees[i].children.length > newAllTrees[i + 1].children.length)
-//           return newAllTrees[i + 1].userId;
-//       }
-//     }
-//   }
-// };
-
 export const findNextUser = async (tier) => {
   const nextUserInDB = await NextUserTier.findOne({ tier });
   if (nextUserInDB) return nextUserInDB.userId;
@@ -116,83 +67,35 @@ export const findNextUser = async (tier) => {
     : "6494e9101e2f152a593b66f2";
 };
 
-// const findNextUser = async (tier) => {
-// const nextUserInDB = await NextUserTier.findOne({ tier });
-//   if (nextUserInDB) return nextUserInDB.userId;
-//   const newAllTrees = await Tree.find({ tier }).sort({ createdAt: 1 });
-//   const userIdCheckLevel1 = await checkNextUserLevel1(tier);
-//   const indexOfNextUser = newAllTrees.findIndex(
-//     (ele) => ele.userId === userIdCheckLevel1
-//   );
-//   const newAllTrees2 = newAllTrees.splice(0, indexOfNextUser);
-//   for (let tree of newAllTrees2) {
-//     if (tree.children.length < 3) {
-//       return tree.userId;
-//     }
-//   }
-//   return userIdCheckLevel1;
-// }
+export const findNextUserNotIncludeNextUserTier = async (tier) => {
+  const admin = await User.findById("6494e9101e2f152a593b66f2");
+  if (!admin) throw "Unknow admin";
+  const listUserLevel = await findUsersAtLevel(
+    admin._id,
+    admin.currentLayer[tier - 1],
+    2,
+    1
+  );
+  const sortedData = listUserLevel.sort(
+    (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+  );
+  // for (let user of sortedData) {
+  //   console.log({
+  //     userName: user.userName,
+  //     length: user.children.length,
+  //     createdAt: user.createdAt,
+  //   });
+  // }
 
-// const checkNextUserLevel1 = async (tier) => {
-//   const newAllTrees = await Tree.find({ tier }).sort({ createdAt: 1 });
-//   const allTrees = newAllTrees.filter((ele) => ele.children.length < 3);
-
-//   const max = findMax(allTrees.map((item) => item.children.length));
-
-//   for (let i = 0; i < allTrees.length; i++) {
-//     if (allTrees[i].children.length === 2) {
-//       if (allTrees[i].children.length > allTrees[i + 1].children.length) {
-//         return allTrees[i + 1].userId;
-//       }
-//     } else {
-//       const nextUserId = findNext(allTrees, max, tier);
-
-//       if (nextUserId) {
-//         return nextUserId;
-//       } else {
-//         return allTrees[0].userId;
-//       }
-//     }
-//   }
-// };
-
-// async function findNext(allTrees, max, tier) {
-//   for (let i = 0; i < allTrees.length; i++) {
-//     if (allTrees[i].children.length < max) {
-//       if (allTrees[i].parentId) {
-//         const parent = await Tree.findOne({
-//           userId: allTrees[i].parentId,
-//           tier,
-//         });
-//         if (parent && parent.children.length < 3) {
-//           return parent.userId;
-//         } else {
-//           return allTrees[i].userId;
-//         }
-//       } else {
-//         return allTrees[i].userId;
-//       }
-//     } else {
-//       return allTrees[i].userId;
-//     }
-//   }
-// }
-
-// function findMax(arr) {
-//   if (arr.length === 0) {
-//     return -1; // Trả về -1 nếu mảng rỗng
-//   }
-
-//   let maxValue = arr[0];
-
-//   for (let i = 1; i < arr.length; i++) {
-//     if (arr[i] > maxValue) {
-//       maxValue = arr[i];
-//     }
-//   }
-
-//   return maxValue;
-// }
+  const itemWithMinLength = sortedData.reduce((minItem, currentItem) => {
+    return currentItem.children.length < minItem.children.length
+      ? currentItem
+      : minItem;
+  }, sortedData[0]);
+  return itemWithMinLength
+    ? itemWithMinLength.userId
+    : "6494e9101e2f152a593b66f2";
+};
 
 async function findUsersAtLevel(
   rootUserId,
