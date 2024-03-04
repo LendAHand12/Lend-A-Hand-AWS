@@ -13,6 +13,7 @@ import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { UPDATE_USER_INFO, LOGOUT } from "@/slices/authSlice";
 import { useLocation } from "react-router-dom";
+import { useDisconnect } from "wagmi";
 
 const AppLayout = () => {
   const { t } = useTranslation();
@@ -21,32 +22,42 @@ const AppLayout = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const location = useLocation();
   const { pathname } = location;
+  const { disconnect } = useDisconnect();
+
+  const handleLogout = () => {
+    disconnect();
+    dispatch(LOGOUT());
+  };
 
   var routes = [];
   if (!userInfo) {
     history.push("/login");
   } else {
-    const { permissions } = userInfo;
-    if (userInfo.role !== "user") {
-      routes = AdminRoutes.filter((route) => {
-        let currentRoute = `/admin${route.path}`;
-        let page = permissions.find((ele) => ele.page?.path === currentRoute);
-        if (page && page.actions.includes("read")) {
-          return route;
-        }
-      });
-    } else {
-      routes = UserRoutes.filter((route) => {
-        if (route.permissionWithStatus.includes(userInfo.status)) {
-          if (userInfo.phone === "" || userInfo.idCode === "") {
-            if (route.noNeedCheckInfo) {
-              return route;
-            }
-          } else {
+    try {
+      const { permissions } = userInfo;
+      if (userInfo.role !== "user") {
+        routes = AdminRoutes.filter((route) => {
+          let currentRoute = `/admin${route.path}`;
+          let page = permissions.find((ele) => ele.page?.path === currentRoute);
+          if (page && page.actions.includes("read")) {
             return route;
           }
-        }
-      });
+        });
+      } else {
+        routes = UserRoutes.filter((route) => {
+          if (route.permissionWithStatus.includes(userInfo.status)) {
+            if (userInfo.phone === "" || userInfo.idCode === "") {
+              if (route.noNeedCheckInfo) {
+                return route;
+              }
+            } else {
+              return route;
+            }
+          }
+        });
+      }
+    } catch (err) {
+      handleLogout();
     }
   }
 
