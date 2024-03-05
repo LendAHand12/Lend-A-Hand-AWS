@@ -528,38 +528,38 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
       throw new Error("User not have child");
     } else {
       const tree = { key: user._id, label: user.userId, nodes: [] };
-      let level, listUserOfLevel;
-      if (userRequest.isAdmin && currentTier >= 2) {
-        level = await findLevelById(user._id, currentTier);
-        listUserOfLevel = await findUsersAtLevel(
-          "6494e9101e2f152a593b66f2",
-          level + 1,
-          currentTier
-        );
-        listUserOfLevel.sort((a, b) => {
-          return new Date(a.createdAt) - new Date(b.createdAt);
-        });
-      }
+      // let level, listUserOfLevel;
+      // if (userRequest.isAdmin && currentTier >= 2) {
+      //   level = await findLevelById(user._id, currentTier);
+      //   listUserOfLevel = await findUsersAtLevel(
+      //     "6494e9101e2f152a593b66f2",
+      //     level + 1,
+      //     currentTier
+      //   );
+      //   listUserOfLevel.sort((a, b) => {
+      //     return new Date(a.createdAt) - new Date(b.createdAt);
+      //   });
+      // }
       for (const childId of treeOfUser.children) {
         const child = await User.findById(childId).select(
           "tier userId buyPackage countChild countPay fine status errLahCode"
         );
-        // const childTree = await Tree.findOne({
-        //   userId: childId,
-        //   tier: currentTier,
-        // });
-        const childTree = await Tree.findOneAndUpdate(
-          { userId: childId, tier: currentTier },
-          {
-            $set: {
-              indexOnLevel:
-                userRequest.isAdmin && currentTier >= 2
-                  ? listUserOfLevel.findIndex((ele) => ele.userId === childId) +
-                    1
-                  : 0,
-            },
-          }
-        );
+        const childTree = await Tree.findOne({
+          userId: childId,
+          tier: currentTier,
+        });
+        // const childTree = await Tree.findOneAndUpdate(
+        //   { userId: childId, tier: currentTier },
+        //   {
+        //     $set: {
+        //       indexOnLevel:
+        //         userRequest.isAdmin && currentTier >= 2
+        //           ? listUserOfLevel.findIndex((ele) => ele.userId === childId) +
+        //             1
+        //           : 0,
+        //     },
+        //   }
+        // );
 
         tree.nodes.push({
           key: child._id,

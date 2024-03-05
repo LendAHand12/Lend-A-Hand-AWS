@@ -46,6 +46,7 @@ import {
   nextUserWithTier,
   addLockTime,
   addTierTime,
+  countIndexTree,
 } from "./common.js";
 
 const app = express();
@@ -61,6 +62,7 @@ connectDB();
 // await checkUnPayUserOnTierUser(2);
 // await addLockTime();
 // await addTierTime();
+// await countIndexTree();
 
 app.use(express.json({ limit: "50mb", extended: true }));
 app.use(express.urlencoded({ extended: false, limit: "2gb" }));
@@ -151,14 +153,14 @@ const cron8 = new CronJob("30 23 * * *", async () => {
   console.log("Check block children done");
 });
 
-cron1.start();
-cron2.start();
-cron3.start();
-cron4.start();
-cron5.start();
-cron6.start();
-cron7.start();
-cron8.start();
+// cron1.start();
+// cron2.start();
+// cron3.start();
+// cron4.start();
+// cron5.start();
+// cron6.start();
+// cron7.start();
+// cron8.start();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
