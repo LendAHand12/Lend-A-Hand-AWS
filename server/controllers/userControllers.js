@@ -515,7 +515,7 @@ const getTreeOfUser = asyncHandler(async (req, res) => {
 
 const getChildsOfUserForTree = asyncHandler(async (req, res) => {
   const { id, currentTier } = req.body;
-  console.log({ id, currentTier });
+  // console.log({ id, currentTier });
   const userRequest = req.user;
   const user = await User.findOne({ _id: id }).select("userId countChild");
   const treeOfUser = await Tree.findOne({
@@ -530,14 +530,15 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
     } else {
       const tree = { key: user._id, label: user.userId, nodes: [] };
       const level = await findLevelById(user._id, currentTier);
-      console.log({ level });
       const listUserOfLevel = await findUsersAtLevel(
         "6494e9101e2f152a593b66f2",
         level + 1,
-        currentTier,
-        level + 1
+        currentTier
       );
-      console.log({ listUserOfLevel });
+      listUserOfLevel.sort((a, b) => {
+        return new Date(a.createdAt) - new Date(b.createdAt);
+      });
+      // console.log({ level, listUserOfLevel });
       for (const childId of treeOfUser.children) {
         const child = await User.findById(childId).select(
           "tier userId buyPackage countChild countPay fine status errLahCode"

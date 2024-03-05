@@ -6,21 +6,27 @@ import NoContent from "@/components/NoContent";
 import transStatus from "@/constants/transStatus";
 import { useTranslation } from "react-i18next";
 import { ToastContainer, toast } from "react-toastify";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 // import { shortenWalletAddress } from "@/utils";
 import { PaginationControl } from "react-bootstrap-pagination-control";
 
 const Transactions = () => {
   const { t } = useTranslation();
   const history = useHistory();
-  const [pageNumber, setPageNumber] = useState(1);
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const key = searchParams.get("keyword");
+  const page = searchParams.get("page");
+  const status = searchParams.get("status");
+  const paramsTier = searchParams.get("tier");
+  const [pageNumber, setPageNumber] = useState(page ? page : 1);
   const [totalPage, setTotalPage] = useState(0);
-  const [keyword, setKeyword] = useState("");
-  const [searchStatus, setSearchStatus] = useState("HOLD");
+  const [keyword, setKeyword] = useState(key ? key : "");
+  const [searchStatus, setSearchStatus] = useState(status ? status : "HOLD");
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
-  const [searchKey, setSearchKey] = useState("");
-  const [tier, setTier] = useState(1);
+  const [searchKey, setSearchKey] = useState(key ? key : "");
+  const [tier, setTier] = useState(paramsTier ? paramsTier : 1);
 
   useEffect(() => {
     (async () => {
@@ -31,6 +37,7 @@ const Transactions = () => {
           setData(payments);
           setTotalPage(pages);
           setLoading(false);
+          pushParamsToUrl(pageNumber, searchKey, searchStatus, tier);
         })
         .catch((error) => {
           let message =
@@ -47,12 +54,13 @@ const Transactions = () => {
     (async () => {
       setLoading(true);
       setPageNumber(1);
-      await Payment.getAllPayments(1, searchKey, searchStatus, tier)
+      await Payment.getAllPayments(pageNumber, searchKey, searchStatus, tier)
         .then((response) => {
           const { payments, pages } = response.data;
           setData(payments);
           setTotalPage(pages);
           setLoading(false);
+          pushParamsToUrl(pageNumber, searchKey, searchStatus, tier);
         })
         .catch((error) => {
           let message =
@@ -64,6 +72,27 @@ const Transactions = () => {
         });
     })();
   }, [searchKey, searchStatus, tier]);
+
+  const pushParamsToUrl = (pageNumber, searchKey, searchStatus, tier) => {
+    const searchParams = new URLSearchParams();
+    if (searchKey) {
+      searchParams.set("keyword", searchKey);
+    }
+    if (pageNumber) {
+      searchParams.set("page", pageNumber);
+    }
+    if (searchStatus) {
+      searchParams.set("status", searchStatus);
+    }
+    if (tier) {
+      searchParams.set("tier", tier);
+    }
+    const queryString = searchParams.toString();
+    const url = queryString
+      ? `/admin/transactions?${queryString}`
+      : "/admin/transactions";
+    history.push(url);
+  };
 
   const onChangeStatus = (e) => setSearchStatus(e.target.value);
 

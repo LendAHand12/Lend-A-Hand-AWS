@@ -47,7 +47,6 @@ export const findNextUser = async (tier) => {
     1
   );
 
-  console.log({ listUserLevel });
   const sortedData = listUserLevel.sort(
     (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
   );
