@@ -74,9 +74,11 @@ const TreePage = ({ match }) => {
               : "#16a34a",
           }}
         >
-          <div className="absolute bg-white border border-gray-900 rounded-full text-black -top-4 -right-4 w-8 h-8 flex justify-center items-center">
-            {indexOnLevel}
-          </div>
+          {indexOnLevel && indexOnLevel !== 0 && (
+            <div className="absolute bg-white border border-gray-900 rounded-full text-black -top-4 -right-4 w-8 h-8 flex justify-center items-center">
+              {indexOnLevel}
+            </div>
+          )}
           <div className="flex flex-col items-center">
             <span>{children}</span>
             <svg
