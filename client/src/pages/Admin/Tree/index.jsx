@@ -57,11 +57,11 @@ const TreePage = ({ match }) => {
   }, [id]);
 
   const StyledNode = useCallback(
-    ({ children, onClick, layer, isRed, isYellow, isGray }) => {
+    ({ children, onClick, layer, isRed, isYellow, isGray, indexOnLevel }) => {
       return (
         <div
           onClick={onClick}
-          className={`cursor-pointer p-3 rotate-180 text-white text-sm rounded-md inline-block`}
+          className={`relative cursor-pointer p-3 rotate-180 text-white text-sm rounded-md inline-block`}
           style={{
             backgroundColor: isGray
               ? "#8c8c8c"
@@ -74,6 +74,9 @@ const TreePage = ({ match }) => {
               : "#16a34a",
           }}
         >
+          <div className="absolute bg-white border border-gray-900 rounded-full text-black -top-4 -right-4 w-8 h-8 flex justify-center items-center">
+            {indexOnLevel}
+          </div>
           <div className="flex flex-col items-center">
             <span>{children}</span>
             <svg
@@ -121,6 +124,7 @@ const TreePage = ({ match }) => {
             isRed={node.isRed}
             isGray={node.isGray}
             isYellow={node.isYellow}
+            indexOnLevel={node.indexOnLevel}
           >
             {node.label}
           </StyledNode>

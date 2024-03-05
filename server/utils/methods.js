@@ -46,6 +46,7 @@ export const findNextUser = async (tier) => {
     2,
     1
   );
+
   const sortedData = listUserLevel.sort(
     (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
   );
@@ -97,12 +98,12 @@ export const findNextUserNotIncludeNextUserTier = async (tier) => {
     : "6494e9101e2f152a593b66f2";
 };
 
-async function findUsersAtLevel(
+export const findUsersAtLevel = async (
   rootUserId,
   targetLevel,
   tier,
   currentLevel = 1
-) {
+) => {
   if (currentLevel > targetLevel) {
     return [];
   }
@@ -133,7 +134,7 @@ async function findUsersAtLevel(
   }
 
   return usersAtLevel;
-}
+};
 
 export const findRootLayer = async (id, tier) => {
   // Tìm người dùng root đầu tiên (có parentId null)
@@ -249,4 +250,36 @@ export const removeAccents = (str) => {
     str = str.replace(re, char);
   }
   return str.toLowerCase();
+};
+
+export const findLevelById = async (userId, tier) => {
+  try {
+    // Tìm node trong cây với userId được cung cấp
+    const node = await Tree.findOne({ userId, tier });
+
+    if (!node) {
+      return -1;
+    }
+
+    // Đếm số lớp cha để xác định cấp độ
+    let level = 0;
+    let currentParentId = node.parentId;
+
+    while (currentParentId) {
+      // Tìm node cha của node hiện tại
+      const parentNode = await Tree.findOne({ userId: currentParentId, tier });
+
+      if (!parentNode) {
+        break; // Trong trường hợp có lỗi hoặc mất dữ liệu
+      }
+
+      level++;
+      currentParentId = parentNode.parentId;
+    }
+
+    return level;
+  } catch (error) {
+    console.error("Error finding level:", error);
+    return -1;
+  }
 };

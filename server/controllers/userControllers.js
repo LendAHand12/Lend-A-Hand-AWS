@@ -14,6 +14,8 @@ import {
   findNextUser,
   findNextUserNotIncludeNextUserTier,
   findRootLayer,
+  findLevelById,
+  findUsersAtLevel,
 } from "../utils/methods.js";
 import generateGravatar from "../utils/generateGravatar.js";
 import { areArraysEqual } from "../cronJob/index.js";
@@ -513,18 +515,30 @@ const getTreeOfUser = asyncHandler(async (req, res) => {
 
 const getChildsOfUserForTree = asyncHandler(async (req, res) => {
   const { id, currentTier } = req.body;
+  // console.log({ id, currentTier });
   const userRequest = req.user;
   const user = await User.findOne({ _id: id }).select("userId countChild");
   const treeOfUser = await Tree.findOne({
     userId: id,
     tier: currentTier,
   }).select("userId children");
+
   if (user) {
     if (treeOfUser.children.length === 0) {
       res.status(404);
       throw new Error("User not have child");
     } else {
       const tree = { key: user._id, label: user.userId, nodes: [] };
+      const level = await findLevelById(user._id, currentTier);
+      const listUserOfLevel = await findUsersAtLevel(
+        "6494e9101e2f152a593b66f2",
+        level + 1,
+        currentTier
+      );
+      listUserOfLevel.sort((a, b) => {
+        return new Date(a.createdAt) - new Date(b.createdAt);
+      });
+      // console.log({ level, listUserOfLevel });
       for (const childId of treeOfUser.children) {
         const child = await User.findById(childId).select(
           "tier userId buyPackage countChild countPay fine status errLahCode"
@@ -560,6 +574,8 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
               ? true
               : false,
           isYellow: child.errLahCode === "OVER30",
+          indexOnLevel:
+            listUserOfLevel.findIndex((ele) => ele.userId === childId) + 1,
         });
       }
       res.status(200).json(tree);

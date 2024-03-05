@@ -155,9 +155,9 @@ const TransactionDetail = () => {
       {!loading && trans !== null && (
         <div className="container mx-auto p-5">
           <div className="mb-3 lg:mb-6">
-            <Link
-              to="/admin/transactions"
-              className="max-w-fit flex text-blue-500 gap-4 hover:underline items-center"
+            <div
+              onClick={() => history.goBack()}
+              className="max-w-fit flex text-blue-500 gap-4 hover:underline items-center cursor-pointer"
             >
               <svg
                 fill="currentColor"
@@ -173,7 +173,7 @@ const TransactionDetail = () => {
                 />
               </svg>
               {t("transactionsList")}
-            </Link>
+            </div>
           </div>
           <div className="md:flex no-wrap md:-mx-2 ">
             <div className="w-full lg:w-3/12 lg:mx-2 mb-4 lg:mb-0">

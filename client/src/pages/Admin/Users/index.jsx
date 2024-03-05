@@ -36,8 +36,8 @@ const Users = () => {
           const { users, pages } = response.data;
           setData(users);
           setTotalPage(pages);
-
           setLoading(false);
+          pushParamsToUrl(pageNumber, searchKey, searchStatus);
         })
         .catch((error) => {
           let message =
@@ -59,8 +59,9 @@ const Users = () => {
           const { users, pages } = response.data;
           setData(users);
           setTotalPage(pages);
-
           setLoading(false);
+
+          pushParamsToUrl(pageNumber, searchKey, searchStatus);
         })
         .catch((error) => {
           let message =
@@ -77,6 +78,22 @@ const Users = () => {
 
   const onSearch = (e) => {
     setKeyword(e.target.value);
+  };
+
+  const pushParamsToUrl = (pageNumber, searchKey, searchStatus) => {
+    const searchParams = new URLSearchParams();
+    if (searchKey) {
+      searchParams.set("keyword", searchKey);
+    }
+    if (pageNumber) {
+      searchParams.set("page", pageNumber);
+    }
+    if (searchStatus) {
+      searchParams.set("status", searchStatus);
+    }
+    const queryString = searchParams.toString();
+    const url = queryString ? `/admin/users?${queryString}` : "/admin/users";
+    history.push(url);
   };
 
   const handleApprove = async (id) => {
