@@ -296,6 +296,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       const ancestors = await findAncestors(user.id, countLAH, user.tier);
 
       let countPayUser = user.countPay;
+      let indexFor = 1;
       for (let p of ancestors) {
         console.log({ p: p.userName });
         let referralCommissionWallet, haveParentNotPayEnough;
@@ -312,7 +313,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         } else {
           if (
             receiveUser.status === "LOCKED" ||
-            receiveUser.errLahCode !== "" ||
+            (receiveUser.errLahCode !== "" && indexFor > 6) ||
             receiveUser.tier < user.tier ||
             (receiveUser.tier === user.tier &&
               receiveUser.countPay < user.countPay + 1)
@@ -362,7 +363,6 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           if (!isSerepayWallet) {
             referralCommissionWallet = holdWallet[user.tier];
           }
-          console.log({ isSerepayWallet });
         }
 
         payments.push({
@@ -390,6 +390,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           to: referralCommissionWallet,
         });
         countPayUser = countPayUser + 1;
+        indexFor++;
       }
     }
 
@@ -1266,6 +1267,7 @@ const addPayment = asyncHandler(async (req, res) => {
 const onDonePayment = asyncHandler(async (req, res) => {
   const { user } = req;
   const { transIds } = req.body;
+  console.log({ transIds });
   const transIdsList = Object.values(transIds);
   if (transIdsList.length > 0) {
     if (transIdsList.length === 1 && transIdsList[0].type === "FINE") {
@@ -1305,9 +1307,9 @@ const onDonePayment = asyncHandler(async (req, res) => {
       user.countPay =
         transIds.length === 15
           ? 13
-          : transIds.length === 7
+          : transIds.length === 9
           ? 7
-          : transIds.length === 6
+          : transIds.length === 7
           ? 13
           : user.countPay + 1;
     }

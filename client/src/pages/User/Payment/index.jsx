@@ -126,9 +126,8 @@ const PaymentPage = () => {
           arrayWallet: paymentsList,
         }
       )
-      .then((response) => {
+      .then(() => {
         setLoadingGetOtp(false);
-        console.log(response);
         openModal();
       })
       .catch((error) => {
@@ -264,11 +263,7 @@ const PaymentPage = () => {
                   <p>OTP Verification</p>
                 </div>
                 <div className="flex flex-row text-sm text-gray-700">
-                  <p>
-                    {t("We have sent a code to your email")}
-                    {" : "}
-                    {userInfo.email}
-                  </p>
+                  <p>{t("We have sent a code to your email")}</p>
                 </div>
               </div>
 
