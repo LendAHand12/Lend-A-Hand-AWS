@@ -283,3 +283,32 @@ export const findLevelById = async (userId, tier) => {
     return -1;
   }
 };
+
+export const findLowestLevelUsers = async (
+  rootUserId,
+  tier,
+  currentLevel = 1
+) => {
+  const root = await Tree.findOne({ userId: rootUserId, tier }).populate(
+    "children"
+  );
+  if (!root) {
+    return [];
+  }
+
+  if (currentLevel === root.tier) {
+    return [root];
+  }
+
+  let usersAtLevel = [];
+  for (const child of root.children) {
+    const usersInChildren = await findLowestLevelUsers(
+      child,
+      tier,
+      currentLevel + 1
+    );
+    usersAtLevel = usersAtLevel.concat(usersInChildren);
+  }
+
+  return usersAtLevel;
+};
