@@ -169,7 +169,8 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         }
       } else if (user.tier === 1 && user.buyPackage === "B") {
         if (user.countPay === 0) {
-          directCommissionFee = 35 * user.tier;
+          // directCommissionFee = 35 * user.tier;
+          directCommissionFee = 3 * user.tier;
           if (refUser.closeLah) {
             directCommissionWallet = holdWallet[user.tier];
             haveRefNotPayEnough = true;
@@ -192,7 +193,8 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
             }
           }
         } else if (user.countPay === 7 && user.continueWithBuyPackageB) {
-          directCommissionFee = 30 * user.tier;
+          // directCommissionFee = 30 * user.tier;
+          directCommissionFee = 4 * user.tier;
           if (refUser.closeLah) {
             directCommissionWallet = holdWallet[user.tier];
             haveRefNotPayEnough = true;
@@ -283,17 +285,21 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         user.continueWithBuyPackageB
       );
 
-      const countLAH =
-        user.buyPackage === "A"
-          ? 13
-          : user.buyPackage === "B" && user.countPay === 0
-          ? 7
-          : user.buyPackage === "B" &&
-            user.countPay === 7 &&
-            continueWithBuyPackageB
-          ? 6
-          : 1;
-      const ancestors = await findAncestors(user.id, countLAH, user.tier);
+      const ancestorsData = await findAncestors(user.id, 13, user.tier);
+      let ancestors = [...ancestorsData];
+      if (user.buyPackage === "A") {
+        ancestors = [...ancestorsData];
+      } else if (user.buyPackage === "B" && user.countPay === 0) {
+        ancestors = ancestorsData.slice(0, 6);
+      } else if (
+        user.buyPackage === "B" &&
+        user.countPay === 7 &&
+        continueWithBuyPackageB
+      ) {
+        ancestors = ancestorsData.slice(7);
+      } else {
+        ancestors = ancestorsData.slice(user.countPay, user.countPay + 1);
+      }
 
       let countPayUser = user.countPay;
       let indexFor = 1;
