@@ -290,7 +290,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       if (user.buyPackage === "A") {
         ancestors = [...ancestorsData];
       } else if (user.buyPackage === "B" && user.countPay === 0) {
-        ancestors = ancestorsData.slice(0, 6);
+        ancestors = ancestorsData.slice(0, 7);
       } else if (
         user.buyPackage === "B" &&
         user.countPay === 7 &&
