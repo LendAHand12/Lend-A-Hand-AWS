@@ -1318,6 +1318,19 @@ const onDonePayment = asyncHandler(async (req, res) => {
           : transIds.length === 7
           ? 13
           : user.countPay + 1;
+
+      console.log({ count: user.countPay });
+      if (user.countPay === 13 && user.buyPackage === "B") {
+        if (user.continueWithBuyPackageB === true) {
+          user.buyPackage = "A";
+          await Tree.findOneAndUpdate(
+            { userId: user._id },
+            { buyPackage: "A" }
+          );
+        } else {
+          user.buyPackage = "C";
+        }
+      }
     }
 
     const updatedUser = await user.save();
