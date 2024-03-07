@@ -2,6 +2,7 @@ import moment from "moment";
 import NextUserTier from "../models/nextUserTierModel.js";
 import Tree from "../models/treeModel.js";
 import User from "../models/userModel.js";
+import ADMIN_ID from "../constants/AdminId.js";
 
 export const getParentUser = async (userId, tier) => {
   const tree = await Tree.findOne({ userId, tier });
@@ -254,23 +255,20 @@ export const removeAccents = (str) => {
 
 export const findLevelById = async (userId, tier) => {
   try {
-    // Tìm node trong cây với userId được cung cấp
     const node = await Tree.findOne({ userId, tier });
 
     if (!node) {
       return -1;
     }
 
-    // Đếm số lớp cha để xác định cấp độ
     let level = 0;
     let currentParentId = node.parentId;
 
     while (currentParentId) {
-      // Tìm node cha của node hiện tại
       const parentNode = await Tree.findOne({ userId: currentParentId, tier });
 
       if (!parentNode) {
-        break; // Trong trường hợp có lỗi hoặc mất dữ liệu
+        break;
       }
 
       level++;
@@ -284,31 +282,22 @@ export const findLevelById = async (userId, tier) => {
   }
 };
 
-export const findLowestLevelUsers = async (
-  rootUserId,
-  tier,
-  currentLevel = 1
-) => {
-  const root = await Tree.findOne({ userId: rootUserId, tier }).populate(
-    "children"
-  );
-  if (!root) {
-    return [];
-  }
+export const findHighestLevelUsers = async (tier) => {
+  const rootUser = await User.findById(ADMIN_ID);
+  const targetLevel = rootUser.currentLayer[tier - 1] + 1;
+  let highestLevelUsers = [];
+  highestLevelUsers = await findUsersAtLevel(ADMIN_ID, targetLevel, tier, 1);
+  return highestLevelUsers;
+};
 
-  if (currentLevel === root.tier) {
-    return [root];
-  }
-
-  let usersAtLevel = [];
-  for (const child of root.children) {
-    const usersInChildren = await findLowestLevelUsers(
-      child,
-      tier,
-      currentLevel + 1
+export const findHighestIndexOfLevel = async (tier) => {
+  const highestLevelUsers = await findHighestLevelUsers(tier);
+  if (highestLevelUsers.length === 0) {
+    return 1;
+  } else {
+    const maxIndexOfLevel = Math.max(
+      ...highestLevelUsers.map((o) => o.indexOnLevel)
     );
-    usersAtLevel = usersAtLevel.concat(usersInChildren);
+    return maxIndexOfLevel + 1;
   }
-
-  return usersAtLevel;
 };

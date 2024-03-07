@@ -48,6 +48,7 @@ import {
   addTierTime,
   countIndexTree,
 } from "./common.js";
+import { findHighestIndexOfLevel } from "./utils/methods.js";
 
 const app = express();
 
@@ -58,11 +59,13 @@ if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 connectDB();
 
 // await listTier(2);
-await nextUserWithTier(2);
+// await nextUserWithTier(2);
 // await checkUnPayUserOnTierUser(2);
 // await addLockTime();
 // await addTierTime();
 // await countIndexTree();
+const usersAtLevel = await findHighestIndexOfLevel(2);
+console.log({ usersAtLevel });
 
 app.use(express.json({ limit: "50mb", extended: true }));
 app.use(express.urlencoded({ extended: false, limit: "2gb" }));
