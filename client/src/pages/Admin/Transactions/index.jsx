@@ -15,29 +15,32 @@ const Transactions = () => {
   const history = useHistory();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const key = searchParams.get("keyword");
-  const page = searchParams.get("page");
-  const status = searchParams.get("status");
-  const paramsTier = searchParams.get("tier");
-  const [pageNumber, setPageNumber] = useState(page ? page : 1);
+  const key = searchParams.get("keyword") || "";
+  const page = searchParams.get("page") || 1;
+  const status = searchParams.get("status") || "HOLD";
+  const paramsTier = searchParams.get("tier") || 1;
   const [totalPage, setTotalPage] = useState(0);
-  const [keyword, setKeyword] = useState(key ? key : "");
-  const [searchStatus, setSearchStatus] = useState(status ? status : "HOLD");
+  const [keyword, setKeyword] = useState(key);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
-  const [searchKey, setSearchKey] = useState(key ? key : "");
-  const [tier, setTier] = useState(paramsTier ? paramsTier : 1);
+  const [objectFilter, setObjectFilter] = useState({
+    pageNumber: page,
+    keyword: key,
+    status,
+    tier: paramsTier,
+  });
 
   useEffect(() => {
     (async () => {
       setLoading(true);
-      await Payment.getAllPayments(pageNumber, searchKey, searchStatus, tier)
+      const { pageNumber, keyword, status, tier } = objectFilter;
+      await Payment.getAllPayments(pageNumber, keyword, status, tier)
         .then((response) => {
           const { payments, pages } = response.data;
           setData(payments);
           setTotalPage(pages);
           setLoading(false);
-          pushParamsToUrl(pageNumber, searchKey, searchStatus, tier);
+          pushParamsToUrl(pageNumber, keyword, status, tier);
         })
         .catch((error) => {
           let message =
@@ -48,30 +51,7 @@ const Transactions = () => {
           setLoading(false);
         });
     })();
-  }, [pageNumber]);
-
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
-      setPageNumber(1);
-      await Payment.getAllPayments(pageNumber, searchKey, searchStatus, tier)
-        .then((response) => {
-          const { payments, pages } = response.data;
-          setData(payments);
-          setTotalPage(pages);
-          setLoading(false);
-          pushParamsToUrl(pageNumber, searchKey, searchStatus, tier);
-        })
-        .catch((error) => {
-          let message =
-            error.response && error.response.data.error
-              ? error.response.data.error
-              : error.message;
-          toast.error(t(message));
-          setLoading(false);
-        });
-    })();
-  }, [searchKey, searchStatus, tier]);
+  }, [objectFilter]);
 
   const pushParamsToUrl = (pageNumber, searchKey, searchStatus, tier) => {
     const searchParams = new URLSearchParams();
@@ -94,7 +74,15 @@ const Transactions = () => {
     history.push(url);
   };
 
-  const onChangeStatus = (e) => setSearchStatus(e.target.value);
+  const onChangeStatus = useCallback(
+    (e) =>
+      setObjectFilter({
+        ...objectFilter,
+        pageNumber: 1,
+        status: e.target.value,
+      }),
+    [objectFilter]
+  );
 
   const onSearch = (e) => {
     setTimeout(() => {
@@ -102,17 +90,37 @@ const Transactions = () => {
     }, 1000);
   };
 
-  const handleChangePage = (page) => {
-    setPageNumber(page);
-  };
+  const handleChangePage = useCallback(
+    (page) =>
+      setObjectFilter({
+        ...objectFilter,
+        pageNumber: page,
+      }),
+    [objectFilter]
+  );
 
   const handleRowClick = (id) => {
     history.push(`/admin/transactions/${id}`);
   };
 
   const handleSearch = useCallback(() => {
-    setSearchKey(keyword);
-  }, [keyword]);
+    setObjectFilter({
+      ...objectFilter,
+      pageNumber: 1,
+      keyword,
+    });
+  }, [keyword, objectFilter]);
+
+  const handleChangeTier = useCallback(
+    (newTier) => {
+      setObjectFilter({
+        ...objectFilter,
+        pageNumber: 1,
+        tier: newTier,
+      });
+    },
+    [objectFilter]
+  );
 
   return (
     <div>
@@ -121,9 +129,9 @@ const Transactions = () => {
         {[...Array(5)].map((item, i) => (
           <button
             key={i}
-            onClick={() => setTier(i + 1)}
+            onClick={() => handleChangeTier(i + 1)}
             className={`flex justify-center items-center hover:underline gradient text-white font-bold ${
-              tier === i + 1 ? "border-2 border-gray-700" : ""
+              objectFilter.tier === i + 1 ? "border-2 border-gray-700" : ""
             } rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out`}
           >
             {t("tier")} {i + 1}
@@ -136,7 +144,7 @@ const Transactions = () => {
             <select
               className="block p-2 pr-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none active:outline-none"
               onChange={onChangeStatus}
-              defaultValue={"HOLD"}
+              defaultValue={objectFilter.status}
             >
               <option value="REGISTER" key="REGISTER">
                 {t("REGISTER")}{" "}
@@ -180,6 +188,7 @@ const Transactions = () => {
                 onChange={onSearch}
                 className="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50"
                 placeholder={t("search with user ref code")}
+                defaultValue={objectFilter.keyword}
               />
               <button
                 onClick={handleSearch}
@@ -197,16 +206,17 @@ const Transactions = () => {
               <th scope="col" className="px-6 py-3">
                 {t("send")}
               </th>
-              {searchStatus !== "REGISTER" && searchStatus !== "FINE" && (
-                <>
-                  <th scope="col" className="px-6 py-3">
-                    {t("receive")}
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    {t("count pay")}
-                  </th>
-                </>
-              )}
+              {objectFilter.status !== "REGISTER" &&
+                objectFilter.status !== "FINE" && (
+                  <>
+                    <th scope="col" className="px-6 py-3">
+                      {t("receive")}
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      {t("count pay")}
+                    </th>
+                  </>
+                )}
               <th scope="col" className="px-6 py-3">
                 {t("tier")}
               </th>
@@ -222,7 +232,7 @@ const Transactions = () => {
               <th scope="col" className="px-6 py-3">
                 {t("time")}
               </th>
-              {searchStatus === "HOLD" && (
+              {objectFilter.searchStatus === "HOLD" && (
                 <th scope="col" className="px-6 py-3">
                   {t("refundStatus")}
                 </th>
@@ -251,23 +261,24 @@ const Transactions = () => {
                       </div>
                     </div>
                   </th>
-                  {searchStatus !== "REGISTER" && searchStatus !== "FINE" && (
-                    <>
-                      <td className="px-6 py-4">
-                        <div className="">
-                          <div className="text-base font-semibold">
-                            {ele.userReceiveId}
+                  {objectFilter.searchStatus !== "REGISTER" &&
+                    objectFilter.searchStatus !== "FINE" && (
+                      <>
+                        <td className="px-6 py-4">
+                          <div className="">
+                            <div className="text-base font-semibold">
+                              {ele.userReceiveId}
+                            </div>
+                            <div className="font-normal text-gray-500">
+                              {ele.userReceiveEmail}
+                            </div>
                           </div>
-                          <div className="font-normal text-gray-500">
-                            {ele.userReceiveEmail}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        {ele.userCountPay} {t("times")}
-                      </td>
-                    </>
-                  )}
+                        </td>
+                        <td className="px-6 py-4">
+                          {ele.userCountPay} {t("times")}
+                        </td>
+                      </>
+                    )}
                   <td className="px-6 py-4">{ele.tier}</td>
                   {/* <td className="px-6 py-4 text-blue-600">
                     <a
@@ -291,7 +302,7 @@ const Transactions = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4">{ele.createdAt}</td>
-                  {searchStatus === "HOLD" && (
+                  {objectFilter.searchStatus === "HOLD" && (
                     <td className="px-6 py-4">
                       <div
                         className={`max-w-fit text-white rounded-sm py-1 px-2 text-sm ${
@@ -319,7 +330,9 @@ const Transactions = () => {
           >
             <span className="text-sm font-normal text-gray-500">
               Showing{" "}
-              <span className="font-semibold text-gray-900">{pageNumber}</span>{" "}
+              <span className="font-semibold text-gray-900">
+                {objectFilter.pageNumber}
+              </span>{" "}
               of{" "}
               <span className="font-semibold text-gray-900">{totalPage}</span>{" "}
               page
@@ -377,7 +390,7 @@ const Transactions = () => {
             <div>
               <div>
                 <PaginationControl
-                  page={pageNumber}
+                  page={objectFilter.pageNumber}
                   between={5}
                   total={10 * totalPage}
                   limit={10}

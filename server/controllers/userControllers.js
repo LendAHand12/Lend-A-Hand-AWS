@@ -16,6 +16,8 @@ import {
   findRootLayer,
   findLevelById,
   findUsersAtLevel,
+  findHighestIndexOfLevel,
+  findNextUserByIndex,
 } from "../utils/methods.js";
 import generateGravatar from "../utils/generateGravatar.js";
 import { areArraysEqual } from "../cronJob/index.js";
@@ -1170,7 +1172,7 @@ const onAcceptIncreaseTier = asyncHandler(async (req, res) => {
       await NextUserTier.deleteMany({ tier: u.tier });
       await sendMailUserCanInceaseTierToAdmin(u);
       await checkUnPayUserOnTierUser(u.tier + 1);
-      const newParentId = await findNextUser(nextTier);
+      const newParentId = await findNextUserByIndex(nextTier);
       const newParent = await Tree.findOne({
         userId: newParentId,
         tier: nextTier,
@@ -1179,6 +1181,7 @@ const onAcceptIncreaseTier = asyncHandler(async (req, res) => {
       newParent.children = [...childs, u._id];
       await newParent.save();
 
+      const highestIndexOfLevel = await findHighestIndexOfLevel(nextTier);
       const tree = await Tree.create({
         userName: u.userId,
         userId: u._id,
@@ -1186,6 +1189,7 @@ const onAcceptIncreaseTier = asyncHandler(async (req, res) => {
         refId: newParentId,
         tier: nextTier,
         children: [],
+        indexOnLevel: highestIndexOfLevel,
       });
 
       u.tier = nextTier;
@@ -1371,7 +1375,7 @@ const adminCreateUser = asyncHandler(async (req, res) => {
     });
 
     await checkUnPayUserOnTierUser(tier);
-    const newParentId = await findNextUser(tier);
+    const newParentId = await findNextUserByIndex(tier);
     const newParent = await Tree.findOne({
       userId: newParentId,
       tier,
@@ -1382,6 +1386,7 @@ const adminCreateUser = asyncHandler(async (req, res) => {
 
     await NextUserTier.deleteMany({ tier });
 
+    const highestIndexOfLevel = await findHighestIndexOfLevel(tier);
     await Tree.create({
       userName: user.userId,
       userId: user._id,
@@ -1389,6 +1394,7 @@ const adminCreateUser = asyncHandler(async (req, res) => {
       refId: newParentId,
       tier,
       children: [],
+      indexOnLevel: highestIndexOfLevel,
     });
 
     // await sendMail(user._id, email, "email verification");

@@ -48,7 +48,10 @@ import {
   addTierTime,
   countIndexTree,
 } from "./common.js";
-import { findHighestIndexOfLevel } from "./utils/methods.js";
+import {
+  findHighestIndexOfLevel,
+  findNextUserByIndex,
+} from "./utils/methods.js";
 
 const app = express();
 
@@ -64,8 +67,8 @@ connectDB();
 // await addLockTime();
 // await addTierTime();
 // await countIndexTree();
-const usersAtLevel = await findHighestIndexOfLevel(2);
-console.log({ usersAtLevel });
+// const usersAtLevel = await findNextUserByIndex(2);
+// console.log({ usersAtLevel });
 
 app.use(express.json({ limit: "50mb", extended: true }));
 app.use(express.urlencoded({ extended: false, limit: "2gb" }));
@@ -156,14 +159,14 @@ const cron8 = new CronJob("30 23 * * *", async () => {
   console.log("Check block children done");
 });
 
-// cron1.start();
-// cron2.start();
-// cron3.start();
-// cron4.start();
-// cron5.start();
-// cron6.start();
-// cron7.start();
-// cron8.start();
+cron1.start();
+cron2.start();
+cron3.start();
+cron4.start();
+cron5.start();
+cron6.start();
+cron7.start();
+cron8.start();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>

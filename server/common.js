@@ -6,6 +6,7 @@ import {
   findNextUser,
   findLevelById,
   findUsersAtLevel,
+  findNextUserByIndex,
 } from "./utils/methods.js";
 
 export const transferUserToTree = async () => {
@@ -148,7 +149,7 @@ export const listTier = async (tier) => {
 };
 
 export const nextUserWithTier = async (tier) => {
-  const nextId = await findNextUser(tier);
+  const nextId = await findNextUserByIndex(tier);
   console.log({ nextId });
 };
 

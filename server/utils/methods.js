@@ -301,3 +301,16 @@ export const findHighestIndexOfLevel = async (tier) => {
     return maxIndexOfLevel + 1;
   }
 };
+
+export const findNextUserByIndex = async (tier) => {
+  const lastUserTree = await Tree.findOne({ tier }).sort("-createdAt");
+  const parentOfLastUserTree = await Tree.findOne({
+    userId: lastUserTree.parentId,
+    tier,
+  });
+  const nextUserTree = await Tree.findOne({
+    createdAt: { $gt: parentOfLastUserTree.createdAt },
+    tier,
+  });
+  return nextUserTree.userId;
+};

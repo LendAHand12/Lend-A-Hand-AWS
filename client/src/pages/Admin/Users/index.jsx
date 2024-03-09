@@ -15,29 +15,32 @@ const Users = () => {
   const history = useHistory();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const key = searchParams.get("keyword");
-  const page = searchParams.get("page");
-  const status = searchParams.get("status");
-  const [pageNumber, setPageNumber] = useState(page ? page : 1);
+  const key = searchParams.get("keyword") || "";
+  const page = searchParams.get("page") || 1;
+  const status = searchParams.get("status") || "all";
   const [totalPage, setTotalPage] = useState(0);
-  const [keyword, setKeyword] = useState(key ? key : "");
-  const [searchStatus, setSearchStatus] = useState(status ? status : "all");
+  const [keyword, setKeyword] = useState(key);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [refresh, setRefresh] = useState(false);
-  const [searchKey, setSearchKey] = useState(key ? key : "");
   const { userInfo } = useSelector((state) => state.auth);
+  const [objectFilter, setObjectFilter] = useState({
+    pageNumber: page,
+    keyword: key,
+    status,
+  });
 
   useEffect(() => {
     (async () => {
       setLoading(true);
-      await User.getAllUsers(pageNumber, searchKey, searchStatus)
+      const { pageNumber, keyword, status } = objectFilter;
+      await User.getAllUsers(pageNumber, keyword, status)
         .then((response) => {
           const { users, pages } = response.data;
           setData(users);
           setTotalPage(pages);
           setLoading(false);
-          pushParamsToUrl(pageNumber, searchKey, searchStatus);
+          pushParamsToUrl(pageNumber, keyword, status);
         })
         .catch((error) => {
           let message =
@@ -48,33 +51,17 @@ const Users = () => {
           setLoading(false);
         });
     })();
-  }, [pageNumber, refresh]);
+  }, [objectFilter, refresh]);
 
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
-      setPageNumber(1);
-      await User.getAllUsers(pageNumber, searchKey, searchStatus)
-        .then((response) => {
-          const { users, pages } = response.data;
-          setData(users);
-          setTotalPage(pages);
-          setLoading(false);
-
-          pushParamsToUrl(pageNumber, searchKey, searchStatus);
-        })
-        .catch((error) => {
-          let message =
-            error.response && error.response.data.error
-              ? error.response.data.error
-              : error.message;
-          toast.error(t(message));
-          setLoading(false);
-        });
-    })();
-  }, [searchStatus, searchKey]);
-
-  const onChangeStatus = (e) => setSearchStatus(e.target.value);
+  const onChangeStatus = useCallback(
+    (e) =>
+      setObjectFilter({
+        ...objectFilter,
+        status: e.target.value,
+        pageNumber: 1,
+      }),
+    [objectFilter]
+  );
 
   const onSearch = (e) => {
     setKeyword(e.target.value);
@@ -120,51 +107,14 @@ const Users = () => {
     history.push(`/admin/tree/${id}`);
   };
 
-  // const handleDelete = async (id) => {
-  //   confirmAlert({
-  //     title: t("Are you sure to do this."),
-  //     message: "",
-  //     buttons: [
-  //       {
-  //         label: "Yes",
-  //         onClick: async () => {
-  //           await User.deleteUserById(id)
-  //             .then((response) => {
-  //               const { message } = response.data;
-  //               setRefresh(!refresh);
-  //               toast.success(t(message));
-  //             })
-  //             .catch((error) => {
-  //               let message =
-  //                 error.response && error.response.data.error
-  //                   ? error.response.data.error
-  //                   : error.message;
-  //               toast.error(t(message));
-  //             });
-  //         },
-  //       },
-  //       {
-  //         label: "No",
-  //       },
-  //     ],
-  //   });
-  // };
-
-  // const handleNextPage = () => {
-  //   setPageNumber((pageNumber) => pageNumber + 1);
-  // };
-
-  // const handlePrevPage = () => {
-  //   setPageNumber((pageNumber) => pageNumber - 1);
-  // };
-
-  const handleChangePage = (page) => {
-    setPageNumber(page);
-  };
+  const handleChangePage = useCallback(
+    (page) => setObjectFilter({ ...objectFilter, pageNumber: page }),
+    [objectFilter]
+  );
 
   const handleSearch = useCallback(() => {
-    setSearchKey(keyword);
-  }, [keyword]);
+    setObjectFilter({ ...objectFilter, keyword, pageNumber: 1 });
+  }, [keyword, objectFilter]);
 
   return (
     <div>
@@ -175,7 +125,7 @@ const Users = () => {
             <select
               className="block p-2 pr-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none active:outline-none"
               onChange={onChangeStatus}
-              defaultValue={searchStatus}
+              defaultValue={objectFilter.status}
               disabled={loading}
             >
               <option value="all">All</option>
@@ -211,7 +161,7 @@ const Users = () => {
                 onChange={onSearch}
                 className="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50"
                 placeholder={t("search with user name or email")}
-                defaultValue={searchKey}
+                defaultValue={objectFilter.keyword}
               />
               <button
                 onClick={handleSearch}
@@ -407,7 +357,9 @@ const Users = () => {
           >
             <span className="text-sm font-normal text-gray-500">
               Showing{" "}
-              <span className="font-semibold text-gray-900">{pageNumber}</span>{" "}
+              <span className="font-semibold text-gray-900">
+                {objectFilter.pageNumber}
+              </span>{" "}
               of{" "}
               <span className="font-semibold text-gray-900">{totalPage}</span>{" "}
               page
@@ -464,7 +416,7 @@ const Users = () => {
             </ul> */}
             <div>
               <PaginationControl
-                page={pageNumber}
+                page={objectFilter.pageNumber}
                 between={5}
                 total={20 * totalPage}
                 limit={20}
