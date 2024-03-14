@@ -277,7 +277,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       } else {
         if (
           parentUser.status === "LOCKED" ||
-          parentUser.errLahCode !== "" ||
+          // parentUser.errLahCode !== "" ||
           parentUser.tier < user.tier ||
           (parentUser.tier === user.tier &&
             parentUser.countPay < user.countPay + 1)
@@ -324,7 +324,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         referralCommissionWallet = parentWithCountPay.walletAddress[0];
       } else if (
         parentWithCountPay.status === "LOCKED" ||
-        parentWithCountPay.errLahCode !== "" ||
+        // parentWithCountPay.errLahCode !== "" ||
         parentWithCountPay.tier < user.tier ||
         (parentWithCountPay.tier === user.tier &&
           parentWithCountPay.countPay < user.countPay + 1)

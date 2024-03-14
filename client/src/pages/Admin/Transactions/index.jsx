@@ -232,7 +232,7 @@ const Transactions = () => {
               <th scope="col" className="px-6 py-3">
                 {t("time")}
               </th>
-              {objectFilter.searchStatus === "HOLD" && (
+              {objectFilter.status === "HOLD" && (
                 <th scope="col" className="px-6 py-3">
                   {t("refundStatus")}
                 </th>
@@ -302,7 +302,7 @@ const Transactions = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4">{ele.createdAt}</td>
-                  {objectFilter.searchStatus === "HOLD" && (
+                  {objectFilter.status === "HOLD" && (
                     <td className="px-6 py-4">
                       <div
                         className={`max-w-fit text-white rounded-sm py-1 px-2 text-sm ${

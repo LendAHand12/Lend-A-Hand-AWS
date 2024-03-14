@@ -52,9 +52,9 @@ const AppNav = () => {
 
   const onClickOutside = () => setShowMenu(false);
 
-  // useEffect(() => {
-  //   connect();
-  // }, []);
+  useEffect(() => {
+    connect();
+  }, []);
 
   useLayoutEffect(() => {
     const handleScroll = () => {

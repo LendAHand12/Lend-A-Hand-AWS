@@ -33,32 +33,32 @@ const AppLayout = () => {
   if (!userInfo) {
     history.push("/login");
   } else {
-    // try {
-    const { permissions } = userInfo;
-    if (userInfo.role !== "user") {
-      routes = AdminRoutes.filter((route) => {
-        let currentRoute = `/admin${route.path}`;
-        let page = permissions.find((ele) => ele.page?.path === currentRoute);
-        if (page && page.actions.includes("read")) {
-          return route;
-        }
-      });
-    } else {
-      routes = UserRoutes.filter((route) => {
-        if (route.permissionWithStatus.includes(userInfo.status)) {
-          if (userInfo.phone === "" || userInfo.idCode === "") {
-            if (route.noNeedCheckInfo) {
-              return route;
-            }
-          } else {
+    try {
+      const { permissions } = userInfo;
+      if (userInfo.role !== "user") {
+        routes = AdminRoutes.filter((route) => {
+          let currentRoute = `/admin${route.path}`;
+          let page = permissions.find((ele) => ele.page?.path === currentRoute);
+          if (page && page.actions.includes("read")) {
             return route;
           }
-        }
-      });
+        });
+      } else {
+        routes = UserRoutes.filter((route) => {
+          if (route.permissionWithStatus.includes(userInfo.status)) {
+            if (userInfo.phone === "" || userInfo.idCode === "") {
+              if (route.noNeedCheckInfo) {
+                return route;
+              }
+            } else {
+              return route;
+            }
+          }
+        });
+      }
+    } catch (err) {
+      handleLogout();
     }
-    // } catch (err) {
-    //   handleLogout();
-    // }
   }
 
   useEffect(() => {
