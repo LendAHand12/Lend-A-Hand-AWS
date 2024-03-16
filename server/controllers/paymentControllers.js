@@ -401,6 +401,10 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       if (!checkRatioCountChild) holdReferralCommission = true;
     }
 
+    if (parentUser.userId === "NU HONG VIP") {
+      holdDirectCommission = true;
+    }
+
     if (holdDirectCommission) {
       haveRefNotPayEnough = true;
       directCommissionWallet = holdWallet[user.tier].address;

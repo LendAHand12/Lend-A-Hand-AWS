@@ -1172,7 +1172,7 @@ const onAcceptIncreaseTier = asyncHandler(async (req, res) => {
       await NextUserTier.deleteMany({ tier: u.tier });
       await sendMailUserCanInceaseTierToAdmin(u);
       await checkUnPayUserOnTierUser(u.tier + 1);
-      const newParentId = await findNextUserByIndex(nextTier);
+      const newParentId = await findNextUser(nextTier);
       const newParent = await Tree.findOne({
         userId: newParentId,
         tier: nextTier,
@@ -1375,7 +1375,7 @@ const adminCreateUser = asyncHandler(async (req, res) => {
     });
 
     await checkUnPayUserOnTierUser(tier);
-    const newParentId = await findNextUserByIndex(tier);
+    const newParentId = await findNextUser(tier);
     const newParent = await Tree.findOne({
       userId: newParentId,
       tier,

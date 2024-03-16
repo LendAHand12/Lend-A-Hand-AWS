@@ -149,7 +149,7 @@ export const listTier = async (tier) => {
 };
 
 export const nextUserWithTier = async (tier) => {
-  const nextId = await findNextUserByIndex(tier);
+  const nextId = await findNextUser(tier);
   console.log({ nextId });
 };
 

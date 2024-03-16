@@ -308,9 +308,11 @@ export const findNextUserByIndex = async (tier) => {
     userId: lastUserTree.parentId,
     tier,
   });
-  const nextUserTree = await Tree.findOne({
-    createdAt: { $gt: parentOfLastUserTree.createdAt },
+  console.log({ parentOfLastUserTree });
+  const nextUserTree = await Tree.find({
+    createdAt: { $gte: parentOfLastUserTree.createdAt },
     tier,
   });
+  console.log({ nextUserTree: nextUserTree[1] });
   return nextUserTree.userId;
 };

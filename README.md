@@ -206,3 +206,8 @@ $set: {
 
 db.users.updateMany({isAdmin: false}, {$set: {role: "user"}})
 db.users.updateMany({isAdmin: true}, {$set: {role: "admin"}})
+
+- Giao diện trang => 5tr
+- kết nối ví phổ biến hiện nay => 7tr
+- Phần thanh toán => 5tr
+- Dữ liệu thanh toán (ví kết nối, thông tin user, thông tin thanh toán) => 10tr
