@@ -251,6 +251,9 @@ const updateUser = asyncHandler(async (req, res) => {
         tier: 1,
       }).select("userId email walletAddress");
       const packages = await getActivePackages();
+      const permissions = await Permission.findOne({
+        role: user.role,
+      }).populate("pagePermissions.page");
       res.status(200).json({
         message: "Update successful",
         data: {
@@ -277,6 +280,8 @@ const updateUser = asyncHandler(async (req, res) => {
           continueWithBuyPackageB: updatedUser.continueWithBuyPackageB,
           listDirectUser,
           packages,
+          permissions: permissions ? permissions.pagePermissions : [],
+          role: user.role,
         },
       });
     }
@@ -731,7 +736,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
       tier5Time: user.tier5Time,
       hold: user.hold,
       role: user.role,
-      permissions: permissions ? permissions.pagePermissions : null,
+      permissions: permissions ? permissions.pagePermissions : [],
     });
   } else {
     res.status(400);

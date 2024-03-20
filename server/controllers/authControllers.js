@@ -266,7 +266,7 @@ const authUser = asyncHandler(async (req, res) => {
         closeLah: user.closeLah,
         tierDate: user.tierDate,
         role: user.role,
-        permissions: permissions ? permissions.pagePermissions : null,
+        permissions: permissions ? permissions.pagePermissions : [],
       },
       accessToken,
       refreshToken,
