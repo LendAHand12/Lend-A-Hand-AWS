@@ -211,3 +211,8 @@ db.users.updateMany({isAdmin: true}, {$set: {role: "admin"}})
 - kết nối ví phổ biến hiện nay => 7tr
 - Phần thanh toán => 5tr
 - Dữ liệu thanh toán (ví kết nối, thông tin user, thông tin thanh toán) => 10tr
+
+- Popup cập nhật ví tier với user ở Tier 2 trở lên -> 400
+- Popup cập nhật ví khi thanh toán lên tier -> 400
+- Chỉnh sửa phần thanh toán theo ví tier -> 1tr
+- Xem, chỉnh sửa ví user theo tier ở admin -> 1tr
