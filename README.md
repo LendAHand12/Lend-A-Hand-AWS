@@ -208,3 +208,26 @@ $set: {
 {
 "multi": true
 })
+
+- Form tạo admin mới -> 1tr5
+- List thứ tự user sẽ nhận doanh số theo tier -> 1tr
+
+- Làm quen source code -> 3h
+- Redirect default sau khi login sang trang dashboard -> 0h
+- Sửa trang Discovery Hub -> 4h
+- Trang danh sách và chi tiết manga của user -> 6h
+- Trang danh sách manga -> 3h
+- Sửa trang profile -> 1h
+
+db.users.updateMany({isAdmin: false}, {$set: {role: "user"}})
+db.users.updateMany({isAdmin: true}, {$set: {role: "admin"}})
+
+- Giao diện trang => 5tr
+- kết nối ví phổ biến hiện nay => 7tr
+- Phần thanh toán => 5tr
+- Dữ liệu thanh toán (ví kết nối, thông tin user, thông tin thanh toán) => 10tr
+
+- Popup cập nhật ví tier với user ở Tier 2 trở lên -> 400
+- Popup cập nhật ví khi thanh toán lên tier -> 400
+- Chỉnh sửa phần thanh toán theo ví tier -> 1tr
+- Xem, chỉnh sửa ví user theo tier ở admin -> 1tr

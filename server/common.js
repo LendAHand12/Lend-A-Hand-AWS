@@ -2,7 +2,12 @@ import Transaction from "./models/transactionModel.js";
 import Tree from "./models/treeModel.js";
 import User from "./models/userModel.js";
 import { getParentWithCountPay } from "./utils/getParentWithCountPay.js";
-import { findNextUser } from "./utils/methods.js";
+import {
+  findNextUser,
+  findLevelById,
+  findUsersAtLevel,
+  findNextUserByIndex,
+} from "./utils/methods.js";
 
 export const transferUserToTree = async () => {
   const listUser = await User.find({ isAdmin: false });
@@ -220,4 +225,37 @@ export const addTierTime = async () => {
   }
 
   console.log("addTierTime done");
+};
+
+export const countIndexTree = async () => {
+  const listTree = await Tree.find({ tier: 2, userName: { $ne: "Admin2" } });
+
+  for (let treeOfUser of listTree) {
+    if (treeOfUser.children.length > 0) {
+      console.log({ name: treeOfUser.userName });
+      let level, listUserOfLevel;
+      level = await findLevelById(treeOfUser.userId, 2);
+      listUserOfLevel = await findUsersAtLevel(
+        "6494e9101e2f152a593b66f2",
+        level + 1,
+        2
+      );
+      listUserOfLevel.sort((a, b) => {
+        return new Date(a.createdAt) - new Date(b.createdAt);
+      });
+      for (let childId of treeOfUser.children) {
+        const childTree = await Tree.findOneAndUpdate(
+          { userId: childId, tier: 2 },
+          {
+            $set: {
+              indexOnLevel:
+                listUserOfLevel.findIndex((ele) => ele.userId === childId) + 1,
+            },
+          }
+        );
+      }
+    }
+  }
+
+  console.log("countIndexTree done");
 };

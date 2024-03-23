@@ -8,6 +8,8 @@ const Payment = lazy(() => import("@/pages/User/Payment"));
 const Referral = lazy(() => import("@/pages/User/Referral"));
 const ChangeWallet = lazy(() => import("@/pages/User/ChangeWallet"));
 const ChangeUser = lazy(() => import("@/pages/User/ChangeUser"));
+const Legal = lazy(() => import("@/pages/User/Legal"));
+const LegalDetail = lazy(() => import("@/pages/User/Legal/Detail"));
 
 const routes = [
   {
@@ -58,6 +60,35 @@ const routes = [
     title: "changeUser",
     permissionWithStatus: ["APPROVED"],
     component: ChangeUser,
+  },
+  {
+    path: "/legal/COMMON",
+    title: "legal",
+    permissionWithStatus: ["APPROVED"],
+    children: [
+      {
+        path: "/legal/COMMON",
+        title: "legalCommon",
+        permissionWithStatus: ["APPROVED"],
+        component: Legal,
+      },
+      {
+        path: "/legal/TIER1",
+        title: "legalTier",
+        permissionWithStatus: ["APPROVED"],
+        component: Legal,
+      },
+    ],
+  },
+  {
+    path: "/legal/:category",
+    permissionWithStatus: ["APPROVED"],
+    component: Legal,
+  },
+  {
+    path: "/legal/:category/:id",
+    permissionWithStatus: ["APPROVED"],
+    component: LegalDetail,
   },
 ];
 

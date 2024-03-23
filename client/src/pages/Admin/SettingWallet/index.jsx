@@ -3,6 +3,7 @@ import Loading from "@/components/Loading";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
 const SettingPage = () => {
@@ -13,6 +14,7 @@ const SettingPage = () => {
     setValue,
     formState: { errors },
   } = useForm();
+  const { userInfo } = useSelector((state) => state.auth);
   const [loading, setLoading] = useState(true);
   const [submiting, setSubmiting] = useState(false);
 
@@ -207,13 +209,17 @@ const SettingPage = () => {
                   />
                   <p className="error-message-text">{errors.HOLD5?.message}</p>
                 </div>
-                <button
-                  type="submit"
-                  className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-                >
-                  {submiting && <Loading />}
-                  {t("confirm")}
-                </button>
+                {userInfo?.permissions
+                  .find((p) => p.page.pageName === "admin-setting-wallet")
+                  ?.actions.includes("update") && (
+                  <button
+                    type="submit"
+                    className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                  >
+                    {submiting && <Loading />}
+                    {t("confirm")}
+                  </button>
+                )}
               </form>
             </div>
           </div>

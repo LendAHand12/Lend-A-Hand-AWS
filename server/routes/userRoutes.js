@@ -25,8 +25,17 @@ import {
   changeNextUserTier,
   getLastUserInTier,
   removeLastUserInTier,
+  createAdmin,
+  getListAdmin,
+  updateAdmin,
+  deleteAdmin,
+  getAdminById,
 } from "../controllers/userControllers.js";
-import { protectRoute, isAdmin } from "../middleware/authMiddleware.js";
+import {
+  protectRoute,
+  isAdmin,
+  isSuperAdmin,
+} from "../middleware/authMiddleware.js";
 import uploadCloud from "../middleware/uploadCloud.js";
 
 const router = express.Router();
@@ -53,6 +62,17 @@ router
   .route("/getAllUsersWithKeyword")
   .post(protectRoute, isAdmin, getAllUsersWithKeyword);
 router.route("/listChild").get(protectRoute, getListChildOfUser);
+
+router
+  .route("/admin")
+  .get(protectRoute, isSuperAdmin, getListAdmin)
+  .post(protectRoute, isSuperAdmin, createAdmin);
+
+router
+  .route("/admin/:id")
+  .get(protectRoute, isSuperAdmin, getAdminById)
+  .put(protectRoute, isSuperAdmin, updateAdmin)
+  .delete(protectRoute, isSuperAdmin, deleteAdmin);
 
 router
   .route("/:id")

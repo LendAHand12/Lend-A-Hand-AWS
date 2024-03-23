@@ -2,7 +2,11 @@ import moment from "moment";
 import NextUserTier from "../models/nextUserTierModel.js";
 import Tree from "../models/treeModel.js";
 import User from "../models/userModel.js";
+<<<<<<< HEAD
 import axios from "axios";
+=======
+import ADMIN_ID from "../constants/AdminId.js";
+>>>>>>> main
 
 export const getParentUser = async (userId, tier) => {
   const tree = await Tree.findOne({ userId, tier });
@@ -47,6 +51,7 @@ export const findNextUser = async (tier) => {
     2,
     1
   );
+
   const sortedData = listUserLevel.sort(
     (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
   );
@@ -98,12 +103,12 @@ export const findNextUserNotIncludeNextUserTier = async (tier) => {
     : "6494e9101e2f152a593b66f2";
 };
 
-async function findUsersAtLevel(
+export const findUsersAtLevel = async (
   rootUserId,
   targetLevel,
   tier,
   currentLevel = 1
-) {
+) => {
   if (currentLevel > targetLevel) {
     return [];
   }
@@ -134,7 +139,7 @@ async function findUsersAtLevel(
   }
 
   return usersAtLevel;
-}
+};
 
 export const findRootLayer = async (id, tier) => {
   // Tìm người dùng root đầu tiên (có parentId null)
@@ -227,6 +232,7 @@ export const checkRatioCountChildOfUser = async (userId) => {
   }
 };
 
+<<<<<<< HEAD
 export const checkSerepayWallet = async (walletAddress) => {
   return axios
     .post(`${process.env.SEREPAY_HOST}/api/user/checkwallet`, {
@@ -243,4 +249,93 @@ export const checkSerepayWallet = async (walletAddress) => {
       //     : error.message;
       // throw new Error(message);
     });
+=======
+export const removeAccents = (str) => {
+  var AccentsMap = [
+    "aàảãáạăằẳẵắặâầẩẫấậ",
+    "AÀẢÃÁẠĂẰẲẴẮẶÂẦẨẪẤẬ",
+    "dđ",
+    "DĐ",
+    "eèẻẽéẹêềểễếệ",
+    "EÈẺẼÉẸÊỀỂỄẾỆ",
+    "iìỉĩíị",
+    "IÌỈĨÍỊ",
+    "oòỏõóọôồổỗốộơờởỡớợ",
+    "OÒỎÕÓỌÔỒỔỖỐỘƠỜỞỠỚỢ",
+    "uùủũúụưừửữứự",
+    "UÙỦŨÚỤƯỪỬỮỨỰ",
+    "yỳỷỹýỵ",
+    "YỲỶỸÝỴ",
+  ];
+  for (var i = 0; i < AccentsMap.length; i++) {
+    var re = new RegExp("[" + AccentsMap[i].substr(1) + "]", "g");
+    var char = AccentsMap[i][0];
+    str = str.replace(re, char);
+  }
+  return str.toLowerCase();
+};
+
+export const findLevelById = async (userId, tier) => {
+  try {
+    const node = await Tree.findOne({ userId, tier });
+
+    if (!node) {
+      return -1;
+    }
+
+    let level = 0;
+    let currentParentId = node.parentId;
+
+    while (currentParentId) {
+      const parentNode = await Tree.findOne({ userId: currentParentId, tier });
+
+      if (!parentNode) {
+        break;
+      }
+
+      level++;
+      currentParentId = parentNode.parentId;
+    }
+
+    return level;
+  } catch (error) {
+    console.error("Error finding level:", error);
+    return -1;
+  }
+};
+
+export const findHighestLevelUsers = async (tier) => {
+  const rootUser = await User.findById(ADMIN_ID);
+  const targetLevel = rootUser.currentLayer[tier - 1] + 1;
+  let highestLevelUsers = [];
+  highestLevelUsers = await findUsersAtLevel(ADMIN_ID, targetLevel, tier, 1);
+  return highestLevelUsers;
+};
+
+export const findHighestIndexOfLevel = async (tier) => {
+  const highestLevelUsers = await findHighestLevelUsers(tier);
+  if (highestLevelUsers.length === 0) {
+    return 1;
+  } else {
+    const maxIndexOfLevel = Math.max(
+      ...highestLevelUsers.map((o) => o.indexOnLevel)
+    );
+    return maxIndexOfLevel + 1;
+  }
+};
+
+export const findNextUserByIndex = async (tier) => {
+  const lastUserTree = await Tree.findOne({ tier }).sort("-createdAt");
+  const parentOfLastUserTree = await Tree.findOne({
+    userId: lastUserTree.parentId,
+    tier,
+  });
+  console.log({ parentOfLastUserTree });
+  const nextUserTree = await Tree.find({
+    createdAt: { $gte: parentOfLastUserTree.createdAt },
+    tier,
+  });
+  console.log({ nextUserTree: nextUserTree[1] });
+  return nextUserTree.userId;
+>>>>>>> main
 };

@@ -118,43 +118,60 @@ const Nav = () => {
               <li className="mr-3">
                 <Link
                   className={`inline-block ${
-                    hash.includes("#about") ? "font-bold" : ""
-                  } py-2 px-4 text-black no-underline`}
-                  to="/#about"
+                    !hash.includes("") ? "font-bold" : ""
+                  } text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4`}
+                  to="/"
                 >
-                  {t("aboutUs")}
+                  {t("homepage")}
                 </Link>
               </li>
-              <li className="mr-3">
-                <Link
-                  className={`inline-block ${
-                    hash.includes("#features") ? "font-bold" : ""
-                  } text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4`}
-                  to="/#features"
-                >
-                  {t("features")}
-                </Link>
+              <li className="mr-3 relative group cursor-pointer">
+                <span className="hidden lg:inline">{t("referral")}</span>
+                <div className="lg:absolute lg:p-2 lg:top-6 lg:w-40 lg:invisible lg:group-hover:visible lg:bg-gray-100 lg:rounded-md lg:shadow-lg flex flex-col">
+                  <Link
+                    className={`inline-block py-2 px-4 hover:text-gray-700 hover:text-underline`}
+                    to="/aboutUs"
+                  >
+                    {t("aboutUs")}
+                  </Link>
+                  <Link
+                    className={`inline-block py-2 px-4  hover:text-gray-700 hover:text-underline`}
+                    to="/ourTeam"
+                  >
+                    {t("ourTeam")}
+                  </Link>
+                </div>
               </li>
               <li className="mr-3">
                 <Link
                   className={`inline-block ${
                     hash.includes("#contact") ? "font-bold" : ""
                   } text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4`}
-                  to="/#contact"
+                  to="/contact"
                 >
                   {t("contact")}
                 </Link>
               </li>
-              {/* <li className="mr-3">
+              <li className="mr-3">
                 <Link
                   className={`inline-block ${
-                    pathname.includes("/login") ? "font-bold" : ""
+                    pathname.includes("terms") ? "font-bold" : ""
                   } text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4`}
-                  to="/login"
+                  to="/terms"
                 >
-                  Login
+                  {t("legal")}
                 </Link>
-              </li> */}
+              </li>
+              <li className="mr-3">
+                <Link
+                  className={`inline-block ${
+                    pathname.includes("news") ? "font-bold" : ""
+                  } text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4`}
+                  to="/news"
+                >
+                  {t("news")}
+                </Link>
+              </li>
               <li className="mr-3">
                 <Link
                   to="/login"
@@ -163,7 +180,6 @@ const Nav = () => {
                   {t("login")}
                 </Link>
               </li>
-
               <li className="">
                 <select
                   className="bg-inherit px-4 py-2 focus:outline-none active:outline-none"

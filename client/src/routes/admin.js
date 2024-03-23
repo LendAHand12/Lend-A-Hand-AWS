@@ -20,6 +20,26 @@ const ListUserNextTier = lazy(() => import("@/pages/Admin/ListUserNextTier"));
 const RemoveLastUserTier = lazy(() =>
   import("@/pages/Admin/RemoveLastUserTier")
 );
+const CMSPage = lazy(() => import("@/pages/Admin/CMS"));
+const EditCMSPage = lazy(() => import("@/pages/Admin/EditCMS"));
+const PreviewHomePage = lazy(() => import("@/pages/HomePage"));
+const PreviewAboutUsPage = lazy(() => import("@/pages/AboutPage"));
+const PreviewOurTeamPage = lazy(() => import("@/pages/OurTeamPage"));
+
+const PostsPage = lazy(() => import("@/pages/Admin/Posts"));
+const CreatePostsPage = lazy(() => import("@/pages/Admin/Posts/Create"));
+const EditPostsPage = lazy(() => import("@/pages/Admin/Posts/Edit"));
+
+const PermissionsPage = lazy(() => import("@/pages/Admin/Permissions"));
+const PermissionsDetailsPage = lazy(() =>
+  import("@/pages/Admin/Permissions/Details")
+);
+const PermissionsCreatePage = lazy(() =>
+  import("@/pages/Admin/Permissions/Create")
+);
+const AdminPage = lazy(() => import("@/pages/Admin/Admin"));
+const AdminDetailPage = lazy(() => import("@/pages/Admin/Admin/Detail"));
+const CreateAdminPage = lazy(() => import("@/pages/Admin/Admin/Create"));
 
 const routes = [
   {
@@ -99,6 +119,63 @@ const routes = [
   {
     path: "/lastUserTier",
     component: RemoveLastUserTier,
+  },
+  {
+    path: "/cms",
+    title: "CMS",
+    component: CMSPage,
+  },
+  {
+    path: "/cms/:page",
+    component: EditCMSPage,
+  },
+  {
+    path: "/cms/preview/cms-homepage",
+    component: PreviewHomePage,
+  },
+  {
+    path: "/cms/preview/cms-aboutUs",
+    component: PreviewAboutUsPage,
+  },
+  {
+    path: "/cms/preview/cms-ourTeam",
+    component: PreviewOurTeamPage,
+  },
+  {
+    path: "/posts",
+    component: PostsPage,
+  },
+  {
+    path: "/posts/create",
+    component: CreatePostsPage,
+  },
+  {
+    path: "/posts/edit",
+    component: EditPostsPage,
+  },
+  {
+    path: "/permissions",
+    component: PermissionsPage,
+  },
+  {
+    path: "/permissions/create",
+    component: PermissionsCreatePage,
+  },
+  {
+    path: "/permissions/:id",
+    component: PermissionsDetailsPage,
+  },
+  {
+    path: "/admin",
+    component: AdminPage,
+  },
+  {
+    path: "/create-admin",
+    component: CreateAdminPage,
+  },
+  {
+    path: "/admin/:id",
+    component: AdminDetailPage,
   },
 ];
 

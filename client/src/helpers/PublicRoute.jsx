@@ -9,9 +9,9 @@ const PublicRoute = ({ component: Component, ...rest }) => {
       {...rest}
       render={(props) => {
         if (accessToken && userInfo) {
-          if (userInfo && userInfo.isAdmin) {
+          if (userInfo && userInfo.role !== "user") {
             return <Redirect to={{ pathname: "/admin" }} />;
-          } else if (userInfo && !userInfo.isAdmin) {
+          } else if (userInfo && userInfo.role === "user") {
             return <Redirect to={{ pathname: "/user" }} />;
           }
         } else {

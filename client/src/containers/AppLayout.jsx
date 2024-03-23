@@ -2,7 +2,7 @@ import { Suspense, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 
-import AppFooter from "@/components/AppFooter";
+import Footer from "@/components/AppFooter";
 import FallbackLoading from "@/components/FallbackLoading";
 import AdminRoutes from "@/routes/admin";
 import UserRoutes from "@/routes/user";
@@ -12,30 +12,52 @@ import User from "@/api/User";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { UPDATE_USER_INFO, LOGOUT } from "@/slices/authSlice";
+import { useLocation } from "react-router-dom";
+import { useDisconnect } from "wagmi";
 
 const AppLayout = () => {
   const { t } = useTranslation();
   const history = useHistory();
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
+  const location = useLocation();
+  const { pathname } = location;
+  const { disconnect } = useDisconnect();
+
+  const handleLogout = () => {
+    disconnect();
+    dispatch(LOGOUT());
+  };
+
   var routes = [];
   if (!userInfo) {
     history.push("/login");
   } else {
-    if (userInfo.isAdmin) {
-      routes = AdminRoutes;
-    } else {
-      routes = UserRoutes.filter((route) => {
-        if (route.permissionWithStatus.includes(userInfo.status)) {
-          if (userInfo.phone === "" || userInfo.idCode === "") {
-            if (route.noNeedCheckInfo) {
-              return route;
-            }
-          } else {
+    try {
+      const { permissions } = userInfo;
+      if (userInfo.role !== "user") {
+        routes = AdminRoutes.filter((route) => {
+          let currentRoute = `/admin${route.path}`;
+          let page = permissions.find((ele) => ele.page?.path === currentRoute);
+          if (page && page.actions.includes("read")) {
             return route;
           }
-        }
-      });
+        });
+      } else {
+        routes = UserRoutes.filter((route) => {
+          if (route.permissionWithStatus.includes(userInfo.status)) {
+            if (userInfo.phone === "" || userInfo.idCode === "") {
+              if (route.noNeedCheckInfo) {
+                return route;
+              }
+            } else {
+              return route;
+            }
+          }
+        });
+      }
+    } catch (err) {
+      // handleLogout();
     }
   }
 
@@ -56,7 +78,14 @@ const AppLayout = () => {
     <>
       <div className="leading-normal tracking-normal">
         <AppNav />
-        <div className="container mx-auto py-32 min-h-screen bg-white">
+
+        <div
+          className={`${
+            pathname.includes("preview")
+              ? ""
+              : "container mx-auto py-32 min-h-screen bg-white"
+          }`}
+        >
           <Suspense fallback={<FallbackLoading />}>
             <Switch>
               {routes.map((route, i) => {
@@ -64,7 +93,7 @@ const AppLayout = () => {
                   <Route
                     key={i}
                     exact={true}
-                    path={`${userInfo.isAdmin ? "/admin" : "/user"}${
+                    path={`${userInfo.role !== "user" ? "/admin" : "/user"}${
                       route.path
                     }`}
                     render={(props) => <route.component {...props} />}
@@ -78,7 +107,7 @@ const AppLayout = () => {
             </Switch>
           </Suspense>
         </div>
-        <AppFooter />
+        <Footer />
       </div>
     </>
   );

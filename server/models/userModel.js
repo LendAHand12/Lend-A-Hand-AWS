@@ -177,6 +177,10 @@ const userSchema = mongoose.Schema(
     },
     role: {
       type: String,
+<<<<<<< HEAD
+=======
+      // enum: ["USER", "ADMIN", "ADMIN1", "ADMIN2"],
+>>>>>>> main
     },
   },
   {

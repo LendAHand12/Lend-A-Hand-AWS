@@ -13,6 +13,12 @@ const ConfirmPage = lazy(() => import("@/pages/ConfirmPage"));
 const ForgotPassword = lazy(() => import("@/pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
 const TermsPage = lazy(() => import("@/pages/Terms"));
+const AboutPage = lazy(() => import("@/pages/AboutPage"));
+const OurTeamPage = lazy(() => import("@/pages/OurTeamPage"));
+const NewsPage = lazy(() => import("@/pages/News"));
+const NewsDetailPage = lazy(() => import("@/pages/News/Detail"));
+const TermsDetailPage = lazy(() => import("@/pages/Terms/Detail"));
+const ContactPage = lazy(() => import("@/pages/Contact"));
 
 function App() {
   return (
@@ -20,11 +26,17 @@ function App() {
       <Switch>
         <PublicRoute path="/" component={HomePage} exact />
         <PublicRoute path="/login" component={Login} exact />
-        <PublicRoute path="/terms" component={TermsPage} exact />
         <PublicRoute path="/register" component={Register} exact />
         <PublicRoute path="/confirm" component={ConfirmPage} exact />
         <PublicRoute path="/forgot-password" component={ForgotPassword} exact />
         <PublicRoute path="/reset-password" component={ResetPassword} exact />
+        <PublicRoute path="/aboutUs" component={AboutPage} exact />
+        <PublicRoute path="/ourTeam" component={OurTeamPage} exact />
+        <PublicRoute path="/news" component={NewsPage} exact />
+        <PublicRoute path="/news/:id" component={NewsDetailPage} />
+        <PublicRoute path="/terms" component={TermsPage} exact />
+        <PublicRoute path="/terms/:id" component={TermsDetailPage} />
+        <PublicRoute path="/contact" component={ContactPage} exact />
 
         <PrivateRoute path="/user" component={AppLayout} />
         <PrivateRoute path="/admin" component={AppLayout} />

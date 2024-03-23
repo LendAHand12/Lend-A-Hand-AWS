@@ -15,10 +15,15 @@ import {
   findNextUser,
   findNextUserNotIncludeNextUserTier,
   findRootLayer,
+  findLevelById,
+  findUsersAtLevel,
+  findHighestIndexOfLevel,
+  findNextUserByIndex,
 } from "../utils/methods.js";
 import generateGravatar from "../utils/generateGravatar.js";
 import { areArraysEqual } from "../cronJob/index.js";
 import { sendMailUserCanInceaseTierToAdmin } from "../utils/sendMailCustom.js";
+import Permission from "../models/permissionModel.js";
 
 dotenv.config();
 
@@ -38,7 +43,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
         ],
       },
       {
-        isAdmin: false,
+        role: "user",
       },
       {
         status: { $regex: searchStatus, $options: "i" },
@@ -54,7 +59,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
         ],
       },
       {
-        isAdmin: false,
+        role: "user",
       },
       {
         status: { $regex: searchStatus, $options: "i" },
@@ -194,6 +199,7 @@ const getUserById = asyncHandler(async (req, res) => {
       changeUser,
       refUserName: refUser ? refUser.userId : "",
       refUserEmail: refUser ? refUser.email : "",
+      role: user.role,
       listOldParent,
       isSerepayWallet: await checkSerepayWallet(user.walletAddress[0]),
     });
@@ -247,6 +253,9 @@ const updateUser = asyncHandler(async (req, res) => {
         tier: 1,
       }).select("userId email walletAddress");
       const packages = await getActivePackages();
+      const permissions = await Permission.findOne({
+        role: user.role,
+      }).populate("pagePermissions.page");
       res.status(200).json({
         message: "Update successful",
         data: {
@@ -273,6 +282,8 @@ const updateUser = asyncHandler(async (req, res) => {
           continueWithBuyPackageB: updatedUser.continueWithBuyPackageB,
           listDirectUser,
           packages,
+          permissions: permissions ? permissions.pagePermissions : [],
+          role: user.role,
         },
       });
     }
@@ -519,16 +530,46 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
     userId: id,
     tier: currentTier,
   }).select("userId children");
+
   if (user) {
     if (treeOfUser.children.length === 0) {
       res.status(404);
       throw new Error("User not have child");
     } else {
       const tree = { key: user._id, label: user.userId, nodes: [] };
+      // let level, listUserOfLevel;
+      // if (userRequest.isAdmin && currentTier >= 2) {
+      //   level = await findLevelById(user._id, currentTier);
+      //   listUserOfLevel = await findUsersAtLevel(
+      //     "6494e9101e2f152a593b66f2",
+      //     level + 1,
+      //     currentTier
+      //   );
+      //   listUserOfLevel.sort((a, b) => {
+      //     return new Date(a.createdAt) - new Date(b.createdAt);
+      //   });
+      // }
       for (const childId of treeOfUser.children) {
         const child = await User.findById(childId).select(
           "tier userId buyPackage countChild countPay fine status errLahCode"
         );
+        const childTree = await Tree.findOne({
+          userId: childId,
+          tier: currentTier,
+        });
+        // const childTree = await Tree.findOneAndUpdate(
+        //   { userId: childId, tier: currentTier },
+        //   {
+        //     $set: {
+        //       indexOnLevel:
+        //         userRequest.isAdmin && currentTier >= 2
+        //           ? listUserOfLevel.findIndex((ele) => ele.userId === childId) +
+        //             1
+        //           : 0,
+        //     },
+        //   }
+        // );
+
         tree.nodes.push({
           key: child._id,
           label: `${child.userId} (${child.countChild[currentTier - 1]} - ${
@@ -560,6 +601,7 @@ const getChildsOfUserForTree = asyncHandler(async (req, res) => {
               ? true
               : false,
           isYellow: child.errLahCode === "OVER30",
+          indexOnLevel: childTree.indexOnLevel,
         });
       }
       res.status(200).json(tree);
@@ -651,6 +693,10 @@ const getUserProfile = asyncHandler(async (req, res) => {
     }
     const packages = await getActivePackages();
 
+    const permissions = await Permission.findOne({ role: user.role }).populate(
+      "pagePermissions.page"
+    );
+
     res.json({
       id: user._id,
       email: user.email,
@@ -691,7 +737,12 @@ const getUserProfile = asyncHandler(async (req, res) => {
       tier4Time: user.tier4Time,
       tier5Time: user.tier5Time,
       hold: user.hold,
+<<<<<<< HEAD
       isSerepayWallet: await checkSerepayWallet(user.walletAddress[0]),
+=======
+      role: user.role,
+      permissions: permissions ? permissions.pagePermissions : [],
+>>>>>>> main
     });
   } else {
     res.status(400);
@@ -835,7 +886,7 @@ const getAllDeletedUsers = asyncHandler(async (req, res) => {
 const getAllUsersForExport = asyncHandler(async (req, res) => {
   let fromDate, toDate;
   const { limit, page } = req.body;
-  let match = { isAdmin: false };
+  let match = { role: "user" };
 
   if (req.body.fromDate) {
     fromDate = req.body.fromDate.split("T")[0];
@@ -1141,6 +1192,7 @@ const onAcceptIncreaseTier = asyncHandler(async (req, res) => {
       newParent.children = [...childs, u._id];
       await newParent.save();
 
+      const highestIndexOfLevel = await findHighestIndexOfLevel(nextTier);
       const tree = await Tree.create({
         userName: u.userId,
         userId: u._id,
@@ -1148,6 +1200,7 @@ const onAcceptIncreaseTier = asyncHandler(async (req, res) => {
         refId: newParentId,
         tier: nextTier,
         children: [],
+        indexOnLevel: highestIndexOfLevel,
       });
 
       u.tier = nextTier;
@@ -1329,6 +1382,7 @@ const adminCreateUser = asyncHandler(async (req, res) => {
       tier3Time: tier === 3 ? new Date() : null,
       tier4Time: tier === 4 ? new Date() : null,
       tier5Time: tier === 5 ? new Date() : null,
+      role: "user",
     });
 
     await checkUnPayUserOnTierUser(tier);
@@ -1343,6 +1397,7 @@ const adminCreateUser = asyncHandler(async (req, res) => {
 
     await NextUserTier.deleteMany({ tier });
 
+    const highestIndexOfLevel = await findHighestIndexOfLevel(tier);
     await Tree.create({
       userName: user.userId,
       userId: user._id,
@@ -1350,6 +1405,7 @@ const adminCreateUser = asyncHandler(async (req, res) => {
       refId: newParentId,
       tier,
       children: [],
+      indexOnLevel: highestIndexOfLevel,
     });
 
     // await sendMail(user._id, email, "email verification");
@@ -1593,6 +1649,190 @@ const removeLastUserInTier = asyncHandler(async (req, res) => {
   }
 });
 
+const createAdmin = asyncHandler(async (req, res) => {
+  const { userId, walletAddress, email, password, phone, role } = req.body;
+
+  const userExistsUserId = await User.findOne({
+    userId: { $regex: userId, $options: "i" },
+  });
+  const userExistsEmail = await User.findOne({
+    email: { $regex: email, $options: "i" },
+  });
+  const userExistsPhone = await User.findOne({
+    $and: [{ phone: { $ne: "" } }, { phone }],
+  });
+  const userExistsWalletAddress = await User.findOne({
+    walletAddress: { $in: [walletAddress] },
+  });
+
+  if (userExistsUserId) {
+    let message = "duplicateInfoUserId";
+    res.status(400);
+    throw new Error(message);
+  } else if (userExistsEmail) {
+    let message = "duplicateInfoEmail";
+    res.status(400);
+    throw new Error(message);
+  } else if (userExistsPhone) {
+    let message = "Dupplicate phone";
+    res.status(400);
+    throw new Error(message);
+  } else if (userExistsWalletAddress) {
+    let message = "Dupplicate wallet address";
+    res.status(400);
+    throw new Error(message);
+  } else {
+    const avatar = generateGravatar(email);
+
+    await User.create({
+      userId,
+      email,
+      phone,
+      password,
+      avatar,
+      walletAddress: [walletAddress],
+      imgBack: "",
+      imgFront: "",
+      tier: 5,
+      countPay: 100,
+      createBy: "ADMIN",
+      status: "APPROVED",
+      isConfirmed: true,
+      role,
+    });
+
+    let message = "createUserSuccessful";
+
+    res.status(201).json({
+      message,
+    });
+  }
+});
+
+const getListAdmin = asyncHandler(async (req, res) => {
+  const { pageNumber, keyword } = req.query;
+  const page = Number(pageNumber) || 1;
+
+  const pageSize = 20;
+
+  const count = await User.countDocuments({
+    $and: [
+      {
+        $or: [
+          { userId: { $regex: keyword, $options: "i" } }, // Tìm theo userId
+          { email: { $regex: keyword, $options: "i" } }, // Tìm theo email
+        ],
+      },
+      {
+        role: { $ne: "user" },
+      },
+    ],
+  });
+  const allUsers = await User.find({
+    $and: [
+      {
+        $or: [
+          { userId: { $regex: keyword, $options: "i" } }, // Tìm theo userId
+          { email: { $regex: keyword, $options: "i" } }, // Tìm theo email
+        ],
+      },
+      {
+        role: { $ne: "user" },
+      },
+    ],
+  })
+    .limit(pageSize)
+    .skip(pageSize * (page - 1))
+    .sort("-createdAt")
+    .select("-password");
+
+  res.json({
+    admins: allUsers,
+    pages: Math.ceil(count / pageSize),
+  });
+});
+
+const updateAdmin = asyncHandler(async (req, res) => {
+  console.log({ data: req.body });
+  const { walletAddress, email, phone, role, password } = req.body;
+  const user = await User.findOne({ _id: req.params.id }).select("-password");
+
+  if (phone) {
+    const userHavePhone = await User.find({
+      $and: [{ phone }],
+    });
+    if (userHavePhone.length >= 1) {
+      res.status(400).json({ error: "duplicateInfo" });
+    }
+  }
+
+  if (walletAddress) {
+    const userHaveWalletAddress = await User.find({
+      $and: [{ walletAddress: { $in: [walletAddress] } }],
+    });
+    if (userHaveWalletAddress.length > 1) {
+      res.status(400).json({ error: "duplicateInfo" });
+    }
+  }
+
+  if (email) {
+    const userHaveEmail = await User.find({
+      $and: [{ email }],
+    });
+    if (userHaveEmail.length > 1) {
+      res.status(400).json({ error: "duplicateInfo" });
+    }
+  }
+
+  if (user) {
+    if (phone) user.phone = phone;
+    if (email) user.email = email;
+    if (role) user.role = role;
+    if (walletAddress)
+      user.walletAddress = [walletAddress, ...user.walletAddress];
+    if (password) user.password = password;
+    await user.save();
+
+    res.json({
+      message: "Update successful",
+    });
+  } else {
+    res.status(400).json({ error: "User not found" });
+  }
+});
+
+const deleteAdmin = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  await User.deleteOne({ _id: id });
+
+  res.json({
+    message: "delete successful",
+  });
+});
+
+const getAdminById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const admin = await User.findById(id);
+
+  if (admin) {
+    const { userId, phone, email, _id, walletAddress, role } = admin;
+    res.json({
+      admin: {
+        userId,
+        phone,
+        email,
+        _id,
+        walletAddress: walletAddress[0],
+        role,
+      },
+    });
+  } else {
+    res.status(400).json({ error: "Admin not found" });
+  }
+});
+
 export {
   getUserProfile,
   getAllUsers,
@@ -1622,4 +1862,9 @@ export {
   changeNextUserTier,
   getLastUserInTier,
   removeLastUserInTier,
+  createAdmin,
+  getListAdmin,
+  updateAdmin,
+  deleteAdmin,
+  getAdminById,
 };
