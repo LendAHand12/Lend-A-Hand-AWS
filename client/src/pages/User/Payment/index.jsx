@@ -151,7 +151,7 @@ const PaymentPage = () => {
           }/api/payment/confirmWalletTransferArray`,
           {
             code: otp,
-            wallet: userInfo.walletAddress,
+            wallet: userInfo[`walletAddress${userInfo.tier}`],
             arrayWallet: paymentsList,
           }
         )
@@ -427,7 +427,12 @@ const PaymentPage = () => {
                         <span className="mr-2 text-black">
                           From :{" "}
                           <span className="border rounded-md border-dashed border-gray-300 p-1">
-                            {shortenWalletAddress(userInfo.walletAddress, 10)}
+                            {shortenWalletAddress(
+                              userInfo[`walletAddress${userInfo.tier}`]
+                                ? userInfo[`walletAddress${userInfo.tier}`]
+                                : userInfo.walletAddress1,
+                              10
+                            )}
                           </span>
                         </span>
                         <span className="mx-2 text-black">
