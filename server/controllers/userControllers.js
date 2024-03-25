@@ -737,12 +737,9 @@ const getUserProfile = asyncHandler(async (req, res) => {
       tier4Time: user.tier4Time,
       tier5Time: user.tier5Time,
       hold: user.hold,
-<<<<<<< HEAD
       isSerepayWallet: await checkSerepayWallet(user.walletAddress[0]),
-=======
       role: user.role,
       permissions: permissions ? permissions.pagePermissions : [],
->>>>>>> main
     });
   } else {
     res.status(400);

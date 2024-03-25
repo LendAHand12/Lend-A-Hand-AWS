@@ -365,7 +365,6 @@
 
   "refUserEmail": "Email người giới thiệu",
 
-<<<<<<< HEAD
   "Please input OTP code from your email": "Vui lòng nhập mã OTP từ email của Bạn",
   "We have sent a code to your email": "Chúng tôi đã gửi mã tới email của bạn",
   "Didn't recieve code?": "Không nhận được mã?",
@@ -377,8 +376,7 @@
   "Insufficient balance": "Không đủ số dư",
   "isNotSerepayWalletAlert": "Vui lòng chuyển sang sử dụng ví Serepay. Link tải tài liệu hướng dẫn : ",
   "download": "Tải xuống",
-  "The wallet address does not exist in the Serepay system": "Địa chỉ ví không tồn tại trong hệ thống Serepay"
-=======
+  "The wallet address does not exist in the Serepay system": "Địa chỉ ví không tồn tại trong hệ thống Serepay",
   "ourTeam": "Đội ngũ của chúng tôi",
 
   "admin-dashboard": "ADMIN - Thống kê",
@@ -472,5 +470,4 @@
   "admin-admin-create": "Admin - Tạo mới Admin",
   "cms-feature": "CMS - Chức năng",
   "cms-call": "CMS - Kêu gọi"
->>>>>>> main
 }

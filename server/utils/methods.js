@@ -2,11 +2,8 @@ import moment from "moment";
 import NextUserTier from "../models/nextUserTierModel.js";
 import Tree from "../models/treeModel.js";
 import User from "../models/userModel.js";
-<<<<<<< HEAD
 import axios from "axios";
-=======
 import ADMIN_ID from "../constants/AdminId.js";
->>>>>>> main
 
 export const getParentUser = async (userId, tier) => {
   const tree = await Tree.findOne({ userId, tier });
@@ -232,7 +229,6 @@ export const checkRatioCountChildOfUser = async (userId) => {
   }
 };
 
-<<<<<<< HEAD
 export const checkSerepayWallet = async (walletAddress) => {
   return axios
     .post(`${process.env.SEREPAY_HOST}/api/user/checkwallet`, {
@@ -249,7 +245,7 @@ export const checkSerepayWallet = async (walletAddress) => {
       //     : error.message;
       // throw new Error(message);
     });
-=======
+};
 export const removeAccents = (str) => {
   var AccentsMap = [
     "aàảãáạăằẳẵắặâầẩẫấậ",
@@ -337,5 +333,4 @@ export const findNextUserByIndex = async (tier) => {
   });
   console.log({ nextUserTree: nextUserTree[1] });
   return nextUserTree.userId;
->>>>>>> main
 };
