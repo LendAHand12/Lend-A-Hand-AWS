@@ -90,8 +90,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       let registerFee = user.countPay === 0 ? 7 * user.tier : 0;
       let directCommissionWallet = "";
       let directCommissionFee = 5 * user.tier;
-      // let referralCommissionFee = 10 * user.tier;
-      let referralCommissionFee = 1 * user.tier;
+      let referralCommissionFee = 10 * user.tier;
 
       // delete pending trans
       await Transaction.deleteMany({
@@ -131,8 +130,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
 
       if (user.tier >= 2 || user.buyPackage === "A") {
         if (user.countPay === 0) {
-          // directCommissionFee = 65 * user.tier;
-          directCommissionFee = 6 * user.tier;
+          directCommissionFee = 65 * user.tier;
           if (refUser.closeLah) {
             directCommissionWallet = holdWallet[user.tier];
             haveRefNotPayEnough = true;
@@ -169,8 +167,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         }
       } else if (user.tier === 1 && user.buyPackage === "B") {
         if (user.countPay === 0) {
-          // directCommissionFee = 35 * user.tier;
-          directCommissionFee = 3 * user.tier;
+          directCommissionFee = 35 * user.tier;
           if (refUser.closeLah) {
             directCommissionWallet = holdWallet[user.tier];
             haveRefNotPayEnough = true;
@@ -193,8 +190,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
             }
           }
         } else if (user.countPay === 7 && user.continueWithBuyPackageB) {
-          // directCommissionFee = 30 * user.tier;
-          directCommissionFee = 4 * user.tier;
+          directCommissionFee = 30 * user.tier;
           if (refUser.closeLah) {
             directCommissionWallet = holdWallet[user.tier];
             haveRefNotPayEnough = true;
@@ -304,7 +300,6 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       let countPayUser = user.countPay;
       let indexFor = 1;
       for (let p of ancestors) {
-        console.log({ p: p.userName });
         let referralCommissionWallet, haveParentNotPayEnough;
         const receiveUser = await User.findById(p.userId);
         if (receiveUser.closeLah) {
