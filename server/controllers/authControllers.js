@@ -225,7 +225,7 @@ const authUser = asyncHandler(async (req, res) => {
     if (listRefIdOfUser && listRefIdOfUser.length > 0) {
       for (let refId of listRefIdOfUser) {
         const refedUser = await User.findById(refId.userId).select(
-          "userId email walletAddress"
+          "userId email"
         );
         listDirectUser.push(refedUser);
       }
@@ -246,7 +246,11 @@ const authUser = asyncHandler(async (req, res) => {
         isAdmin: user.isAdmin,
         isConfirmed: user.isConfirmed,
         avatar: user.avatar,
-        walletAddress: user.walletAddress[0],
+        walletAddress1: user.walletAddress1,
+        walletAddress2: user.walletAddress2,
+        walletAddress3: user.walletAddress3,
+        walletAddress4: user.walletAddress4,
+        walletAddress5: user.walletAddress5,
         tier: user.tier,
         createdAt: user.createdAt,
         fine: user.fine,

@@ -26,7 +26,11 @@ const Profile = () => {
   let {
     email,
     userId,
-    walletAddress,
+    walletAddress1,
+    walletAddress2,
+    walletAddress3,
+    walletAddress4,
+    walletAddress5,
     createdAt,
     id,
     status,
@@ -266,7 +270,9 @@ const Profile = () => {
                   download
                   rel="noopener noreferrer"
                   target="_blank"
-                  href={`${import.meta.env.VITE_API_URL}/documents/SEREPAY_DOCUMENT.pdf`}
+                  href={`${
+                    import.meta.env.VITE_API_URL
+                  }/documents/SEREPAY_DOCUMENT.pdf`}
                 >
                   {t("download")}
                 </a>
@@ -438,11 +444,51 @@ const Profile = () => {
                   </div>
                   <div className="grid lg:grid-cols-2 grid-cols-1">
                     <div className="px-4 py-2 font-semibold">
-                      {t("walletAddress")}
+                      {t("walletAddress")} Tier 1
                     </div>
                     <div className="">
                       <div className="px-4 py-2 break-words">
-                        {walletAddress}
+                        {walletAddress1}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid lg:grid-cols-2 grid-cols-1">
+                    <div className="px-4 py-2 font-semibold">
+                      {t("walletAddress")} Tier 2
+                    </div>
+                    <div className="">
+                      <div className="px-4 py-2 break-words">
+                        {walletAddress2}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid lg:grid-cols-2 grid-cols-1">
+                    <div className="px-4 py-2 font-semibold">
+                      {t("walletAddress")} Tier 3
+                    </div>
+                    <div className="">
+                      <div className="px-4 py-2 break-words">
+                        {walletAddress3}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid lg:grid-cols-2 grid-cols-1">
+                    <div className="px-4 py-2 font-semibold">
+                      {t("walletAddress")} Tier 4
+                    </div>
+                    <div className="">
+                      <div className="px-4 py-2 break-words">
+                        {walletAddress4}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid lg:grid-cols-2 grid-cols-1">
+                    <div className="px-4 py-2 font-semibold">
+                      {t("walletAddress")} Tier 5
+                    </div>
+                    <div className="">
+                      <div className="px-4 py-2 break-words">
+                        {walletAddress5}
                       </div>
                     </div>
                   </div>

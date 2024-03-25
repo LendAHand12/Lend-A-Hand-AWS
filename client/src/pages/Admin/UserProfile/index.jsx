@@ -53,14 +53,28 @@ const UserProfile = (match) => {
         .then((response) => {
           setLoading(false);
           setData(response.data);
-          const { userId, email, phone, idCode, walletAddress, tier } =
-            response.data;
+          const {
+            userId,
+            email,
+            phone,
+            idCode,
+            walletAddress1,
+            walletAddress2,
+            walletAddress3,
+            walletAddress4,
+            walletAddress5,
+            tier,
+          } = response.data;
           setValue("userId", userId);
           setValue("email", email);
           setPhone(phone);
           setValue("idCode", idCode);
           setValue("tier", tier);
-          setValue("walletAddress", walletAddress);
+          setValue("walletAddress1", walletAddress1);
+          setValue("walletAddress2", walletAddress2);
+          setValue("walletAddress3", walletAddress3);
+          setValue("walletAddress4", walletAddress4);
+          setValue("walletAddress5", walletAddress5);
           setCurrentOpenLah(response.data.openLah);
           setCurrentCloseLah(response.data.closeLah);
         })
@@ -99,8 +113,20 @@ const UserProfile = (match) => {
       if (values.tier !== data.tier) {
         body.tier = values.tier;
       }
-      if (values.walletAddress !== data.walletAddress) {
-        body.walletAddress = values.walletAddress;
+      if (values.walletAddress1 !== data.walletAddress1) {
+        body.walletAddress1 = values.walletAddress1;
+      }
+      if (values.walletAddress2 !== data.walletAddress2) {
+        body.walletAddress2 = values.walletAddress2;
+      }
+      if (values.walletAddress3 !== data.walletAddress3) {
+        body.walletAddress3 = values.walletAddress3;
+      }
+      if (values.walletAddress4 !== data.walletAddress4) {
+        body.walletAddress4 = values.walletAddress4;
+      }
+      if (values.walletAddress5 !== data.walletAddress5) {
+        body.walletAddress5 = values.walletAddress5;
       }
       if (currentOpenLah !== data.openLah) {
         body.openLah = currentOpenLah;
@@ -705,13 +731,13 @@ const UserProfile = (match) => {
                     </div>
                     <div className="grid lg:grid-cols-2 grid-cols-1">
                       <div className="px-4 py-2 font-semibold">
-                        {t("walletAddress")}
+                        {t("walletAddress")} Tier 1
                       </div>
                       {isEditting ? (
                         <div className="px-4">
                           <input
                             className="w-full px-4 py-1.5 rounded-md border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                            {...register("walletAddress", {
+                            {...register("walletAddress1", {
                               required: t("Wallet address is required"),
                               pattern: {
                                 value: /^0x[a-fA-F0-9]{40}$/g,
@@ -723,12 +749,124 @@ const UserProfile = (match) => {
                             autoComplete="off"
                           />
                           <p className="error-message-text">
-                            {errors.walletAddress?.message}
+                            {errors.walletAddress1?.message}
                           </p>
                         </div>
                       ) : (
                         <div className="px-4 py-2 break-words">
-                          {data.walletAddress}
+                          {data.walletAddress1}
+                        </div>
+                      )}
+                    </div>
+                    <div className="grid lg:grid-cols-2 grid-cols-1">
+                      <div className="px-4 py-2 font-semibold">
+                        {t("walletAddress")} Tier 2
+                      </div>
+                      {isEditting ? (
+                        <div className="px-4">
+                          <input
+                            className="w-full px-4 py-1.5 rounded-md border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                            {...register("walletAddress2", {
+                              pattern: {
+                                value: /^0x[a-fA-F0-9]{40}$/g,
+                                message: t(
+                                  "Please enter the correct wallet format"
+                                ),
+                              },
+                            })}
+                            autoComplete="off"
+                          />
+                          <p className="error-message-text">
+                            {errors.walletAddress2?.message}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="px-4 py-2 break-words">
+                          {data.walletAddress2}
+                        </div>
+                      )}
+                    </div>
+                    <div className="grid lg:grid-cols-2 grid-cols-1">
+                      <div className="px-4 py-2 font-semibold">
+                        {t("walletAddress")} Tier 3
+                      </div>
+                      {isEditting ? (
+                        <div className="px-4">
+                          <input
+                            className="w-full px-4 py-1.5 rounded-md border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                            {...register("walletAddress3", {
+                              pattern: {
+                                value: /^0x[a-fA-F0-9]{40}$/g,
+                                message: t(
+                                  "Please enter the correct wallet format"
+                                ),
+                              },
+                            })}
+                            autoComplete="off"
+                          />
+                          <p className="error-message-text">
+                            {errors.walletAddress3?.message}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="px-4 py-2 break-words">
+                          {data.walletAddress3}
+                        </div>
+                      )}
+                    </div>
+                    <div className="grid lg:grid-cols-2 grid-cols-1">
+                      <div className="px-4 py-2 font-semibold">
+                        {t("walletAddress")} Tier 4
+                      </div>
+                      {isEditting ? (
+                        <div className="px-4">
+                          <input
+                            className="w-full px-4 py-1.5 rounded-md border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                            {...register("walletAddress4", {
+                              pattern: {
+                                value: /^0x[a-fA-F0-9]{40}$/g,
+                                message: t(
+                                  "Please enter the correct wallet format"
+                                ),
+                              },
+                            })}
+                            autoComplete="off"
+                          />
+                          <p className="error-message-text">
+                            {errors.walletAddress4?.message}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="px-4 py-2 break-words">
+                          {data.walletAddress4}
+                        </div>
+                      )}
+                    </div>
+                    <div className="grid lg:grid-cols-2 grid-cols-1">
+                      <div className="px-4 py-2 font-semibold">
+                        {t("walletAddress")} Tier 5
+                      </div>
+                      {isEditting ? (
+                        <div className="px-4">
+                          <input
+                            className="w-full px-4 py-1.5 rounded-md border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                            {...register("walletAddress5", {
+                              pattern: {
+                                value: /^0x[a-fA-F0-9]{40}$/g,
+                                message: t(
+                                  "Please enter the correct wallet format"
+                                ),
+                              },
+                            })}
+                            autoComplete="off"
+                          />
+                          <p className="error-message-text">
+                            {errors.walletAddress5?.message}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="px-4 py-2 break-words">
+                          {data.walletAddress5}
                         </div>
                       )}
                     </div>

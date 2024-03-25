@@ -259,3 +259,14 @@ export const countIndexTree = async () => {
 
   console.log("countIndexTree done");
 };
+
+export const changeWalletAddress = async () => {
+  const listUser = await User.find({ role: "user" });
+
+  for (let user of listUser) {
+    user.walletAddress1 = user.walletAddress[0];
+    await user.save();
+  }
+
+  console.log("changeWalletAddress done");
+};

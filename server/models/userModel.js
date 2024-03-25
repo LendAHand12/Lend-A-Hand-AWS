@@ -8,13 +8,28 @@ const userSchema = mongoose.Schema(
       required: true,
     },
     walletAddress: {
-      type: [
-        {
-          type: String,
-          unique: true,
-        },
-      ],
+      type: Array,
+    },
+    walletAddress1: {
+      type: String,
+      unique: true,
       required: true,
+    },
+    walletAddress2: {
+      type: String,
+      unique: true,
+    },
+    walletAddress3: {
+      type: String,
+      unique: true,
+    },
+    walletAddress4: {
+      type: String,
+      unique: true,
+    },
+    walletAddress5: {
+      type: String,
+      unique: true,
     },
     email: {
       type: String,
@@ -177,10 +192,7 @@ const userSchema = mongoose.Schema(
     },
     role: {
       type: String,
-<<<<<<< HEAD
-=======
       // enum: ["USER", "ADMIN", "ADMIN1", "ADMIN2"],
->>>>>>> main
     },
   },
   {

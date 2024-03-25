@@ -27,10 +27,14 @@ const ChangeWallet = () => {
 
   const onSubmit = async (data) => {
     setLoading(true);
-    const { newWallet } = data;
+    const { newWallet1, newWallet2, newWallet3, newWallet4, newWallet5 } = data;
     await User.changeWallet({
       token,
-      newWallet,
+      newWallet1,
+      newWallet2,
+      newWallet3,
+      newWallet4,
+      newWallet5,
     })
       .then((response) => {
         setLoading(false);
@@ -66,23 +70,118 @@ const ChangeWallet = () => {
                     onSubmit={handleSubmit(onSubmit)}
                     autoComplete="off"
                   >
-                    {/* Password */}
-                    <input
-                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
-                      type="text"
-                      placeholder="Wallet address : Oxbx7..."
-                      {...register("newWallet", {
-                        required: t("Wallet address is required"),
-                        pattern: {
-                          value: /^0x[a-fA-F0-9]{40}$/g,
-                          message: t("Please enter the correct wallet format"),
-                        },
-                      })}
-                      disabled={loading}
-                    />
-                    <p className="error-message-text">
-                      {errors.newWallet?.message}
-                    </p>
+                    <div className="mb-6">
+                      <div className="font-semibold">
+                        {t("walletAddress")} Tier 1
+                      </div>
+                      <input
+                        className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-2"
+                        type="text"
+                        placeholder="Wallet address : Oxbx7..."
+                        {...register("newWallet1", {
+                          required: t("Wallet address is required"),
+                          pattern: {
+                            value: /^0x[a-fA-F0-9]{40}$/g,
+                            message: t(
+                              "Please enter the correct wallet format"
+                            ),
+                          },
+                        })}
+                        disabled={loading}
+                      />
+                      <p className="error-message-text">
+                        {errors.newWallet1?.message}
+                      </p>
+                    </div>
+                    <div className="mb-6">
+                      <div className="font-semibold">
+                        {t("walletAddress")} Tier 2
+                      </div>
+                      <input
+                        className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-2"
+                        type="text"
+                        placeholder="Wallet address : Oxbx7..."
+                        {...register("newWallet2", {
+                          pattern: {
+                            value: /^0x[a-fA-F0-9]{40}$/g,
+                            message: t(
+                              "Please enter the correct wallet format"
+                            ),
+                          },
+                        })}
+                        disabled={loading}
+                      />
+                      <p className="error-message-text">
+                        {errors.newWallet2?.message}
+                      </p>
+                    </div>
+                    <div className="mb-6">
+                      <div className="font-semibold">
+                        {t("walletAddress")} Tier 3
+                      </div>
+                      <input
+                        className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-2"
+                        type="text"
+                        placeholder="Wallet address : Oxbx7..."
+                        {...register("newWallet3", {
+                          pattern: {
+                            value: /^0x[a-fA-F0-9]{40}$/g,
+                            message: t(
+                              "Please enter the correct wallet format"
+                            ),
+                          },
+                        })}
+                        disabled={loading}
+                      />
+                      <p className="error-message-text">
+                        {errors.newWallet3?.message}
+                      </p>
+                    </div>
+                    <div className="mb-6">
+                      <div className="font-semibold">
+                        {t("walletAddress")} Tier 4
+                      </div>
+                      <input
+                        className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-2"
+                        type="text"
+                        placeholder="Wallet address : Oxbx7..."
+                        {...register("newWallet4", {
+                          pattern: {
+                            value: /^0x[a-fA-F0-9]{40}$/g,
+                            message: t(
+                              "Please enter the correct wallet format"
+                            ),
+                          },
+                        })}
+                        disabled={loading}
+                      />
+                      <p className="error-message-text">
+                        {errors.newWallet4?.message}
+                      </p>
+                    </div>
+                    <div className="mb-6">
+                      <div className="font-semibold">
+                        {t("walletAddress")} Tier 5
+                      </div>
+                      <input
+                        className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-2"
+                        type="text"
+                        placeholder="Wallet address : Oxbx7..."
+                        {...register("newWallet5", {
+                          pattern: {
+                            value: /^0x[a-fA-F0-9]{40}$/g,
+                            message: t(
+                              "Please enter the correct wallet format"
+                            ),
+                          },
+                        })}
+                        disabled={loading}
+                      />
+                      <p className="error-message-text">
+                        {errors.newWallet5?.message}
+                      </p>
+                    </div>
+
                     <button
                       type="submit"
                       className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
