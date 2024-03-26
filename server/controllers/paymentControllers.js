@@ -1269,7 +1269,7 @@ const addPayment = asyncHandler(async (req, res) => {
   }
 });
 
-const onDonePayment = asyncHandler(async (req, res) => {
+const onDonePaymentNew = asyncHandler(async (req, res) => {
   const { user } = req;
   const { transIds } = req.body;
   console.log({ transIds });
@@ -1342,7 +1342,7 @@ const onDonePayment = asyncHandler(async (req, res) => {
   }
 });
 
-const onDonePaymentTest = async (user, transIds) => {
+const onDonePayment = async (user, transIds) => {
   const transIdsList = Object.values(transIds);
   if (transIdsList.length > 0) {
     for (let transId of transIdsList) {
