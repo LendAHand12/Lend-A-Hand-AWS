@@ -254,7 +254,7 @@ const Profile = () => {
           </div>
         )}
 
-        {!isSerepayWallet && (
+        {/* {!isSerepayWallet && (
           <div
             className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-5"
             role="alert"
@@ -273,7 +273,7 @@ const Profile = () => {
               </span>
             </span>
           </div>
-        )}
+        )} */}
         <div className="md:flex no-wrap md:-mx-2 ">
           <div className="w-full lg:w-3/12 lg:mx-2 mb-4 lg:mb-0">
             <div className="bg-white shadow-md p-3 border-t-4 border-primary">
