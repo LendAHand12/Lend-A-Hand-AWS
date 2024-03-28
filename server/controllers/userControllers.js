@@ -1364,7 +1364,7 @@ const adminCreateUser = asyncHandler(async (req, res) => {
     $and: [{ phone: { $ne: "" } }, { phone }],
   });
   const userExistsWalletAddress = await User.findOne({
-    walletAddress: { $in: [walletAddress] },
+    walletAddress1: walletAddress,
   });
   const userExistsIdCode = await User.findOne({
     $and: [{ idCode: { $ne: "" } }, { idCode }],
@@ -1399,6 +1399,7 @@ const adminCreateUser = asyncHandler(async (req, res) => {
       phone,
       password,
       avatar,
+      walletAddress: [walletAddress],
       walletAddress1: walletAddress,
       idCode,
       imgBack,
@@ -1695,7 +1696,7 @@ const createAdmin = asyncHandler(async (req, res) => {
     $and: [{ phone: { $ne: "" } }, { phone }],
   });
   const userExistsWalletAddress = await User.findOne({
-    walletAddress: { $in: [walletAddress] },
+    walletAddress1: walletAddress,
   });
 
   if (userExistsUserId) {
@@ -1723,6 +1724,7 @@ const createAdmin = asyncHandler(async (req, res) => {
       phone,
       password,
       avatar,
+      walletAddress: [walletAddress],
       walletAddress1: walletAddress,
       imgBack: "",
       imgFront: "",

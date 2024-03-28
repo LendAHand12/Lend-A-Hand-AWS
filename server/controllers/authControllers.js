@@ -76,7 +76,7 @@ const registerUser = asyncHandler(async (req, res) => {
     status: { $ne: "DELETED" },
   });
   const userExistsWalletAddress = await User.findOne({
-    walletAddress: { $in: [walletAddress] },
+    walletAddress1: walletAddress,
   });
   const userExistsIdCode = await User.findOne({
     $and: [{ idCode: { $ne: "" } }, { idCode }],
@@ -116,6 +116,7 @@ const registerUser = asyncHandler(async (req, res) => {
         password,
         avatar,
         walletAddress: [walletAddress],
+        walletAddress1: walletAddress,
         idCode,
         role: "user",
       });
