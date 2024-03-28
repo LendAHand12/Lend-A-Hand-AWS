@@ -1610,7 +1610,7 @@ const checkCanRefundPayment = asyncHandler(async (req, res) => {
     const userReceive = await User.findOne({
       walletAddress: { $in: [address_ref] },
     });
-    const isSerepayWallet = await checkSerepayWallet(userReceive.walletAddress);
+    // const isSerepayWallet = await checkSerepayWallet(userReceive.walletAddress);
     if (userReceive) {
       if (userReceive.status === "LOCKED") {
         res.status(404);
@@ -1618,9 +1618,11 @@ const checkCanRefundPayment = asyncHandler(async (req, res) => {
       } else if (userReceive.closeLah) {
         res.status(404);
         throw new Error(`User is being blocked from trading`);
-      } else if (!isSerepayWallet) {
-        throw new Error(`The wallet received is not a Serepay wallet`);
-      } else if (userReceive.countPay - 1 < userCountPay) {
+      }
+      //  else if (!isSerepayWallet) {
+      //   throw new Error(`The wallet received is not a Serepay wallet`);
+      // }
+      else if (userReceive.countPay - 1 < userCountPay) {
         res.status(404);
         throw new Error(
           userReceive.countPay === 0
