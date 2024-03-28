@@ -122,7 +122,7 @@ const PaymentPage = () => {
           import.meta.env.VITE_HOST_SEREPAY
         }/api/payment/sendCodeWalletTransferArray`,
         {
-          wallet: userInfo.walletAddress,
+          wallet: userInfo.walletAddress1,
           arrayWallet: paymentsList,
         }
       )
