@@ -23,7 +23,9 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
   const { continueWithBuyPackageB } = req.query;
 
   if (user) {
-    let walletUser = user[`walletAddress${user.tier}`];
+    let walletUser = user[`walletAddress${user.tier}`]
+      ? user[`walletAddress${user.tier}`]
+      : user[`walletAddress1`];
     if (user.countPay === 13) {
       const canIncreaseTier = await checkCanIncreaseNextTier(user);
       if (!canIncreaseTier) {
