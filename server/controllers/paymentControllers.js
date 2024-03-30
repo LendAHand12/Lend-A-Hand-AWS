@@ -23,9 +23,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
   const { continueWithBuyPackageB } = req.query;
 
   if (user) {
-    let walletUser = user[`walletAddress${user.tier}`]
-      ? user[`walletAddress${user.tier}`]
-      : user[`walletAddress1`];
+    let walletUser = user[`walletAddress${user.tier}`];
     if (user.countPay === 13) {
       const canIncreaseTier = await checkCanIncreaseNextTier(user);
       if (!canIncreaseTier) {
@@ -142,9 +140,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
             refUser.adminChangeTier ||
             refUser.createBy === "ADMIN"
           ) {
-            directCommissionWallet = refUser[`walletAddress${user.tier}`]
-              ? refUser[`walletAddress${user.tier}`]
-              : refUser[`walletAddress1`];
+            directCommissionWallet = refUser[`walletAddress${user.tier}`];
           } else {
             if (
               refUser.status === "LOCKED" ||
@@ -154,9 +150,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
               directCommissionWallet = holdWallet[user.tier];
               haveRefNotPayEnough = true;
             } else {
-              directCommissionWallet = refUser[`walletAddress${user.tier}`]
-                ? refUser[`walletAddress${user.tier}`]
-                : refUser[`walletAddress1`];
+              directCommissionWallet = refUser[`walletAddress${user.tier}`];
             }
           }
         } else {
@@ -183,9 +177,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
             refUser.adminChangeTier ||
             refUser.createBy === "ADMIN"
           ) {
-            directCommissionWallet = refUser[`walletAddress${user.tier}`]
-              ? refUser[`walletAddress${user.tier}`]
-              : refUser[`walletAddress1`];
+            directCommissionWallet = refUser[`walletAddress${user.tier}`];
           } else {
             if (
               refUser.status === "LOCKED" ||
@@ -195,9 +187,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
               directCommissionWallet = holdWallet[user.tier];
               haveRefNotPayEnough = true;
             } else {
-              directCommissionWallet = refUser[`walletAddress${user.tier}`]
-                ? refUser[`walletAddress${user.tier}`]
-                : refUser[`walletAddress1`];
+              directCommissionWallet = refUser[`walletAddress${user.tier}`];
             }
           }
         } else if (user.countPay === 7 && user.continueWithBuyPackageB) {
@@ -210,9 +200,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
             refUser.adminChangeTier ||
             refUser.createBy === "ADMIN"
           ) {
-            directCommissionWallet = refUser[`walletAddress${user.tier}`]
-              ? refUser[`walletAddress${user.tier}`]
-              : refUser[`walletAddress1`];
+            directCommissionWallet = refUser[`walletAddress${user.tier}`];
           } else {
             if (
               refUser.status === "LOCKED" ||
@@ -222,9 +210,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
               directCommissionWallet = holdWallet[user.tier];
               haveRefNotPayEnough = true;
             } else {
-              directCommissionWallet = refUser[`walletAddress${user.tier}`]
-                ? refUser[`walletAddress${user.tier}`]
-                : refUser[`walletAddress1`];
+              directCommissionWallet = refUser[`walletAddress${user.tier}`];
             }
           }
         } else {
@@ -249,9 +235,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           refUser.adminChangeTier ||
           refUser.createBy === "ADMIN"
         ) {
-          directCommissionWallet = refUser[`walletAddress${user.tier}`]
-            ? refUser[`walletAddress${user.tier}`]
-            : refUser[`walletAddress1`];
+          directCommissionWallet = refUser[`walletAddress${user.tier}`];
         } else {
           if (
             refUser.status === "LOCKED" ||
@@ -261,9 +245,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
             directCommissionWallet = holdWallet[user.tier];
             haveRefNotPayEnough = true;
           } else {
-            directCommissionWallet = refUser[`walletAddress${user.tier}`]
-              ? refUser[`walletAddress${user.tier}`]
-              : refUser[`walletAddress1`];
+            directCommissionWallet = refUser[`walletAddress${user.tier}`];
           }
         }
       }
@@ -331,9 +313,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           receiveUser.adminChangeTier ||
           receiveUser.createBy === "ADMIN"
         ) {
-          referralCommissionWallet = receiveUser[`walletAddress${user.tier}`]
-            ? receiveUser[`walletAddress${user.tier}`]
-            : receiveUser[`walletAddress1`];
+          referralCommissionWallet = receiveUser[`walletAddress${user.tier}`];
         } else {
           if (
             receiveUser.status === "LOCKED" ||
@@ -345,9 +325,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
             referralCommissionWallet = holdWallet[user.tier];
             haveParentNotPayEnough = true;
           } else {
-            referralCommissionWallet = receiveUser[`walletAddress${user.tier}`]
-              ? receiveUser[`walletAddress${user.tier}`]
-              : receiveUser[`walletAddress1`];
+            referralCommissionWallet = receiveUser[`walletAddress${user.tier}`];
           }
         }
 
@@ -383,15 +361,10 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         }
 
         if (
-          referralCommissionWallet ===
-          (receiveUser[`walletAddress${user.tier}`]
-            ? receiveUser[`walletAddress${user.tier}`]
-            : receiveUser[`walletAddress1`])
+          referralCommissionWallet === receiveUser[`walletAddress${user.tier}`]
         ) {
           const isSerepayWallet = await checkSerepayWallet(
             receiveUser[`walletAddress${user.tier}`]
-              ? receiveUser[`walletAddress${user.tier}`]
-              : receiveUser[`walletAddress1`]
           );
           if (!isSerepayWallet) {
             referralCommissionWallet = holdWallet[user.tier];
@@ -407,9 +380,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
           userId: user.id,
           amount: referralCommissionFee,
           userCountPay: countPayUser,
-          address_ref: receiveUser[`walletAddress${user.tier}`]
-            ? receiveUser[`walletAddress${user.tier}`]
-            : receiveUser[`walletAddress1`],
+          address_ref: receiveUser[`walletAddress${user.tier}`],
           address_from: user.walletAddress[0],
           address_to: referralCommissionWallet,
           tier: user.tier,
