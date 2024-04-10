@@ -1292,7 +1292,7 @@ const addPayment = asyncHandler(async (req, res) => {
   }
 });
 
-const onDonePaymentNew = asyncHandler(async (req, res) => {
+const onDonePayment = asyncHandler(async (req, res) => {
   const { user } = req;
   const { transIds } = req.body;
   console.log({ transIds });
@@ -1365,51 +1365,51 @@ const onDonePaymentNew = asyncHandler(async (req, res) => {
   }
 });
 
-const onDonePayment = async (user, transIds) => {
-  const transIdsList = Object.values(transIds);
-  if (transIdsList.length > 0) {
-    for (let transId of transIdsList) {
-      try {
-        await Transaction.findOne({
-          $and: [
-            { userId: user._id },
-            { userCountPay: user.countPay },
-            { _id: transId },
-            { status: "SUCCESS" },
-          ],
-        });
-      } catch (err) {
-        throw new Error("No transaction found");
-      }
-    }
+// const onDonePayment = async (user, transIds) => {
+//   const transIdsList = Object.values(transIds);
+//   if (transIdsList.length > 0) {
+//     for (let transId of transIdsList) {
+//       try {
+//         await Transaction.findOne({
+//           $and: [
+//             { userId: user._id },
+//             { userCountPay: user.countPay },
+//             { _id: transId },
+//             { status: "SUCCESS" },
+//           ],
+//         });
+//       } catch (err) {
+//         throw new Error("No transaction found");
+//       }
+//     }
 
-    if (user.countPay === 0 && user.tier === 1) {
-      const links = await getActiveLink(user.email, user.userId, user.phone);
-      if (links.length === 1) {
-        await sendActiveLink(user.email, links[0]);
-      }
-    }
+//     if (user.countPay === 0 && user.tier === 1) {
+//       const links = await getActiveLink(user.email, user.userId, user.phone);
+//       if (links.length === 1) {
+//         await sendActiveLink(user.email, links[0]);
+//       }
+//     }
 
-    if (user.countPay === 12 && user.buyPackage === "B") {
-      if (user.continueWithBuyPackageB === true) {
-        user.buyPackage = "A";
-        await Tree.findOneAndUpdate({ userId: user._id }, { buyPackage: "A" });
-      } else {
-        user.buyPackage = "C";
-      }
-    }
+//     if (user.countPay === 12 && user.buyPackage === "B") {
+//       if (user.continueWithBuyPackageB === true) {
+//         user.buyPackage = "A";
+//         await Tree.findOneAndUpdate({ userId: user._id }, { buyPackage: "A" });
+//       } else {
+//         user.buyPackage = "C";
+//       }
+//     }
 
-    user.countPay = user.countPay + 1;
+//     user.countPay = user.countPay + 1;
 
-    const updatedUser = await user.save();
+//     const updatedUser = await user.save();
 
-    if (updatedUser) {
-      return;
-    }
-  } else {
-    throw new Error("No transaction found");
-  }
-};
+//     if (updatedUser) {
+//       return;
+//     }
+//   } else {
+//     throw new Error("No transaction found");
+//   }
+// };
 
 const getAllPayments = asyncHandler(async (req, res) => {
   const { pageNumber, keyword, status, tier } = req.query;

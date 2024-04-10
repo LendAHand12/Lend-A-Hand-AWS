@@ -9,6 +9,7 @@ import bcrypt from "bcryptjs";
 import Tree from "../models/treeModel.js";
 import { getActivePackages } from "./packageControllers.js";
 import Permission from "../models/permissionModel.js";
+import { checkSerepayWallet } from "../utils/methods.js";
 
 const checkLinkRef = asyncHandler(async (req, res) => {
   const { ref, receiveId } = req.body;
@@ -275,6 +276,7 @@ const authUser = asyncHandler(async (req, res) => {
         closeLah: user.closeLah,
         tierDate: user.tierDate,
         role: user.role,
+        isSerepayWallet: await checkSerepayWallet(user.walletAddress1),
         permissions: permissions ? permissions.pagePermissions : [],
       },
       accessToken,
