@@ -168,7 +168,11 @@ const getUserById = asyncHandler(async (req, res) => {
       isAdmin: user.isAdmin,
       isConfirmed: user.isConfirmed,
       avatar: user.avatar,
-      walletAddress: user.walletAddress[0],
+      walletAddress1: user.walletAddress1,
+      walletAddress2: user.walletAddress2,
+      walletAddress3: user.walletAddress3,
+      walletAddress4: user.walletAddress4,
+      walletAddress5: user.walletAddress5,
       tier: user.tier,
       createdAt: user.createdAt,
       fine: user.fine,
@@ -201,7 +205,7 @@ const getUserById = asyncHandler(async (req, res) => {
       refUserEmail: refUser ? refUser.email : "",
       role: user.role,
       listOldParent,
-      isSerepayWallet: await checkSerepayWallet(user.walletAddress[0]),
+      isSerepayWallet: await checkSerepayWallet(user.walletAddress1),
     });
   } else {
     res.status(404);
@@ -266,7 +270,11 @@ const updateUser = asyncHandler(async (req, res) => {
           isAdmin: updatedUser.isAdmin,
           isConfirmed: updatedUser.isConfirmed,
           avatar: updatedUser.avatar,
-          walletAddress: updatedUser.walletAddress[0],
+          walletAddress1: updatedUser.walletAddress1,
+          walletAddress2: updatedUser.walletAddress2,
+          walletAddress3: updatedUser.walletAddress3,
+          walletAddress4: updatedUser.walletAddress4,
+          walletAddress5: updatedUser.walletAddress5,
           tier: updatedUser.tier,
           createdAt: updatedUser.createdAt,
           fine: updatedUser.fine,
@@ -307,7 +315,11 @@ const adminUpdateUser = asyncHandler(async (req, res) => {
     imgBack,
     imgFront,
     tier,
-    walletAddress,
+    walletAddress1,
+    walletAddress2,
+    walletAddress3,
+    walletAddress4,
+    walletAddress5,
     note,
     hold,
     holdLevel,
@@ -346,11 +358,11 @@ const adminUpdateUser = asyncHandler(async (req, res) => {
     }
   }
 
-  if (walletAddress) {
-    const userExistsWalletAddress = await User.findOne({
-      walletAddress: { $in: [walletAddress] },
+  if (walletAddress1) {
+    const userExistsWalletAddress1 = await User.findOne({
+      walletAddress1,
     });
-    if (userExistsWalletAddress) {
+    if (userExistsWalletAddress1) {
       let message = "Dupplicate wallet address";
       res.status(400);
       throw new Error(message);
@@ -424,9 +436,12 @@ const adminUpdateUser = asyncHandler(async (req, res) => {
     if (isRegistered && isRegistered === "on" && user.countPay === 0) {
       user.countPay = 1;
     }
-    if (walletAddress && !user.walletAddress.includes(walletAddress)) {
-      user.walletAddress = [walletAddress, ...user.walletAddress];
-    }
+
+    user.walletAddress1 = walletAddress1 || user.walletAddress1;
+    user.walletAddress2 = walletAddress2 || user.walletAddress2;
+    user.walletAddress3 = walletAddress3 || user.walletAddress3;
+    user.walletAddress4 = walletAddress4 || user.walletAddress4;
+    user.walletAddress5 = walletAddress5 || user.walletAddress5;
     if (tier && user.tier !== tier && tier >= 2) {
       user.countPay = 0;
       user.tier = tier;
@@ -665,7 +680,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
     if (listRefIdOfUser && listRefIdOfUser.length > 0) {
       for (let refId of listRefIdOfUser) {
         const refedUser = await User.findById(refId.userId).select(
-          "userId email walletAddress status countPay tier errLahCode buyPackage"
+          "userId email status countPay tier errLahCode buyPackage"
         );
         listDirectUser.push({
           userId: refedUser.userId,
@@ -705,7 +720,11 @@ const getUserProfile = asyncHandler(async (req, res) => {
       isAdmin: user.isAdmin,
       isConfirmed: user.isConfirmed,
       avatar: user.avatar,
-      walletAddress: user.walletAddress[0],
+      walletAddress1: user.walletAddress1,
+      walletAddress2: user.walletAddress2,
+      walletAddress3: user.walletAddress3,
+      walletAddress4: user.walletAddress4,
+      walletAddress5: user.walletAddress5,
       tier: user.tier,
       createdAt: user.createdAt,
       fine: user.fine,
@@ -737,7 +756,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
       tier4Time: user.tier4Time,
       tier5Time: user.tier5Time,
       hold: user.hold,
-      isSerepayWallet: await checkSerepayWallet(user.walletAddress[0]),
+      isSerepayWallet: await checkSerepayWallet(user.walletAddress1),
       role: user.role,
       permissions: permissions ? permissions.pagePermissions : [],
     });
@@ -1039,17 +1058,31 @@ const mailForChangeWallet = asyncHandler(async (req, res) => {
 });
 
 const changeWallet = asyncHandler(async (req, res) => {
-  try {
-    const { token, newWallet } = req.body;
-    const decodedToken = jwt.verify(
-      token,
-      process.env.JWT_FORGOT_PASSWORD_TOKEN_SECRET
-    );
+  const { token, newWallet1, newWallet2, newWallet3, newWallet4, newWallet5 } =
+    req.body;
+  const decodedToken = jwt.verify(
+    token,
+    process.env.JWT_FORGOT_PASSWORD_TOKEN_SECRET
+  );
+  if (decodedToken) {
     const user = await User.findById(decodedToken.id);
 
-    if (user && newWallet) {
-      const newWalletAddress = [newWallet, ...user.walletAddress];
-      user.walletAddress = [...newWalletAddress];
+    if (user) {
+      if (newWallet1) {
+        user.walletAddress1 = newWallet1;
+      }
+      if (newWallet2) {
+        user.walletAddress2 = newWallet2;
+      }
+      if (newWallet3) {
+        user.walletAddress3 = newWallet3;
+      }
+      if (newWallet4) {
+        user.walletAddress4 = newWallet4;
+      }
+      if (newWallet5) {
+        user.walletAddress5 = newWallet5;
+      }
       const updatedUser = await user.save();
 
       if (updatedUser) {
@@ -1060,10 +1093,13 @@ const changeWallet = asyncHandler(async (req, res) => {
         res.status(401);
         throw new Error("Unable to update wallet");
       }
+    } else {
+      res.status(401);
+      throw new Error("User not found");
     }
-  } catch (error) {
+  } else {
     res.status(401);
-    throw new Error("User not found");
+    throw new Error("token expired");
   }
 });
 
@@ -1328,7 +1364,7 @@ const adminCreateUser = asyncHandler(async (req, res) => {
     $and: [{ phone: { $ne: "" } }, { phone }],
   });
   const userExistsWalletAddress = await User.findOne({
-    walletAddress: { $in: [walletAddress] },
+    walletAddress1: walletAddress,
   });
   const userExistsIdCode = await User.findOne({
     $and: [{ idCode: { $ne: "" } }, { idCode }],
@@ -1364,6 +1400,7 @@ const adminCreateUser = asyncHandler(async (req, res) => {
       password,
       avatar,
       walletAddress: [walletAddress],
+      walletAddress1: walletAddress,
       idCode,
       imgBack,
       imgFront,
@@ -1659,7 +1696,7 @@ const createAdmin = asyncHandler(async (req, res) => {
     $and: [{ phone: { $ne: "" } }, { phone }],
   });
   const userExistsWalletAddress = await User.findOne({
-    walletAddress: { $in: [walletAddress] },
+    walletAddress1: walletAddress,
   });
 
   if (userExistsUserId) {
@@ -1688,6 +1725,7 @@ const createAdmin = asyncHandler(async (req, res) => {
       password,
       avatar,
       walletAddress: [walletAddress],
+      walletAddress1: walletAddress,
       imgBack: "",
       imgFront: "",
       tier: 5,

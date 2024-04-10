@@ -91,6 +91,46 @@ export const checkBPackage = asyncHandler(async () => {
   for (let u of listUser) {
     const diffDays = currentDay.diff(u.createdAt, "days");
 
+    if (u.countPay >= 8 && u.countPay <= 12) {
+      console.log({ name: u.userId, countPay: u.countPay, tier: u.tier });
+      u.countPay = 7;
+      if (u.tier === 2) {
+        await Transaction.deleteMany({
+          $and: [
+            { userId: u._id },
+            { tier: 2 },
+            {
+              $or: [
+                { userCountPay: 7 },
+                { userCountPay: 8 },
+                { userCountPay: 9 },
+                { userCountPay: 10 },
+                { userCountPay: 11 },
+                { userCountPay: 12 },
+              ],
+            },
+          ],
+        });
+      } else {
+        await Transaction.deleteMany({
+          $and: [
+            { userId: u._id },
+            { tier: 1 },
+            {
+              $or: [
+                { userCountPay: 7 },
+                { userCountPay: 8 },
+                { userCountPay: 9 },
+                { userCountPay: 10 },
+                { userCountPay: 11 },
+                { userCountPay: 12 },
+              ],
+            },
+          ],
+        });
+      }
+    }
+
     if (diffDays >= 1 && u.countPay < 7) {
       u.status = "LOCKED";
       u.lockedTime = new Date();

@@ -47,6 +47,7 @@ import {
   addLockTime,
   addTierTime,
   countIndexTree,
+  changeWalletAddress,
 } from "./common.js";
 import {
   findHighestIndexOfLevel,
@@ -61,6 +62,7 @@ if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 // connect to the mongoDB database
 connectDB();
 
+// await changeWalletAddress();
 // await listTier(2);
 // await nextUserWithTier(2);
 // await checkUnPayUserOnTierUser(2);
