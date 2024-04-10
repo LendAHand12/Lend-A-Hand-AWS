@@ -2,15 +2,11 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import { useAccount, useConnect } from "wagmi";
-import { bsc } from "wagmi/chains";
-import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 
 import LOGO from "@/assets/img/logo-horizon.png";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import AdminRoutes from "@/routes/admin";
 import UserRoutes from "@/routes/user";
-import { shortenWalletAddress } from "@/utils";
 
 const AppNav = () => {
   var routes = [];
@@ -42,19 +38,8 @@ const AppNav = () => {
       }
     });
   }
-  const { address, isConnected } = useAccount();
-  const connector = new MetaMaskConnector({
-    chains: [bsc],
-  });
-  const { connect } = useConnect({
-    connector,
-  });
 
   const onClickOutside = () => setShowMenu(false);
-
-  // useEffect(() => {
-  //   connect();
-  // }, []);
 
   useLayoutEffect(() => {
     const handleScroll = () => {
@@ -87,14 +72,6 @@ const AppNav = () => {
   useEffect(() => {
     setShowMenu(false);
   }, [pathname]);
-
-  const connectWallet = () => {
-    if (!connector.ready) {
-      toast.error(t("Please install metamask"));
-    } else {
-      connect();
-    }
-  };
 
   return (
     <>
@@ -202,47 +179,6 @@ const AppNav = () => {
                   </li>
                 ))}
 
-              {auth.accessToken &&
-                (auth.userInfo.status === "APPROVED" ||
-                  auth.userInfo.status === "LOCKED") &&
-                (isConnected ? (
-                  <>
-                    <button className="flex items-center gap-2 hover:underline bg-white text-gray-800 font-bold rounded-full lg:mt-0 py-4 px-8 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out">
-                      <svg
-                        className="w-6 h-auto"
-                        viewBox="0 0 16 16"
-                        version="1.1"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fill="#444"
-                          d="M14.5 4h-12.12c-0.057 0.012-0.123 0.018-0.19 0.018-0.552 0-1-0.448-1-1 0-0.006 0-0.013 0-0.019l12.81-0.499v-1.19c0.005-0.041 0.008-0.089 0.008-0.138 0-0.652-0.528-1.18-1.18-1.18-0.049 0-0.097 0.003-0.144 0.009l-11.374 1.849c-0.771 0.289-1.31 1.020-1.31 1.877 0 0.011 0 0.023 0 0.034l-0 10.728c-0 0.003-0 0.006-0 0.010 0 0.828 0.672 1.5 1.5 1.5 0 0 0 0 0 0h13c0 0 0 0 0 0 0.828 0 1.5-0.672 1.5-1.5 0-0.004-0-0.007-0-0.011v-8.999c0-0.012 0.001-0.027 0.001-0.041 0-0.801-0.649-1.45-1.45-1.45-0.018 0-0.036 0-0.053 0.001zM13 11c-0.828 0-1.5-0.672-1.5-1.5s0.672-1.5 1.5-1.5c0.828 0 1.5 0.672 1.5 1.5s-0.672 1.5-1.5 1.5z"
-                        ></path>
-                      </svg>
-                      {shortenWalletAddress(address, 8)}
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      onClick={connectWallet}
-                      className="flex items-center gap-2 hover:underline bg-white text-gray-800 font-bold rounded-full lg:mt-0 py-4 px-8 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-                    >
-                      <svg
-                        className="w-6 h-auto"
-                        viewBox="0 0 16 16"
-                        version="1.1"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fill="#444"
-                          d="M14.5 4h-12.12c-0.057 0.012-0.123 0.018-0.19 0.018-0.552 0-1-0.448-1-1 0-0.006 0-0.013 0-0.019l12.81-0.499v-1.19c0.005-0.041 0.008-0.089 0.008-0.138 0-0.652-0.528-1.18-1.18-1.18-0.049 0-0.097 0.003-0.144 0.009l-11.374 1.849c-0.771 0.289-1.31 1.020-1.31 1.877 0 0.011 0 0.023 0 0.034l-0 10.728c-0 0.003-0 0.006-0 0.010 0 0.828 0.672 1.5 1.5 1.5 0 0 0 0 0 0h13c0 0 0 0 0 0 0.828 0 1.5-0.672 1.5-1.5 0-0.004-0-0.007-0-0.011v-8.999c0-0.012 0.001-0.027 0.001-0.041 0-0.801-0.649-1.45-1.45-1.45-0.018 0-0.036 0-0.053 0.001zM13 11c-0.828 0-1.5-0.672-1.5-1.5s0.672-1.5 1.5-1.5c0.828 0 1.5 0.672 1.5 1.5s-0.672 1.5-1.5 1.5z"
-                        ></path>
-                      </svg>
-                      Connect
-                    </button>
-                  </>
-                ))}
               <li className="">
                 <select
                   className="bg-inherit px-4 py-2 focus:outline-none active:outline-none"
