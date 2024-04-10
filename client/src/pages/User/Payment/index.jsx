@@ -2,28 +2,25 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 
+import Payment from "@/api/Payment";
 import Loading from "@/components/Loading";
 import { ToastContainer, toast } from "react-toastify";
-import Payment from "@/api/Payment";
-import { getBalance, getAccount } from "@/utils/smartContract.js";
-import { useAccount } from "wagmi";
-import User from "../../../api/User";
+import User from "@/api/User";
+import axios from "axios";
+import { shortenWalletAddress } from "@/utils";
+import { useForm } from "react-hook-form";
+import Modal from "react-modal";
+
+Modal.setAppElement("#root");
 
 const PaymentPage = () => {
   const { t } = useTranslation();
-  const [loadingPaymentInfo, setLoadingPaymentInfo] = useState(true);
-  const [paymentInfo, setPaymentInfo] = useState(null);
-  const [payStep, setPayStep] = useState(0);
   const { userInfo } = useSelector((state) => state.auth);
   const [total, setTotal] = useState(0);
-  const registrationFee = userInfo.countPay === 0 ? 7 * userInfo.tier : 0;
-  const [yourBalance, setYourBalance] = useState(0);
-  const { address, isConnected } = useAccount();
-  const [canPay, setCanPay] = useState(true);
-  const [nextPay, setNextPay] = useState();
   const [continueWithBuyPackageB, setContinueWithBuyPackageB] = useState(
     userInfo.continueWithBuyPackageB
   );
+  const [loadingPaymentInfo, setLoadingPaymentInfo] = useState(true);
   const [loadingCheckIncrease, setLoadingCheckIncrease] = useState(false);
   const [showCanIncrease, setShowCanIncrease] = useState(null);
   const [loadingAcceptIncrease, setLoadingAcceptIncrease] = useState(null);
@@ -36,40 +33,24 @@ const PaymentPage = () => {
     userInfo.buyPackage === "B" && userInfo.countPay === 7 ? false : true
   );
 
-  const addPayment = async (id, hash, type, transIds) => {
-    await Payment.addPayment({
-      id,
-      hash,
-      type,
-      transIds,
-    })
-      .then((response) => {
-        toast.success(t(response.data.message));
-      })
-      .catch((error) => {
-        let message =
-          error.response && error.response.data.message
-            ? error.response.data.message
-            : error.message;
-        throw new Error(message);
-      });
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
   const onGetPaymentInfo = async (continueWithBuyPackageB) => {
     setLoadingPaymentInfo(true);
     await Payment.getPaymentInfo(continueWithBuyPackageB)
       .then((response) => {
-        setPaymentInfo(response.data);
-        const {
-          step,
-          registerFee,
-          directCommissionFee,
-          referralCommissionFee,
-          countPay,
-        } = response.data;
-        setTotal(registerFee + directCommissionFee + referralCommissionFee);
-        setPayStep(step);
-        setNextPay(countPay);
+        const { payments, paymentIds } = response.data;
+        const totalPayment = paymentIds.reduce(
+          (accumulator, currentValue) => accumulator + currentValue.amount,
+          0
+        );
+        setTotal(totalPayment);
+        setPaymentIdsList(paymentIds);
+        setPaymentsList(payments);
         setLoadingPaymentInfo(false);
       })
       .catch((error) => {
@@ -89,13 +70,6 @@ const PaymentPage = () => {
       handleCheckCanIncreaseTier();
     }
   }, [continueWithBuyPackageB]);
-
-  useEffect(() => {
-    if (isConnected && address !== userInfo.walletAddress) {
-      setCanPay(false);
-      toast.error(t("Please login your registered wallet"));
-    }
-  }, [address, isConnected]);
 
   const handleChangeContinueWithB = async () => {
     setContinueWithBuyPackageB(!continueWithBuyPackageB);
