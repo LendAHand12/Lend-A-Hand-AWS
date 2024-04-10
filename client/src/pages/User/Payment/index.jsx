@@ -2,197 +2,52 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 
+import Payment from "@/api/Payment";
 import Loading from "@/components/Loading";
 import { ToastContainer, toast } from "react-toastify";
-import Payment from "@/api/Payment";
-import { transfer, getBalance, getAccount } from "@/utils/smartContract.js";
-import { useAccount } from "wagmi";
-import User from "../../../api/User";
+import User from "@/api/User";
+import axios from "axios";
+import { shortenWalletAddress } from "@/utils";
+import { useForm } from "react-hook-form";
+import Modal from "react-modal";
+
+Modal.setAppElement("#root");
 
 const PaymentPage = () => {
   const { t } = useTranslation();
-  const [loadingPaymentInfo, setLoadingPaymentInfo] = useState(true);
-  const [paymentInfo, setPaymentInfo] = useState(null);
-  const [loadingAddRegister, setLoadingAddRegister] = useState(false);
-  const [loadingAddFine, setLoadingAddFine] = useState(false);
-  const [loadingAddDirectCommission, setLoadingAddDirectCommission] =
-    useState(false);
-  const [loadingAddReferralCommission, setLoadingAddReferralCommission] =
-    useState(false);
-  const [payStep, setPayStep] = useState(0);
   const { userInfo } = useSelector((state) => state.auth);
   const [total, setTotal] = useState(0);
-  const registrationFee = userInfo.countPay === 0 ? 7 * userInfo.tier : 0;
-  const [yourBalance, setYourBalance] = useState(0);
-  const { address, isConnected } = useAccount();
-  const [canPay, setCanPay] = useState(true);
-  const [nextPay, setNextPay] = useState();
   const [continueWithBuyPackageB, setContinueWithBuyPackageB] = useState(
     userInfo.continueWithBuyPackageB
   );
+  const [loadingPaymentInfo, setLoadingPaymentInfo] = useState(true);
   const [loadingCheckIncrease, setLoadingCheckIncrease] = useState(false);
   const [showCanIncrease, setShowCanIncrease] = useState(null);
   const [loadingAcceptIncrease, setLoadingAcceptIncrease] = useState(null);
+  const [paymentsList, setPaymentsList] = useState([]);
+  const [paymentIdsList, setPaymentIdsList] = useState([]);
+  const [loadingGetOtp, setLoadingGetOtp] = useState(false);
+  const [loadingPayment, setLoadingPayment] = useState(false);
+  const [showOtpModal, setShowOtpModal] = useState(false);
 
-  const paymentRegisterFee = useCallback(async () => {
-    if (paymentInfo && paymentInfo.registerFee !== 0) {
-      setLoadingAddRegister(true);
-      try {
-        const registerTransaction = await transfer(
-          paymentInfo.registerWallet,
-          paymentInfo.registerFee
-        );
-        if (registerTransaction) {
-          const { transactionHash } = registerTransaction;
-          await addPayment(
-            paymentInfo.transIds.register,
-            transactionHash,
-            // "hash",
-            "REGISTER",
-            paymentInfo.transIds
-          );
-          setPayStep(2);
-          setLoadingAddRegister(false);
-        } else {
-          setLoadingAddRegister(false);
-          throw new Error(t("payment error"));
-        }
-      } catch (error) {
-        toast.error(t(error.message));
-        setLoadingAddRegister(false);
-      }
-    }
-  }, [paymentInfo]);
-
-  const paymentFineFee = useCallback(async () => {
-    if (paymentInfo && paymentInfo.transactionFine !== null) {
-      setLoadingAddFine(true);
-      try {
-        const fineTransaction = await transfer(
-          paymentInfo.registerWallet,
-          paymentInfo.transactionFine.amount
-        );
-        if (fineTransaction) {
-          const { transactionHash } = fineTransaction;
-          await addPayment(
-            paymentInfo.transactionFine._id,
-            transactionHash,
-            // "hash",
-            "FINE",
-            paymentInfo.transIds
-          );
-          setLoadingAddFine(false);
-          window.location.reload(false);
-        } else {
-          setLoadingAddFine(false);
-          throw new Error(t("payment error"));
-        }
-      } catch (error) {
-        toast.error(t(error.message));
-        setLoadingAddFine(false);
-      }
-    }
-  }, [paymentInfo]);
-
-  const paymentDirectionCommission = useCallback(async () => {
-    setLoadingAddDirectCommission(true);
-    try {
-      const registerTransaction = await transfer(
-        paymentInfo.directCommissionWallet,
-        paymentInfo.directCommissionFee
-      );
-      if (registerTransaction) {
-        const { transactionHash } = registerTransaction;
-        await addPayment(
-          paymentInfo.transIds.direct,
-          transactionHash,
-          // "hash",
-          "DIRECT",
-          paymentInfo.transIds
-        );
-        setPayStep(3);
-        setLoadingAddDirectCommission(false);
-      } else {
-        setLoadingAddDirectCommission(false);
-        throw new Error(t("payment error"));
-      }
-    } catch (error) {
-      toast.error(t(error.message));
-      setLoadingAddDirectCommission(false);
-    }
-  }, [paymentInfo]);
-
-  const paymentReferralCommission = useCallback(async () => {
-    setLoadingAddReferralCommission(true);
-    try {
-      const referralTransaction = await transfer(
-        paymentInfo.referralCommissionWallet,
-        paymentInfo.referralCommissionFee
-      );
-      if (referralTransaction) {
-        const { transactionHash } = referralTransaction;
-        await addPayment(
-          paymentInfo.transIds.referral,
-          transactionHash,
-          // "hash",
-          "REFERRAL",
-          paymentInfo.transIds
-        );
-        setPayStep(0);
-        setLoadingAddReferralCommission(false);
-        window.location.reload();
-      } else {
-        setLoadingAddReferralCommission(false);
-        throw new Error(t("payment error"));
-      }
-    } catch (error) {
-      toast.error(t(error.message));
-      setLoadingAddReferralCommission(false);
-    }
-  }, [paymentInfo]);
-
-  const addPayment = async (id, hash, type, transIds) => {
-    await Payment.addPayment({
-      id,
-      hash,
-      type,
-      transIds,
-    })
-      .then((response) => {
-        toast.success(t(response.data.message));
-      })
-      .catch((error) => {
-        let message =
-          error.response && error.response.data.message
-            ? error.response.data.message
-            : error.message;
-        throw new Error(message);
-      });
-  };
-
-  useEffect(() => {
-    (async () => {
-      const account = await getAccount();
-      const balance = await getBalance(account);
-      setYourBalance(balance);
-    })();
-  }, [payStep]);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
   const onGetPaymentInfo = async (continueWithBuyPackageB) => {
     setLoadingPaymentInfo(true);
     await Payment.getPaymentInfo(continueWithBuyPackageB)
       .then((response) => {
-        setPaymentInfo(response.data);
-        const {
-          step,
-          registerFee,
-          directCommissionFee,
-          referralCommissionFee,
-          countPay,
-        } = response.data;
-        setTotal(registerFee + directCommissionFee + referralCommissionFee);
-        setPayStep(step);
-        setNextPay(countPay);
+        const { payments, paymentIds } = response.data;
+        const totalPayment = paymentIds.reduce(
+          (accumulator, currentValue) => accumulator + currentValue.amount,
+          0
+        );
+        setTotal(totalPayment);
+        setPaymentIdsList(paymentIds);
+        setPaymentsList(payments);
         setLoadingPaymentInfo(false);
       })
       .catch((error) => {
@@ -212,13 +67,6 @@ const PaymentPage = () => {
       handleCheckCanIncreaseTier();
     }
   }, [continueWithBuyPackageB]);
-
-  useEffect(() => {
-    if (isConnected && address !== userInfo.walletAddress) {
-      setCanPay(false);
-      toast.error(t("Please login your registered wallet"));
-    }
-  }, [address, isConnected]);
 
   const handleChangeContinueWithB = async () => {
     setContinueWithBuyPackageB(!continueWithBuyPackageB);
@@ -257,6 +105,93 @@ const PaymentPage = () => {
         setLoadingAcceptIncrease(false);
       });
   };
+
+  const openModal = () => {
+    setShowOtpModal(true);
+  };
+
+  const closeModal = () => {
+    setShowOtpModal(false);
+  };
+
+  const handleSubmitOTPSerepay = useCallback(() => {
+    setLoadingGetOtp(true);
+    axios
+      .post(
+        `${
+          import.meta.env.VITE_HOST_SEREPAY
+        }/api/payment/sendCodeWalletTransferArray`,
+        {
+          wallet: userInfo.walletAddress,
+          arrayWallet: paymentsList,
+        }
+      )
+      .then(() => {
+        setLoadingGetOtp(false);
+        openModal();
+      })
+      .catch((error) => {
+        let message =
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message;
+        toast.error(t(message));
+        setLoadingGetOtp(false);
+      });
+  }, [paymentsList]);
+
+  const handlePaySerepay = useCallback(
+    (values) => {
+      const { otp } = values;
+      setLoadingPayment(true);
+      axios
+        .post(
+          `${
+            import.meta.env.VITE_HOST_SEREPAY
+          }/api/payment/confirmWalletTransferArray`,
+          {
+            code: otp,
+            wallet: userInfo.walletAddress,
+            arrayWallet: paymentsList,
+          }
+        )
+        .then(async (response) => {
+          const { message, status } = response.data;
+          if (status) {
+            await donePayment();
+            closeModal();
+            toast.success(t(message));
+            window.location.reload(false);
+          }
+          setLoadingPayment(false);
+        })
+        .catch((error) => {
+          let message =
+            error.response && error.response.data.message
+              ? error.response.data.message
+              : error.message;
+          toast.error(t(message));
+          setLoadingPayment(false);
+        });
+    },
+    [paymentsList]
+  );
+
+  const donePayment = useCallback(async () => {
+    await Payment.onDonePayment({
+      transIds: paymentIdsList,
+    })
+      .then((response) => {
+        toast.success(t(response.data.message));
+      })
+      .catch((error) => {
+        let message =
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message;
+        toast.error(t(message));
+      });
+  }, [paymentIdsList]);
 
   return (
     <>
@@ -306,19 +241,97 @@ const PaymentPage = () => {
           <Loading />
         </div>
       ) : (
-        <div
-          className="w-full mx-auto rounded-lg bg-white shadow-xl p-5 text-gray-700 mt-4"
-          style={{ maxWidth: "600px" }}
-        >
-          <div className="mb-10">
-            <h1 className="text-center font-bold text-xl uppercase">
-              {t("paymentTitle")}
-            </h1>
-          </div>
-          {paymentInfo &&
-            userInfo.buyPackage === "B" &&
-            userInfo.countPay === 7 &&
-            payStep < 3 && (
+        <>
+          <Modal
+            isOpen={showOtpModal}
+            onRequestClose={closeModal}
+            style={{
+              content: {
+                top: "50%",
+                left: "50%",
+                right: "auto",
+                bottom: "auto",
+                marginRight: "-50%",
+                transform: "translate(-50%, -50%)",
+              },
+            }}
+            contentLabel="Example Modal"
+          >
+            <div className="mx-auto flex w-full max-w-md flex-col space-y-8">
+              <div className="flex flex-col items-center justify-center text-center space-y-2">
+                <div className="font-semibold text-3xl">
+                  <p>OTP Verification</p>
+                </div>
+                <div className="flex flex-row text-sm text-gray-700">
+                  <p>{t("We have sent a code to your email")}</p>
+                </div>
+              </div>
+
+              <div>
+                <form onSubmit={handleSubmit(handlePaySerepay)}>
+                  <div className="flex flex-col space-y-4">
+                    <div className="flex flex-row items-center justify-between mx-auto w-full max-w-sm gap-2">
+                      <div className="w-full h-16">
+                        <input
+                          className="w-full h-full flex flex-col items-center justify-center text-center px-5 outline-none rounded-xl border border-gray-200 text-lg bg-white focus:bg-gray-50 focus:ring-1 ring-blue-700"
+                          type="text"
+                          {...register("otp", {
+                            required: t("otp is required"),
+                          })}
+                          autoComplete="off"
+                        />
+                      </div>
+                    </div>
+                    <div className="error-message-text">
+                      {errors.otp?.message}
+                    </div>
+
+                    <div className="flex flex-col space-y-5">
+                      <div className="flex justify-center gap-4">
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            closeModal();
+                          }}
+                          className="flex flex-row items-center justify-center text-center border rounded-xl outline-none py-5 bg-red-500 border-none text-white text-sm shadow-sm px-8 font-semibold"
+                        >
+                          {t("cancel")}
+                        </button>
+                        <button
+                          type="submit"
+                          className="flex flex-row items-center justify-center text-center border rounded-xl outline-none py-5 gradient border-none text-white text-sm shadow-sm px-8 font-semibold"
+                        >
+                          {loadingPayment && <Loading />}
+                          {t("confirm")}
+                        </button>
+                      </div>
+                      <div className="flex flex-row items-center justify-center text-center text-sm font-medium space-x-1 text-gray-500">
+                        <p>{t("Didn't recieve code?")}</p>{" "}
+                        <a
+                          className="flex flex-row items-center text-blue-600"
+                          href="http://"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {t("Resend")}
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </Modal>
+          <div
+            className="w-full mx-auto rounded-lg bg-white shadow-xl p-5 text-gray-700 mt-4"
+            style={{ maxWidth: "600px" }}
+          >
+            <div className="mb-10">
+              <h1 className="text-center font-bold text-xl uppercase">
+                {t("paymentTitle")}
+              </h1>
+            </div>
+            {userInfo.buyPackage === "B" && userInfo.countPay === 7 && (
               <>
                 <div className="w-full flex flex-col mb-3">
                   {userInfo.packages.includes("B") && (
@@ -353,24 +366,8 @@ const PaymentPage = () => {
                 <hr className="mb-3"></hr>
               </>
             )}
-          {canPay && (
+
             <>
-              {userInfo.countPay === 0 && (
-                <div className="mb-3">
-                  <p className="text-lg mb-2 ml-1">
-                    <span className="font-bold">{t("registerFee")}</span> :{" "}
-                    {registrationFee} USDT
-                  </p>
-                </div>
-              )}
-              {nextPay !== 0 && (
-                <div className="mb-3">
-                  <p className="text-lg mb-2 ml-1">
-                    <span className="font-bold">{t("the next pay count")}</span>{" "}
-                    : {nextPay}
-                  </p>
-                </div>
-              )}
               {(userInfo.buyPackage === "A" ||
                 (userInfo.buyPackage === "B" && continueWithBuyPackageB)) && (
                 <div className="mb-3">
@@ -388,354 +385,73 @@ const PaymentPage = () => {
                   <span className="font-bold">Total</span> : {total} USDT
                 </p>
               </div>
-              <div className="mb-3">
-                <p className="text-lg mb-2 ml-1">
-                  <span className="font-bold">{t("yourBalance")}</span> :{" "}
-                  {yourBalance} USDT
-                </p>
-              </div>
-
-              <>
-                {paymentInfo.transactionFine ? (
-                  <>
-                    <div
-                      className="flex p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 "
-                      role="alert"
+              {!loadingPaymentInfo &&
+                paymentIdsList.map((payment) => (
+                  <div
+                    key={payment.id}
+                    className={`flex items-center p-4 mb-4 text-sm rounded-lg ${
+                      payment.type === "REGISTER"
+                        ? "bg-green-50 text-green-800"
+                        : payment.type === "DIRECT"
+                        ? "bg-yellow-50 text-yellow-800"
+                        : payment.type === "FINE"
+                        ? "bg-red-50 text-red-800"
+                        : "bg-blue-50 text-blue-800"
+                    }`}
+                    role="alert"
+                  >
+                    <svg
+                      className="flex-shrink-0 inline w-4 h-4 me-3"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
                     >
-                      <svg
-                        aria-hidden="true"
-                        className="flex-shrink-0 inline w-5 h-5 mr-3"
+                      <path
+                        d="M6 2h12v2H6V2zM4 6V4h2v2H4zm0 12V6H2v12h2zm2 2v-2H4v2h2zm12 0v2H6v-2h12zm2-2v2h-2v-2h2zm0-12h2v12h-2V6zm0 0V4h-2v2h2zm-9-1h2v2h3v2h-6v2h6v6h-3v2h-2v-2H8v-2h6v-2H8V7h3V5z"
                         fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                          clipRule="evenodd"
-                        ></path>
-                      </svg>
-                      <span className="sr-only">Info</span>
-                      <div>
-                        <span className="font-medium">{t("fineFee")}!</span>{" "}
-                        {t("pleasePay")}. ({paymentInfo.transactionFine.amount}{" "}
-                        USDT)
+                      />
+                    </svg>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <div className="font-medium">
+                        {payment.type === "REGISTER"
+                          ? t("registerFee")
+                          : payment.type === "DIRECT"
+                          ? t("commissionFee")
+                          : payment.type === "FINE"
+                          ? t("fine")
+                          : t("lahFuns")}
+                        <span> : </span>
+                        <span>{payment.amount} USDT</span>
+                      </div>
+                      <div className="">
+                        <span className="mr-2 text-black">
+                          From :{" "}
+                          <span className="border rounded-md border-dashed border-gray-300 p-1">
+                            {shortenWalletAddress(userInfo.walletAddress, 10)}
+                          </span>
+                        </span>
+                        <span className="mx-2 text-black">
+                          To :{" "}
+                          <span className="border rounded-md border-dashed border-gray-300 p-1">
+                            {shortenWalletAddress(payment.to, 10)}
+                          </span>
+                        </span>
                       </div>
                     </div>
-                    <div>
-                      <button
-                        type="submit"
-                        onClick={paymentFineFee}
-                        disabled={loadingAddFine}
-                        className="w-xl flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-                      >
-                        {loadingAddFine && <Loading />}
-                        {t("payment")}
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    {payStep === 1 && (
-                      <>
-                        <div
-                          className="flex p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 "
-                          role="alert"
-                        >
-                          <svg
-                            aria-hidden="true"
-                            className="flex-shrink-0 inline w-5 h-5 mr-3"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                              clipRule="evenodd"
-                            ></path>
-                          </svg>
-                          <span className="sr-only">Info</span>
-                          <div>
-                            <span className="font-medium">
-                              {t("registerFee")}!
-                            </span>{" "}
-                            {t("pleasePay")}. ({paymentInfo.registerFee} USDT)
-                          </div>
-                        </div>
-                        <div>
-                          <button
-                            type="submit"
-                            onClick={paymentRegisterFee}
-                            disabled={loadingAddRegister}
-                            className="w-xl flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-                          >
-                            {loadingAddRegister && <Loading />}
-                            {t("payment")}
-                          </button>
-                        </div>
-                      </>
-                    )}
-                    {payStep === 2 && (
-                      <>
-                        {userInfo.countPay === 0 && (
-                          <div
-                            className="flex p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 "
-                            role="alert"
-                          >
-                            <svg
-                              aria-hidden="true"
-                              className="flex-shrink-0 inline w-5 h-5 mr-3"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                                clipRule="evenodd"
-                              ></path>
-                            </svg>
-                            <span className="sr-only">Info</span>
-                            <div>
-                              <span className="font-medium">
-                                {t("registerFee")}!
-                              </span>{" "}
-                              {t("Payment successful")}. (
-                              {paymentInfo.registerFee} USDT)
-                            </div>
-                          </div>
-                        )}
-                        <div
-                          className="flex p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 "
-                          role="alert"
-                        >
-                          <svg
-                            aria-hidden="true"
-                            className="flex-shrink-0 inline w-5 h-5 mr-3"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                              clipRule="evenodd"
-                            ></path>
-                          </svg>
-                          <span className="sr-only">Info</span>
-                          <div>
-                            <span className="font-medium">
-                              {t("commissionFee")}!
-                            </span>{" "}
-                            {t("pleasePay")}. ({paymentInfo.directCommissionFee}{" "}
-                            USDT)
-                          </div>
-                        </div>
-                        <div>
-                          <button
-                            type="submit"
-                            disabled={loadingAddDirectCommission}
-                            onClick={paymentDirectionCommission}
-                            className="w-xl flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-                          >
-                            {loadingAddDirectCommission && <Loading />}
-                            {t("payment")}
-                          </button>
-                        </div>
-                      </>
-                    )}
-                    {payStep === 3 && (
-                      <>
-                        {userInfo.countPay === 0 && (
-                          <div
-                            className="flex p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 "
-                            role="alert"
-                          >
-                            <svg
-                              aria-hidden="true"
-                              className="flex-shrink-0 inline w-5 h-5 mr-3"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                                clipRule="evenodd"
-                              ></path>
-                            </svg>
-                            <span className="sr-only">Info</span>
-                            <div>
-                              <span className="font-medium">
-                                {t("registerFee")}!
-                              </span>{" "}
-                              {t("Payment successful")}. (
-                              {paymentInfo.registerFee} USDT)
-                            </div>
-                          </div>
-                        )}
-                        <div
-                          className="flex p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 "
-                          role="alert"
-                        >
-                          <svg
-                            aria-hidden="true"
-                            className="flex-shrink-0 inline w-5 h-5 mr-3"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                              clipRule="evenodd"
-                            ></path>
-                          </svg>
-                          <span className="sr-only">Info</span>
-                          <div>
-                            <span className="font-medium">
-                              {t("commissionFee")}!
-                            </span>{" "}
-                            {t("Payment successful")}. (
-                            {paymentInfo.directCommissionFee} USDT)
-                          </div>
-                        </div>
-                        <div
-                          className="flex p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 "
-                          role="alert"
-                        >
-                          <svg
-                            aria-hidden="true"
-                            className="flex-shrink-0 inline w-5 h-5 mr-3"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                              clipRule="evenodd"
-                            ></path>
-                          </svg>
-                          <span className="sr-only">Info</span>
-                          <div>
-                            <span className="font-medium">{t("lahFuns")}!</span>{" "}
-                            {t("pleasePay")}. (
-                            {paymentInfo.referralCommissionFee} USDT)
-                          </div>
-                        </div>
-                        <div>
-                          <button
-                            type="submit"
-                            onClick={paymentReferralCommission}
-                            disabled={loadingAddReferralCommission}
-                            className="w-xl flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-                          >
-                            {loadingAddReferralCommission && <Loading />}
-                            {t("payment")}
-                          </button>
-                        </div>
-                      </>
-                    )}
-                    {payStep === 4 && (
-                      <>
-                        {userInfo.countPay === 0 && (
-                          <div
-                            className="flex p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 "
-                            role="alert"
-                          >
-                            <svg
-                              aria-hidden="true"
-                              className="flex-shrink-0 inline w-5 h-5 mr-3"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                                clipRule="evenodd"
-                              ></path>
-                            </svg>
-                            <span className="sr-only">Info</span>
-                            <div>
-                              <span className="font-medium">
-                                {t("registerFee")}!
-                              </span>{" "}
-                              {t("Payment successful")}. (
-                              {paymentInfo.registerFee} USDT)
-                            </div>
-                          </div>
-                        )}
-
-                        <div
-                          className="flex p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 "
-                          role="alert"
-                        >
-                          <svg
-                            aria-hidden="true"
-                            className="flex-shrink-0 inline w-5 h-5 mr-3"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                              clipRule="evenodd"
-                            ></path>
-                          </svg>
-                          <span className="sr-only">Info</span>
-                          <div>
-                            <span className="font-medium">
-                              {t("commissionFee")}!
-                            </span>{" "}
-                            {t("Payment successful")}. (
-                            {paymentInfo.directCommissionFee} USDT)
-                          </div>
-                        </div>
-                        <div
-                          className="flex p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 "
-                          role="alert"
-                        >
-                          <svg
-                            aria-hidden="true"
-                            className="flex-shrink-0 inline w-5 h-5 mr-3"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                              clipRule="evenodd"
-                            ></path>
-                          </svg>
-                          <span className="sr-only">Info</span>
-                          <div>
-                            <span className="font-medium">{t("lahFuns")}!</span>{" "}
-                            {t("Payment successful")}. (
-                            {paymentInfo.referralCommissionFee} USDT)
-                          </div>
-                        </div>
-                        {/* <div>
-                          <button
-                            type="submit"
-                            onClick={onDonePay}
-                            className="w-xl flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-                          >
-                            {t("donePayment")}
-                          </button>
-                        </div> */}
-                      </>
-                    )}
-                  </>
-                )}
-              </>
+                  </div>
+                ))}
+              <button
+                type="submit"
+                onClick={handleSubmitOTPSerepay}
+                disabled={loadingGetOtp}
+                className="w-xl flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+              >
+                {loadingGetOtp && <Loading />}
+                {t("payment")}
+              </button>
             </>
-          )}
-        </div>
+          </div>
+        </>
       )}
     </>
   );

@@ -18,7 +18,7 @@ import { checkCanIncreaseNextTier } from "./userControllers.js";
 import Wallet from "../models/walletModel.js";
 import Tree from "../models/treeModel.js";
 
-const getPaymentInfoNew = asyncHandler(async (req, res) => {
+const getPaymentInfo = asyncHandler(async (req, res) => {
   const { user } = req;
   const { continueWithBuyPackageB } = req.query;
 
@@ -405,7 +405,7 @@ const getPaymentInfoNew = asyncHandler(async (req, res) => {
   }
 });
 
-const getPaymentInfo = asyncHandler(async (req, res) => {
+const getPaymentInfoOld = asyncHandler(async (req, res) => {
   const { user } = req;
   const { continueWithBuyPackageB } = req.query;
   const wallets = await Wallet.find();
