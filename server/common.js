@@ -261,7 +261,7 @@ export const countIndexTree = async () => {
 };
 
 export const changeWalletAddress = async () => {
-  const listUser = await User.find({ role: "user" });
+  const listUser = await User.find();
 
   for (let user of listUser) {
     user.walletAddress1 = user.walletAddress[0];

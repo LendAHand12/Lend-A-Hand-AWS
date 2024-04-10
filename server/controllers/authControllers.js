@@ -117,6 +117,10 @@ const registerUser = asyncHandler(async (req, res) => {
         avatar,
         walletAddress: [walletAddress],
         walletAddress1: walletAddress,
+        walletAddress2: walletAddress,
+        walletAddress3: walletAddress,
+        walletAddress4: walletAddress,
+        walletAddress5: walletAddress,
         idCode,
         role: "user",
       });

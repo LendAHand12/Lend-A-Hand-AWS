@@ -277,15 +277,20 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         amount: directCommissionFee,
       });
 
-      await generatePackageTrans(
-        user,
-        refUser,
-        directCommissionWallet,
-        user.continueWithBuyPackageB
-      );
+      // await generatePackageTrans(
+      //   user,
+      //   refUser,
+      //   directCommissionWallet,
+      //   user.continueWithBuyPackageB
+      // );
 
       const ancestorsData = await findAncestors(user.id, 13, user.tier);
-      let ancestors = [...ancestorsData];
+      let ancestors = ancestorsData.map((data, index) => {
+        if (index === 0) {
+          data.isFirst = true;
+        }
+        return data;
+      });
       if (user.buyPackage === "A") {
         ancestors = [...ancestorsData];
       } else if (user.buyPackage === "B" && user.countPay === 0) {
@@ -303,71 +308,84 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
       let countPayUser = user.countPay;
       let indexFor = 1;
       for (let p of ancestors) {
+        // console.log({ name: p.userName, isFirst: p.isFirst });
         let referralCommissionWallet, haveParentNotPayEnough;
         const receiveUser = await User.findById(p.userId);
-        if (receiveUser.closeLah) {
-          referralCommissionWallet = holdWallet[user.tier];
-          haveParentNotPayEnough = true;
-        } else if (
-          receiveUser.openLah ||
-          receiveUser.adminChangeTier ||
-          receiveUser.createBy === "ADMIN"
-        ) {
+        if (p.isFirst) {
           referralCommissionWallet = receiveUser[`walletAddress${user.tier}`];
-        } else {
-          if (
-            receiveUser.status === "LOCKED" ||
-            (receiveUser.errLahCode !== "" && indexFor > 6) ||
-            receiveUser.tier < user.tier ||
-            (receiveUser.tier === user.tier &&
-              receiveUser.countPay < user.countPay + 1)
-          ) {
-            referralCommissionWallet = holdWallet[user.tier];
-            haveParentNotPayEnough = true;
-          } else {
-            referralCommissionWallet = receiveUser[`walletAddress${user.tier}`];
-          }
-        }
-
-        if (
-          user.tier === 1 &&
-          receiveUser.tier === 1 &&
-          ((receiveUser.buyPackage === "B" && receiveUser.countPay < 7) ||
-            (receiveUser.buyPackage === "A" && receiveUser.countPay < 13))
-        ) {
-          haveParentNotPayEnough = true;
-        }
-
-        if (receiveUser.hold !== "no" && receiveUser.holdLevel !== "no") {
-          if (
-            receiveUser.hold.toString() === user.tier.toString() &&
-            parseInt(receiveUser.holdLevel) <= parseInt(user.countPay)
-          ) {
-            haveParentNotPayEnough = true;
-          }
-        } else if (
-          user.tier >= 2 &&
-          user.countPay >= 3 &&
-          receiveUser.countChild[0] >= 300
-        ) {
-          const checkRatioCountChild = await checkRatioCountChildOfUser(
-            receiveUser._id
-          );
-          if (!checkRatioCountChild) haveParentNotPayEnough = true;
-        }
-
-        if (haveParentNotPayEnough) {
-          referralCommissionWallet = holdWallet[user.tier];
-        }
-
-        if (
-          referralCommissionWallet === receiveUser[`walletAddress${user.tier}`]
-        ) {
           const isSerepayWallet = await checkSerepayWallet(
             receiveUser[`walletAddress${user.tier}`]
           );
           if (!isSerepayWallet) {
             referralCommissionWallet = holdWallet[user.tier];
+          }
+        } else {
+          if (receiveUser.closeLah) {
+            referralCommissionWallet = holdWallet[user.tier];
+            haveParentNotPayEnough = true;
+          } else if (
+            receiveUser.openLah ||
+            receiveUser.adminChangeTier ||
+            receiveUser.createBy === "ADMIN"
+          ) {
+            referralCommissionWallet = receiveUser[`walletAddress${user.tier}`];
+          } else {
+            if (
+              receiveUser.status === "LOCKED" ||
+              (receiveUser.errLahCode !== "" && indexFor > 6) ||
+              receiveUser.tier < user.tier ||
+              (receiveUser.tier === user.tier &&
+                receiveUser.countPay < user.countPay + 1)
+            ) {
+              referralCommissionWallet = holdWallet[user.tier];
+              haveParentNotPayEnough = true;
+            } else {
+              referralCommissionWallet =
+                receiveUser[`walletAddress${user.tier}`];
+            }
+          }
+
+          if (
+            user.tier === 1 &&
+            receiveUser.tier === 1 &&
+            ((receiveUser.buyPackage === "B" && receiveUser.countPay < 7) ||
+              (receiveUser.buyPackage === "A" && receiveUser.countPay < 13))
+          ) {
+            haveParentNotPayEnough = true;
+          }
+
+          if (receiveUser.hold !== "no" && receiveUser.holdLevel !== "no") {
+            if (
+              receiveUser.hold.toString() === user.tier.toString() &&
+              parseInt(receiveUser.holdLevel) <= parseInt(user.countPay)
+            ) {
+              haveParentNotPayEnough = true;
+            }
+          } else if (
+            user.tier >= 2 &&
+            user.countPay >= 3 &&
+            receiveUser.countChild[0] >= 300
+          ) {
+            const checkRatioCountChild = await checkRatioCountChildOfUser(
+              receiveUser._id
+            );
+            if (!checkRatioCountChild) haveParentNotPayEnough = true;
+          }
+
+          if (haveParentNotPayEnough) {
+            referralCommissionWallet = holdWallet[user.tier];
+          }
+
+          if (
+            referralCommissionWallet ===
+            receiveUser[`walletAddress${user.tier}`]
+          ) {
+            const isSerepayWallet = await checkSerepayWallet(
+              receiveUser[`walletAddress${user.tier}`]
+            );
+            if (!isSerepayWallet) {
+              referralCommissionWallet = holdWallet[user.tier];
+            }
           }
         }
 
