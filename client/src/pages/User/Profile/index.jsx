@@ -675,7 +675,7 @@ const Profile = () => {
                 {loading && <Loading />}
                 {t("update")}
               </button>
-              {phone !== "" && idCode !== "" && (
+              {status === "APRROVED" && phone !== "" && idCode !== "" && (
                 <button
                   onClick={handleChangeWallet}
                   disabled={loadingChangeWallet}

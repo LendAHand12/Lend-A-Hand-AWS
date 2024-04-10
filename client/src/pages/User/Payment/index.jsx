@@ -29,6 +29,9 @@ const PaymentPage = () => {
   const [loadingGetOtp, setLoadingGetOtp] = useState(false);
   const [loadingPayment, setLoadingPayment] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
+  const [showPaymentList, setShowPaymentList] = useState(
+    userInfo.buyPackage === "B" && userInfo.countPay === 7 ? false : true
+  );
 
   const {
     register,
@@ -331,130 +334,149 @@ const PaymentPage = () => {
                 {t("paymentTitle")}
               </h1>
             </div>
-            {userInfo.buyPackage === "B" && userInfo.countPay === 7 && (
+            {!showPaymentList &&
+              userInfo.buyPackage === "B" &&
+              userInfo.countPay === 7 && (
+                <>
+                  <div className="w-full flex flex-col mb-3">
+                    {userInfo.packages.includes("B") && (
+                      <>
+                        <div
+                          className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-5"
+                          role="alert"
+                        >
+                          <span className="block sm:inline">
+                            {t("congratPackageB")}
+                          </span>
+                        </div>
+                        {/* <button
+                        onClick={handleChangeContinueWithB}
+                        disabled={continueWithBuyPackageB}
+                        className={`${
+                          continueWithBuyPackageB
+                            ? "border hover:shadow-md focus:outline-none focus:ring-4 focus:ring-black-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
+                            : "text-white gradient hover:shadow-md focus:outline-none focus:ring-4 focus:ring-blue-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
+                        }`}
+                      >
+                        {t("contineWithPackageB")}{" "}
+                        {continueWithBuyPackageB && t("applying")}
+                      </button> */}
+                        <button
+                          onClick={() => setShowPaymentList(true)}
+                          className="w-xl flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-2 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                        >
+                          {t("upgradeAPackage")}
+                        </button>
+                      </>
+                    )}
+                    {userInfo.packages.includes("C") && (
+                      <button
+                        onClick={handleChangeContinueWithB}
+                        disabled={!continueWithBuyPackageB}
+                        className={`${
+                          !continueWithBuyPackageB
+                            ? "border hover:shadow-md focus:outline-none focus:ring-4 focus:ring-black-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
+                            : "text-white gradient hover:shadow-md focus:outline-none focus:ring-4 focus:ring-blue-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
+                        }`}
+                      >
+                        {t("contineWithPackageC")}{" "}
+                        {!continueWithBuyPackageB && t("applying")}
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+            {showPaymentList && (
               <>
-                <div className="w-full flex flex-col mb-3">
-                  {userInfo.packages.includes("B") && (
-                    <button
-                      onClick={handleChangeContinueWithB}
-                      disabled={continueWithBuyPackageB}
-                      className={`${
-                        continueWithBuyPackageB
-                          ? "border hover:shadow-md focus:outline-none focus:ring-4 focus:ring-black-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
-                          : "text-white gradient hover:shadow-md focus:outline-none focus:ring-4 focus:ring-blue-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
-                      }`}
-                    >
-                      {t("contineWithPackageB")}{" "}
-                      {continueWithBuyPackageB && t("applying")}
-                    </button>
-                  )}
-                  {userInfo.packages.includes("C") && (
-                    <button
-                      onClick={handleChangeContinueWithB}
-                      disabled={!continueWithBuyPackageB}
-                      className={`${
-                        !continueWithBuyPackageB
-                          ? "border hover:shadow-md focus:outline-none focus:ring-4 focus:ring-black-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
-                          : "text-white gradient hover:shadow-md focus:outline-none focus:ring-4 focus:ring-blue-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
-                      }`}
-                    >
-                      {t("contineWithPackageC")}{" "}
-                      {!continueWithBuyPackageB && t("applying")}
-                    </button>
-                  )}
-                </div>
                 <hr className="mb-3"></hr>
-              </>
-            )}
-
-            <>
-              {(userInfo.buyPackage === "A" ||
-                (userInfo.buyPackage === "B" && continueWithBuyPackageB)) && (
+                {(userInfo.buyPackage === "A" ||
+                  (userInfo.buyPackage === "B" && continueWithBuyPackageB)) && (
+                  <div className="mb-3">
+                    <p className="text-lg mb-2 ml-1">
+                      <span className="font-bold">{t("buyPackage")}</span> :{" "}
+                      {userInfo.buyPackage}{" "}
+                      {userInfo.buyPackage === "A"
+                        ? t("buyPackageA")
+                        : t("buyPackageB")}
+                    </p>
+                  </div>
+                )}
                 <div className="mb-3">
                   <p className="text-lg mb-2 ml-1">
-                    <span className="font-bold">{t("buyPackage")}</span> :{" "}
-                    {userInfo.buyPackage}{" "}
-                    {userInfo.buyPackage === "A"
-                      ? t("buyPackageA")
-                      : t("buyPackageB")}
+                    <span className="font-bold">Total</span> : {total} USDT
                   </p>
                 </div>
-              )}
-              <div className="mb-3">
-                <p className="text-lg mb-2 ml-1">
-                  <span className="font-bold">Total</span> : {total} USDT
-                </p>
-              </div>
-              {!loadingPaymentInfo &&
-                paymentIdsList.map((payment) => (
-                  <div
-                    key={payment.id}
-                    className={`flex items-center p-4 mb-4 text-sm rounded-lg ${
-                      payment.type === "REGISTER"
-                        ? "bg-green-50 text-green-800"
-                        : payment.type === "DIRECT"
-                        ? "bg-yellow-50 text-yellow-800"
-                        : payment.type === "FINE"
-                        ? "bg-red-50 text-red-800"
-                        : "bg-blue-50 text-blue-800"
-                    }`}
-                    role="alert"
-                  >
-                    <svg
-                      className="flex-shrink-0 inline w-4 h-4 me-3"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M6 2h12v2H6V2zM4 6V4h2v2H4zm0 12V6H2v12h2zm2 2v-2H4v2h2zm12 0v2H6v-2h12zm2-2v2h-2v-2h2zm0-12h2v12h-2V6zm0 0V4h-2v2h2zm-9-1h2v2h3v2h-6v2h6v6h-3v2h-2v-2H8v-2h6v-2H8V7h3V5z"
-                        fill="currentColor"
-                      />
-                    </svg>
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <div className="font-medium">
-                        {payment.type === "REGISTER"
-                          ? t("registerFee")
+                {!loadingPaymentInfo &&
+                  paymentIdsList.map((payment) => (
+                    <div
+                      key={payment.id}
+                      className={`flex items-center p-4 mb-4 text-sm rounded-lg ${
+                        payment.type === "REGISTER"
+                          ? "bg-green-50 text-green-800"
                           : payment.type === "DIRECT"
-                          ? t("commissionFee")
+                          ? "bg-yellow-50 text-yellow-800"
                           : payment.type === "FINE"
-                          ? t("fine")
-                          : t("lahFuns")}
-                        <span> : </span>
-                        <span>{payment.amount} USDT</span>
-                      </div>
-                      <div className="">
-                        <span className="mr-2 text-black">
-                          From :{" "}
-                          <span className="border rounded-md border-dashed border-gray-300 p-1">
-                            {shortenWalletAddress(
-                              userInfo[`walletAddress${userInfo.tier}`]
-                                ? userInfo[`walletAddress${userInfo.tier}`]
-                                : userInfo.walletAddress1,
-                              10
-                            )}
+                          ? "bg-red-50 text-red-800"
+                          : "bg-blue-50 text-blue-800"
+                      }`}
+                      role="alert"
+                    >
+                      <svg
+                        className="flex-shrink-0 inline w-4 h-4 me-3"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M6 2h12v2H6V2zM4 6V4h2v2H4zm0 12V6H2v12h2zm2 2v-2H4v2h2zm12 0v2H6v-2h12zm2-2v2h-2v-2h2zm0-12h2v12h-2V6zm0 0V4h-2v2h2zm-9-1h2v2h3v2h-6v2h6v6h-3v2h-2v-2H8v-2h6v-2H8V7h3V5z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <div className="font-medium">
+                          {payment.type === "REGISTER"
+                            ? t("registerFee")
+                            : payment.type === "DIRECT"
+                            ? t("commissionFee")
+                            : payment.type === "FINE"
+                            ? t("fine")
+                            : t("lahFuns")}
+                          <span> : </span>
+                          <span>{payment.amount} USDT</span>
+                        </div>
+                        <div className="">
+                          <span className="mr-2 text-black">
+                            From :{" "}
+                            <span className="border rounded-md border-dashed border-gray-300 p-1">
+                              {shortenWalletAddress(
+                                userInfo[`walletAddress${userInfo.tier}`]
+                                  ? userInfo[`walletAddress${userInfo.tier}`]
+                                  : userInfo.walletAddress1,
+                                10
+                              )}
+                            </span>
                           </span>
-                        </span>
-                        <span className="mx-2 text-black">
-                          To :{" "}
-                          <span className="border rounded-md border-dashed border-gray-300 p-1">
-                            {shortenWalletAddress(payment.to, 10)}
+                          <span className="mx-2 text-black">
+                            To :{" "}
+                            <span className="border rounded-md border-dashed border-gray-300 p-1">
+                              {shortenWalletAddress(payment.to, 10)}
+                            </span>
                           </span>
-                        </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              <button
-                type="submit"
-                onClick={handleSubmitOTPSerepay}
-                disabled={loadingGetOtp}
-                className="w-xl flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-              >
-                {loadingGetOtp && <Loading />}
-                {t("payment")}
-              </button>
-            </>
+                  ))}
+                <button
+                  type="submit"
+                  onClick={handleSubmitOTPSerepay}
+                  disabled={loadingGetOtp}
+                  className="w-xl flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                >
+                  {loadingGetOtp && <Loading />}
+                  {t("payment")}
+                </button>
+              </>
+            )}
           </div>
         </>
       )}

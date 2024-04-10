@@ -370,5 +370,8 @@
   "Insufficient balance": "Insufficient balance",
   "isNotSerepayWalletAlert": "Please switch to using Serepay wallet. Documents download link: ",
   "download": "Download",
-  "The wallet address does not exist in the Serepay system": "The wallet address does not exist in the Serepay system"
+  "The wallet address does not exist in the Serepay system": "The wallet address does not exist in the Serepay system",
+
+  "congratPackageB": "Congratulations, you have successfully paid for package B",
+  "upgradeAPackage": "Upgrade to package A"
 }

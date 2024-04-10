@@ -2,18 +2,27 @@ import { useState } from "react";
 
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
-import { useHistory, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import queryString from "query-string";
 
 import Loading from "@/components/Loading";
 import User from "@/api/User";
+import { useSelector } from "react-redux";
 
 const ChangeWallet = () => {
   const { t } = useTranslation();
-  const history = useHistory();
   const location = useLocation();
   const parsed = queryString.parse(location.search);
+  const {
+    userInfo: {
+      walletAddress1,
+      walletAddress2,
+      walletAddress3,
+      walletAddress4,
+      walletAddress5,
+    },
+  } = useSelector((state) => state.auth);
   let { token } = parsed;
   if (!token) {
     toast.error(t("invalidUrl"));
@@ -22,7 +31,15 @@ const ChangeWallet = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({});
+  } = useForm({
+    defaultValues: {
+      newWallet1: walletAddress1,
+      newWallet2: walletAddress2,
+      newWallet3: walletAddress3,
+      newWallet4: walletAddress4,
+      newWallet5: walletAddress5,
+    },
+  });
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async (data) => {

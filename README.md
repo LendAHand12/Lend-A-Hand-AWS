@@ -231,3 +231,6 @@ db.users.updateMany({isAdmin: true}, {$set: {role: "admin"}})
 - Hiển thị thông báo khi user ở tier 2 mà chưa cập nhật ví tier 2 -> 400
 - Chỉnh sửa phần thanh toán theo ví tier -> 1tr
 - Xem, chỉnh sửa ví user theo tier ở admin -> 1tr
+
+- Hiển thị thông báo chúc mừng thanh toán thành công gói B -> 500
+- Nút nâng cấp lên gói A (khi nhấp nâng cấp gói A mà sau 24h không thanh toán đủ thì reset về 6 lần gói B) -> 1tr

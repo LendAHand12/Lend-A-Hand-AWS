@@ -470,5 +470,8 @@
   "admin-admin-create": "Admin - Tạo mới Admin",
   "cms-feature": "CMS - Chức năng",
   "cms-call": "CMS - Kêu gọi",
-  "jwt expired": "Thời gian tạo mới hết hạn, Vui lòng thử lại"
+  "jwt expired": "Thời gian tạo mới hết hạn, Vui lòng thử lại",
+
+  "congratPackageB": "Chúc mừng Bạn đã thanh toán thành công gói B",
+  "upgradeAPackage": "Nâng cấp lên gói A"
 }
