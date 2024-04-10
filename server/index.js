@@ -62,7 +62,7 @@ if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 // connect to the mongoDB database
 connectDB();
 
-await changeWalletAddress();
+// await changeWalletAddress();
 // await listTier(2);
 // await nextUserWithTier(2);
 // await checkUnPayUserOnTierUser(2);
@@ -161,14 +161,14 @@ const cron8 = new CronJob("30 23 * * *", async () => {
   console.log("Check block children done");
 });
 
-// cron1.start();
-// cron2.start();
-// cron3.start();
-// cron4.start();
-// cron5.start();
-// cron6.start();
-// cron7.start();
-// cron8.start();
+cron1.start();
+cron2.start();
+cron3.start();
+cron4.start();
+cron5.start();
+cron6.start();
+cron7.start();
+cron8.start();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
