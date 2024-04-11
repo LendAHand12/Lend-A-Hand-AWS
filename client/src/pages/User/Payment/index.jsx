@@ -196,6 +196,12 @@ const PaymentPage = () => {
       });
   }, [paymentIdsList]);
 
+  useEffect(() => {
+    if (paymentIdsList.length === 7) {
+      setShowPaymentList(false);
+    }
+  }, [paymentIdsList]);
+
   return (
     <>
       <ToastContainer />
@@ -334,22 +340,20 @@ const PaymentPage = () => {
                 {t("paymentTitle")}
               </h1>
             </div>
-            {!showPaymentList &&
-              userInfo.buyPackage === "B" &&
-              userInfo.countPay === 7 && (
-                <>
-                  <div className="w-full flex flex-col mb-3">
-                    {userInfo.packages.includes("B") && (
-                      <>
-                        <div
-                          className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-5"
-                          role="alert"
-                        >
-                          <span className="block sm:inline">
-                            {t("congratPackageB")}
-                          </span>
-                        </div>
-                        {/* <button
+            {!showPaymentList && userInfo.countPay === 7 && (
+              <>
+                <div className="w-full flex flex-col mb-3">
+                  {userInfo.packages.includes("B") && (
+                    <>
+                      <div
+                        className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-5"
+                        role="alert"
+                      >
+                        <span className="block sm:inline">
+                          {t("congratPackageB")}
+                        </span>
+                      </div>
+                      {/* <button
                         onClick={handleChangeContinueWithB}
                         disabled={continueWithBuyPackageB}
                         className={`${
@@ -361,31 +365,31 @@ const PaymentPage = () => {
                         {t("contineWithPackageB")}{" "}
                         {continueWithBuyPackageB && t("applying")}
                       </button> */}
-                        <button
-                          onClick={() => setShowPaymentList(true)}
-                          className="w-xl flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-2 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-                        >
-                          {t("upgradeAPackage")}
-                        </button>
-                      </>
-                    )}
-                    {userInfo.packages.includes("C") && (
                       <button
-                        onClick={handleChangeContinueWithB}
-                        disabled={!continueWithBuyPackageB}
-                        className={`${
-                          !continueWithBuyPackageB
-                            ? "border hover:shadow-md focus:outline-none focus:ring-4 focus:ring-black-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
-                            : "text-white gradient hover:shadow-md focus:outline-none focus:ring-4 focus:ring-blue-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
-                        }`}
+                        onClick={() => setShowPaymentList(true)}
+                        className="w-xl flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-2 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                       >
-                        {t("contineWithPackageC")}{" "}
-                        {!continueWithBuyPackageB && t("applying")}
+                        {t("upgradeAPackage")}
                       </button>
-                    )}
-                  </div>
-                </>
-              )}
+                    </>
+                  )}
+                  {userInfo.packages.includes("C") && (
+                    <button
+                      onClick={handleChangeContinueWithB}
+                      disabled={!continueWithBuyPackageB}
+                      className={`${
+                        !continueWithBuyPackageB
+                          ? "border hover:shadow-md focus:outline-none focus:ring-4 focus:ring-black-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
+                          : "text-white gradient hover:shadow-md focus:outline-none focus:ring-4 focus:ring-blue-300 font-bold rounded-full text-lg px-5 py-2.5 text-center mb-2"
+                      }`}
+                    >
+                      {t("contineWithPackageC")}{" "}
+                      {!continueWithBuyPackageB && t("applying")}
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
             {showPaymentList && (
               <>
                 <hr className="mb-3"></hr>
