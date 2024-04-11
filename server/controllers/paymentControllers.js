@@ -1486,7 +1486,14 @@ const getAllPayments = asyncHandler(async (req, res) => {
       });
     } else if (status === "DIRECT" || status === "REFERRAL") {
       const userRef = await User.findOne({
-        walletAddress: { $in: [pay.address_ref] },
+        $or: [
+          { walletAddress: { $in: [pay.address_ref] } },
+          { walletAddress1: pay.address_ref },
+          { walletAddress2: pay.address_ref },
+          { walletAddress3: pay.address_ref },
+          { walletAddress4: pay.address_ref },
+          { walletAddress5: pay.address_ref },
+        ],
       });
       result.push({
         _id: pay._id,
