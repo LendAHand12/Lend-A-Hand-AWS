@@ -1595,7 +1595,14 @@ const getPaymentDetail = asyncHandler(async (req, res) => {
       });
     } else if (trans.type === "DIRECT" || trans.type === "REFERRAL") {
       const userRef = await User.findOne({
-        walletAddress: { $in: [trans.address_ref] },
+        $or: [
+          { walletAddress: { $in: [trans.address_ref] } },
+          { walletAddress1: trans.address_ref },
+          { walletAddress2: trans.address_ref },
+          { walletAddress3: trans.address_ref },
+          { walletAddress4: trans.address_ref },
+          { walletAddress5: trans.address_ref },
+        ],
       });
       res.json({
         _id: trans._id,
@@ -1614,7 +1621,14 @@ const getPaymentDetail = asyncHandler(async (req, res) => {
       });
     } else if (trans.type === "DIRECTHOLD" || trans.type === "REFERRALHOLD") {
       const userRef = await User.findOne({
-        walletAddress: { $in: [trans.address_ref] },
+        $or: [
+          { walletAddress: { $in: [trans.address_ref] } },
+          { walletAddress1: trans.address_ref },
+          { walletAddress2: trans.address_ref },
+          { walletAddress3: trans.address_ref },
+          { walletAddress4: trans.address_ref },
+          { walletAddress5: trans.address_ref },
+        ],
       });
       res.json({
         _id: trans._id,
