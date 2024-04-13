@@ -250,6 +250,15 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         }
       }
 
+      if (directCommissionWallet === refUser[`walletAddress${user.tier}`]) {
+        const isSerepayWallet = await checkSerepayWallet(
+          directCommissionWallet
+        );
+        if (!isSerepayWallet) {
+          directCommissionWallet = holdWallet[user.tier];
+        }
+      }
+
       const transactionDirect = await Transaction.create({
         userId: user.id,
         amount: directCommissionFee,
