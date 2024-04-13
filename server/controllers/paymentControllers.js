@@ -256,6 +256,7 @@ const getPaymentInfo = asyncHandler(async (req, res) => {
         );
         if (!isSerepayWallet) {
           directCommissionWallet = holdWallet[user.tier];
+          haveRefNotPayEnough = true;
         }
       }
 
