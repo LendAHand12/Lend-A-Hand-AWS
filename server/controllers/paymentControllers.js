@@ -1305,7 +1305,6 @@ const addPayment = asyncHandler(async (req, res) => {
 const onDonePayment = asyncHandler(async (req, res) => {
   const { user } = req;
   const { transIds } = req.body;
-  console.log({ transIds });
   const transIdsList = Object.values(transIds);
   if (transIdsList.length > 0) {
     if (transIdsList.length === 1 && transIdsList[0].type === "FINE") {
@@ -1323,12 +1322,12 @@ const onDonePayment = asyncHandler(async (req, res) => {
         { status: "SUCCESS" }
       );
 
-      if (user.countPay === 0 && user.tier === 1) {
-        const links = await getActiveLink(user.email, user.userId, user.phone);
-        if (links.length === 1) {
-          await sendActiveLink(user.email, links[0]);
-        }
-      }
+      // if (user.countPay === 0 && user.tier === 1) {
+      //   const links = await getActiveLink(user.email, user.userId, user.phone);
+      //   if (links.length === 1) {
+      //     await sendActiveLink(user.email, links[0]);
+      //   }
+      // }
 
       if (user.countPay === 12 && user.buyPackage === "B") {
         if (user.continueWithBuyPackageB === true) {
@@ -1351,7 +1350,6 @@ const onDonePayment = asyncHandler(async (req, res) => {
           ? 13
           : user.countPay + 1;
 
-      console.log({ count: user.countPay });
       if (user.countPay === 13 && user.buyPackage === "B") {
         if (user.continueWithBuyPackageB === true) {
           user.buyPackage = "A";

@@ -10,6 +10,7 @@ import Tree from "../models/treeModel.js";
 import { getActivePackages } from "./packageControllers.js";
 import Permission from "../models/permissionModel.js";
 import { checkSerepayWallet } from "../utils/methods.js";
+import axios from "axios";
 
 const checkLinkRef = asyncHandler(async (req, res) => {
   const { ref, receiveId } = req.body;
@@ -53,16 +54,7 @@ const checkLinkRef = asyncHandler(async (req, res) => {
 });
 
 const registerUser = asyncHandler(async (req, res) => {
-  const {
-    userId,
-    walletAddress,
-    email,
-    password,
-    ref,
-    receiveId,
-    phone,
-    idCode,
-  } = req.body;
+  const { userId, email, password, ref, receiveId, phone, idCode } = req.body;
 
   const userExistsUserId = await User.findOne({
     userId: { $regex: userId, $options: "i" },
@@ -75,9 +67,6 @@ const registerUser = asyncHandler(async (req, res) => {
   const userExistsPhone = await User.findOne({
     $and: [{ phone: { $ne: "" } }, { phone }],
     status: { $ne: "DELETED" },
-  });
-  const userExistsWalletAddress = await User.findOne({
-    walletAddress1: walletAddress,
   });
   const userExistsIdCode = await User.findOne({
     $and: [{ idCode: { $ne: "" } }, { idCode }],
@@ -100,15 +89,17 @@ const registerUser = asyncHandler(async (req, res) => {
     let message = "duplicateInfoIdCode";
     res.status(400);
     throw new Error(message);
-  } else if (userExistsWalletAddress) {
-    let message = "Dupplicate wallet address";
-    res.status(400);
-    throw new Error(message);
   } else {
     const treeReceiveUser = await Tree.findOne({ userId: receiveId, tier: 1 });
 
     if (treeReceiveUser.children.length < 3) {
       const avatar = generateGravatar(email);
+
+      const wallet = await registerSerepayFnc(
+        userId,
+        email.toLowerCase(),
+        password
+      );
 
       const user = await User.create({
         userId,
@@ -116,12 +107,12 @@ const registerUser = asyncHandler(async (req, res) => {
         phone,
         password,
         avatar,
-        walletAddress: [walletAddress],
-        walletAddress1: walletAddress,
-        walletAddress2: walletAddress,
-        walletAddress3: walletAddress,
-        walletAddress4: walletAddress,
-        walletAddress5: walletAddress,
+        walletAddress: [wallet],
+        walletAddress1: wallet,
+        walletAddress2: wallet,
+        walletAddress3: wallet,
+        walletAddress4: wallet,
+        walletAddress5: wallet,
         idCode,
         role: "user",
       });
@@ -318,7 +309,6 @@ const confirmUser = asyncHandler(async (req, res) => {
   try {
     // set the user to a confirmed status, once the corresponding JWT is verified correctly
     const emailToken = req.params.token;
-    console.log({ emailToken });
     const decodedToken = jwt.verify(
       emailToken,
       process.env.JWT_EMAIL_TOKEN_SECRET
@@ -407,6 +397,43 @@ const getNewPass = asyncHandler(async (req, res) => {
   res.json(bcrypt.hashSync("abcd1234", 12));
 });
 
+const registerSerepayFnc = async (userName, email, password) => {
+  return axios
+    .post(`${process.env.SEREPAY_HOST}/api/user/signup`, {
+      userName,
+      email,
+      password,
+    })
+    .then(async (response) => {
+      const token = response.data.data;
+      return axios
+        .post(
+          `${process.env.SEREPAY_HOST}/api/user/createWallet`,
+          {
+            symbol: "USDT.BEP20",
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        )
+        .then(async (response) => {
+          return response.data.data.address;
+        })
+        .catch((error) => {
+          throw new Error(error.response.data.message);
+        });
+    })
+    .catch((error) => {
+      throw new Error(error.response.data.message);
+    });
+};
+
+const registerSerepay = asyncHandler(async (req, res) => {
+  const { userName, email, password } = req.body;
+  const wallet = await registerSerepayFnc(userName, email, password);
+  console.log({ wallet });
+});
+
 export {
   checkSendMail,
   checkLinkRef,
@@ -420,4 +447,5 @@ export {
   getLinkVerify,
   updateData,
   getNewPass,
+  registerSerepay,
 };

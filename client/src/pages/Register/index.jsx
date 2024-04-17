@@ -47,15 +47,13 @@ const Register = () => {
         return;
       }
       setLoading(true);
-      const { userId, email, password, ref, receiveId, walletAddress, idCode } =
-        data;
+      const { userId, email, password, ref, receiveId, idCode } = data;
       await Auth.register({
         userId: userId.trim(),
         email: email.trim(),
         password,
         ref,
         receiveId,
-        walletAddress: walletAddress.trim(),
         phone: phone.trim(),
         idCode: idCode.trim(),
       })
@@ -173,7 +171,7 @@ const Register = () => {
                         {errors.idCode?.message}
                       </p>
                       {/* Wallet address */}
-                      <input
+                      {/* <input
                         className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
                         type="text"
                         placeholder={`${t("wallet address")} : Oxbx7...`}
@@ -190,7 +188,7 @@ const Register = () => {
                       />
                       <p className="error-message-text">
                         {errors.walletAddress?.message}
-                      </p>
+                      </p> */}
                       {/* Password */}
                       <input
                         className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
