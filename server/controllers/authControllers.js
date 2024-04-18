@@ -408,7 +408,7 @@ const registerSerepayFnc = async (userName, email, password) => {
       const token = response.data.data;
       return axios
         .post(
-          `${process.env.SEREPAY_HOST}/api/user/createWallet`,
+          `${process.env.SEREPAY_HOST}/api/blockico/createWalletBEP20`,
           {
             symbol: "USDT.BEP20",
           },
