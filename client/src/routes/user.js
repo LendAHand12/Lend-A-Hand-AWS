@@ -10,6 +10,7 @@ const ChangeWallet = lazy(() => import("@/pages/User/ChangeWallet"));
 const ChangeUser = lazy(() => import("@/pages/User/ChangeUser"));
 const Legal = lazy(() => import("@/pages/User/Legal"));
 const LegalDetail = lazy(() => import("@/pages/User/Legal/Detail"));
+const SerepayPage = lazy(() => import("@/pages/User/Serepay"));
 
 const routes = [
   {
@@ -89,6 +90,12 @@ const routes = [
     path: "/legal/:category/:id",
     permissionWithStatus: ["APPROVED"],
     component: LegalDetail,
+  },
+  {
+    path: "/serepay",
+    title: "Serepay",
+    permissionWithStatus: ["APPROVED"],
+    component: SerepayPage,
   },
 ];
 

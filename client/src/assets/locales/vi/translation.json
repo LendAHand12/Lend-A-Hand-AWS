@@ -473,5 +473,7 @@
   "jwt expired": "Thời gian tạo mới hết hạn, Vui lòng thử lại",
 
   "congratPackageB": "Chúc mừng Bạn đã thanh toán thành công gói B",
-  "upgradeAPackage": "Nâng cấp lên gói A"
+  "upgradeAPackage": "Nâng cấp lên gói A",
+
+  "serepayAlert": "Tài khoản SEREPAY của Bạn đã được kích hoạt.Email đăng nhập và mật khẩu đăng nhập SEREPAY giống như tài khoản đăng ký LAH ban đầu của Bạn"
 }
