@@ -1068,6 +1068,51 @@ const changeWallet = asyncHandler(async (req, res) => {
     const user = await User.findById(decodedToken.id);
 
     if (user) {
+      const existWallet1 = await User.findOne({
+        userId: { $ne: user.userId },
+        walletAddress1: newWallet1,
+      });
+      if (existWallet1) {
+        res.status(400);
+        throw new Error("Unable to update wallet");
+      }
+
+      const existWallet2 = await User.findOne({
+        userId: { $ne: user.userId },
+        walletAddress2: newWallet2,
+      });
+      if (existWallet2) {
+        res.status(400);
+        throw new Error("Unable to update wallet");
+      }
+
+      const existWallet3 = await User.findOne({
+        userId: { $ne: user.userId },
+        walletAddress3: newWallet3,
+      });
+      if (existWallet3) {
+        res.status(400);
+        throw new Error("Unable to update wallet");
+      }
+
+      const existWallet4 = await User.findOne({
+        userId: { $ne: user.userId },
+        walletAddress4: newWallet4,
+      });
+      if (existWallet4) {
+        res.status(400);
+        throw new Error("Unable to update wallet");
+      }
+
+      const existWallet5 = await User.findOne({
+        userId: { $ne: user.userId },
+        walletAddress5: newWallet5,
+      });
+      if (existWallet5) {
+        res.status(400);
+        throw new Error("Unable to update wallet");
+      }
+
       if (newWallet1) {
         user.walletAddress1 = newWallet1;
       }
@@ -1090,7 +1135,7 @@ const changeWallet = asyncHandler(async (req, res) => {
           message: "Your wallet address updated",
         });
       } else {
-        res.status(401);
+        res.status(400);
         throw new Error("Unable to update wallet");
       }
     } else {

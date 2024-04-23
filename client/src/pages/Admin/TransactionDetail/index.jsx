@@ -2,11 +2,16 @@ import { useCallback, useEffect, useState } from "react";
 
 import Loading from "@/components/Loading";
 import { useTranslation } from "react-i18next";
-import { Link, useHistory, useLocation } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import Payment from "@/api/Payment";
 import { transfer, getAccount } from "@/utils/smartContract.js";
 import { useSelector } from "react-redux";
+import Modal from "react-modal";
+import { useForm } from "react-hook-form";
+import axios from "axios";
+
+Modal.setAppElement("#root");
 
 const TransactionDetail = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -27,6 +32,14 @@ const TransactionDetail = () => {
   const [loadingRefund, setLoadingRefund] = useState(false);
   const [loadingUntilRefund, setLoadingUntilRefund] = useState(false);
   const [refundAmount, setRefundAmount] = useState(0);
+  const [loadingPayment, setLoadingPayment] = useState(false);
+  const [showOtpModal, setShowOtpModal] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
   useEffect(() => {
     (async () => {
@@ -34,6 +47,7 @@ const TransactionDetail = () => {
       await Payment.getPaymentDetail(transId)
         .then((response) => {
           setTrans(response.data);
+          setRefundAmount(response.data.amount)
           setLoading(false);
         })
         .catch((error) => {
@@ -112,6 +126,104 @@ const TransactionDetail = () => {
     [trans, refundAmount]
   );
 
+  const openModal = () => {
+    setShowOtpModal(true);
+  };
+
+  const closeModal = () => {
+    setShowOtpModal(false);
+  };
+
+  const handleSubmitOTPSerepay = useCallback(
+    (type) => {
+      type === "A" ? setLoadingRefund(true) : setLoadingUntilRefund(true);
+      axios
+        .post(
+          `${
+            import.meta.env.VITE_HOST_SEREPAY
+          }/api/payment/sendCodeWalletTransferArray`,
+          {
+            wallet: userInfo.walletAddress1,
+            arrayWallet: [
+              {
+                amount: refundAmount,
+                address: trans.address_to,
+                note: "REFUND",
+              },
+            ],
+          }
+        )
+        .then(() => {
+          setLoadingRefund(false);
+          setLoadingUntilRefund(false);
+          openModal();
+        })
+        .catch((error) => {
+          let message =
+            error.response && error.response.data.message
+              ? error.response.data.message
+              : error.message;
+          toast.error(t(message));
+          setLoadingRefund(false);
+          setLoadingUntilRefund(false);
+        });
+    },
+    [trans, refundAmount]
+  );
+
+  const handlePaySerepay = useCallback(
+    (values) => {
+      const { otp } = values;
+      setLoadingPayment(true);
+      axios
+        .post(
+          `${
+            import.meta.env.VITE_HOST_SEREPAY
+          }/api/payment/confirmWalletTransferArray`,
+          {
+            code: otp,
+            wallet: userInfo[`walletAddress${userInfo.tier}`],
+            arrayWallet: [
+              {
+                amount: refundAmount,
+                address: trans.address_to,
+                note: "REFUND",
+              },
+            ],
+          }
+        )
+        .then(async (response) => {
+          const { message, status } = response.data;
+          if (status) {
+            await adminDoneRefund(
+              trans._id,
+              "refund serepay",
+              trans.type,
+              trans.address_from,
+              trans.address_to
+            );
+            closeModal();
+            toast.success(t(message));
+            setLoadingRefund(false);
+            setLoadingUntilRefund(false);
+            window.location.reload(false);
+          }
+          setLoadingPayment(false);
+        })
+        .catch((error) => {
+          let message =
+            error.response && error.response.data.message
+              ? error.response.data.message
+              : error.message;
+          toast.error(t(message));
+          setLoadingPayment(false);
+          setLoadingRefund(false);
+          setLoadingUntilRefund(false);
+        });
+    },
+    [trans, refundAmount]
+  );
+
   const adminDoneRefund = async (
     transId,
     transHash,
@@ -147,6 +259,84 @@ const TransactionDetail = () => {
   return (
     <div>
       <ToastContainer />
+      <Modal
+        isOpen={showOtpModal}
+        onRequestClose={closeModal}
+        style={{
+          content: {
+            top: "50%",
+            left: "50%",
+            right: "auto",
+            bottom: "auto",
+            marginRight: "-50%",
+            transform: "translate(-50%, -50%)",
+          },
+        }}
+        contentLabel="Example Modal"
+      >
+        <div className="mx-auto flex w-full max-w-md flex-col space-y-8">
+          <div className="flex flex-col items-center justify-center text-center space-y-2">
+            <div className="font-semibold text-3xl">
+              <p>OTP Verification</p>
+            </div>
+            <div className="flex flex-row text-sm text-gray-700">
+              <p>{t("We have sent a code to your email")}</p>
+            </div>
+          </div>
+
+          <div>
+            <form onSubmit={handleSubmit(handlePaySerepay)}>
+              <div className="flex flex-col space-y-4">
+                <div className="flex flex-row items-center justify-between mx-auto w-full max-w-sm gap-2">
+                  <div className="w-full h-16">
+                    <input
+                      className="w-full h-full flex flex-col items-center justify-center text-center px-5 outline-none rounded-xl border border-gray-200 text-lg bg-white focus:bg-gray-50 focus:ring-1 ring-blue-700"
+                      type="text"
+                      {...register("otp", {
+                        required: t("otp is required"),
+                      })}
+                      autoComplete="off"
+                    />
+                  </div>
+                </div>
+                <div className="error-message-text">{errors.otp?.message}</div>
+
+                <div className="flex flex-col space-y-5">
+                  <div className="flex justify-center gap-4">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        closeModal();
+                      }}
+                      className="flex flex-row items-center justify-center text-center border rounded-xl outline-none py-5 bg-red-500 border-none text-white text-sm shadow-sm px-8 font-semibold"
+                    >
+                      {t("cancel")}
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex flex-row items-center justify-center text-center border rounded-xl outline-none py-5 gradient border-none text-white text-sm shadow-sm px-8 font-semibold"
+                    >
+                      {loadingPayment && <Loading />}
+                      {t("confirm")}
+                    </button>
+                  </div>
+                  <div className="flex flex-row items-center justify-center text-center text-sm font-medium space-x-1 text-gray-500">
+                    <p>{t("Didn't recieve code?")}</p>{" "}
+                    <a
+                      className="flex flex-row items-center text-blue-600"
+                      href="http://"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {t("Resend")}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </Modal>
       {loading && (
         <div className="w-full flex justify-center">
           <Loading />
@@ -343,7 +533,8 @@ const TransactionDetail = () => {
                   )}
                 {refunding && (
                   <button
-                    onClick={() => handRefund("A")}
+                    // onClick={() => handRefund("A")}
+                    onClick={() => handleSubmitOTPSerepay("A")}
                     className="w-xl flex bg-green-600 text-white justify-center items-center hover:underline border font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                   >
                     {loadingRefund && <Loading />}
@@ -354,7 +545,8 @@ const TransactionDetail = () => {
                   .find((p) => p.page.pageName === "admin-transactions-details")
                   ?.actions.includes("refund") && (
                   <button
-                    onClick={() => handRefund("B")}
+                    // onClick={() => handRefund("B")}
+                    onClick={() => handleSubmitOTPSerepay("B")}
                     className="w-xl bg-red-600 text-white flex justify-center items-center hover:underline border font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
                   >
                     {loadingUntilRefund && <Loading />}

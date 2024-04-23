@@ -35,7 +35,7 @@ const Serepay = () => {
           pageData.find((ele) => ele.name === "serepay").val_vn}
       </div>
       <a
-        href={`${import.meta.env.VITE_HOST_SEREPAY}/login`}
+        href={`${import.meta.env.VITE_HOST_SEREPAY_LOGIN}`}
         target="_blank"
         className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
         rel="noreferrer"
