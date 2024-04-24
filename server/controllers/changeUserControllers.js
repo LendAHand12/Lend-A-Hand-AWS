@@ -177,6 +177,19 @@ const approveChangeUser = asyncHandler(async (req, res) => {
 
   const user = await User.findById(changeUser.oldUserId);
 
+  const userExistsUserId = await User.findOne({
+    userId: { $regex: changeUser.newUserId, $options: "i" },
+  });
+  const userExistsEmail = await User.findOne({
+    email: { $regex: changeUser.newEmail, $options: "i" },
+  });
+  const userExistsPhone = await User.findOne({
+    $and: [{ phone: { $ne: "" } }, { phone: changeUser.newPhone }],
+  });
+  const userExistsIdCode = await User.findOne({
+    $and: [{ idCode: { $ne: "" } }, { idCode: changeUser.newIdCode }],
+  });
+
   const userExistsWallet = await User.findOne({
     $or: [
       { walletAddress1: changeUser.newWalletAddress[0] },
@@ -187,7 +200,23 @@ const approveChangeUser = asyncHandler(async (req, res) => {
     ],
   });
 
-  if (userExistsWallet) {
+  if (userExistsUserId) {
+    let message = "duplicateInfoUserId";
+    res.status(400);
+    throw new Error(message);
+  } else if (userExistsEmail) {
+    let message = "duplicateInfoEmail";
+    res.status(400);
+    throw new Error(message);
+  } else if (userExistsPhone) {
+    let message = "Dupplicate phone";
+    res.status(400);
+    throw new Error(message);
+  } else if (userExistsIdCode) {
+    let message = "duplicateInfoIdCode";
+    res.status(400);
+    throw new Error(message);
+  } else if (userExistsWallet) {
     let message = "Dupplicate wallet address";
     res.status(400);
     throw new Error(message);
