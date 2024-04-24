@@ -177,6 +177,22 @@ const approveChangeUser = asyncHandler(async (req, res) => {
 
   const user = await User.findById(changeUser.oldUserId);
 
+  const userExistsWallet = await User.findOne({
+    $or: [
+      { walletAddress1: changeUser.newWalletAddress[0] },
+      { walletAddress2: changeUser.newWalletAddress[0] },
+      { walletAddress3: changeUser.newWalletAddress[0] },
+      { walletAddress4: changeUser.newWalletAddress[0] },
+      { walletAddress5: changeUser.newWalletAddress[0] },
+    ],
+  });
+
+  if (userExistsWallet) {
+    let message = "Dupplicate wallet address";
+    res.status(400);
+    throw new Error(message);
+  }
+
   changeUser.oldWalletAddress = user.walletAddress1;
   changeUser.oldEmail = user.email;
   changeUser.status = "APPROVED";
