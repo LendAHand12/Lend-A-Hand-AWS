@@ -234,3 +234,8 @@ db.users.updateMany({isAdmin: true}, {$set: {role: "admin"}})
 
 - Hiển thị thông báo chúc mừng thanh toán thành công gói B -> 500
 - Nút nâng cấp lên gói A (khi nhấp nâng cấp gói A mà sau 24h không thanh toán đủ thì reset về 6 lần gói B) -> 1tr
+
+- ĐIỀU KIỆN ĐỂ USER QUA TIER 3, 4, 5, 6, 7, 8, 9, 10 VÀ NHẬN LAH 12 TẦNG Ở TIER 2, 3, 4, 5, 6,7, 8, 9, 10 -> 2tr5
+- Hiển thị số user còn sống, user xám và % -> 3tr
+- QUY ĐỊNH SỐ LẦN 1 USER ĐƯỢC GẮN VÀO 1 VỊ TRÍ KHI ADMIN XOÁ TÀI KHOẢN. -> 2tr
+- XOÁ DATA SAU 365 NGÀY -> 2tr

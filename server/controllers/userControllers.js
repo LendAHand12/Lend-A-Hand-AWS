@@ -214,7 +214,7 @@ const getUserById = asyncHandler(async (req, res) => {
 });
 
 const updateUser = asyncHandler(async (req, res) => {
-  const { phone, imgFront, imgBack, idCode, buyPackage } = req.body;
+  const { phone, idCode, buyPackage } = req.body;
   const user = await User.findOne({ _id: req.params.id }).select("-password");
   const userHavePhone = await User.find({
     $and: [{ phone }, { email: { $ne: user.email } }, { isAdmin: false }],
@@ -241,14 +241,16 @@ const updateUser = asyncHandler(async (req, res) => {
         res.status(400).json({ error: "Package has been disabled" });
       }
     }
-    if (imgFront && imgBack && imgFront !== "" && imgBack !== "") {
-      if (
-        imgFront.includes("https://res.cloudinary.com/dhqggkmto") &&
-        imgFront.includes("https://res.cloudinary.com/dhqggkmto")
-      )
-        user.status = "PENDING";
-      user.imgFront = imgFront || user.imgFront;
-      user.imgBack = imgBack || user.imgBack;
+    if (
+      req.files &&
+      req.files.imgFront &&
+      req.files.imgBack &&
+      req.files.imgFront[0] &&
+      req.files?.imgBack[0]
+    ) {
+      user.status = "PENDING";
+      user.imgFront = req.files.imgFront[0].filename || user.imgFront;
+      user.imgBack = req.files.imgBack[0].filename || user.imgBack;
     }
     const updatedUser = await user.save();
     if (updatedUser) {

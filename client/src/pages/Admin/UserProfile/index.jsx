@@ -1102,13 +1102,30 @@ const UserProfile = (match) => {
                           </div>
                           <img
                             onClick={handleToggler}
-                            src={data.imgFront}
+                            src={`${
+                              data.imgFront.includes("cloudinary")
+                                ? data.imgFront
+                                : import.meta.env.VITE_API_URL +
+                                  "/uploads/CCCD/" +
+                                  data.imgFront
+                            }`}
                             className="w-full px-4 py-2"
                           />
                         </div>
                         <FsLightbox
                           toggler={toggler}
-                          sources={[data.imgFront, data.imgBack]}
+                          sources={[
+                            data.imgFront.includes("cloudinary")
+                              ? data.imgFront
+                              : import.meta.env.VITE_API_URL +
+                                "/uploads/CCCD/" +
+                                data.imgFront,
+                            data.imgBack.includes("cloudinary")
+                              ? data.imgBack
+                              : import.meta.env.VITE_API_URL +
+                                "/uploads/CCCD/" +
+                                data.imgBack,
+                          ]}
                         />
                         <div className="grid lg:grid-cols-2 grid-cols-1">
                           <div className="px-4 py-2 font-semibold">
@@ -1116,7 +1133,13 @@ const UserProfile = (match) => {
                           </div>
                           <img
                             onClick={handleToggler}
-                            src={data.imgBack}
+                            src={`${
+                              data.imgBack.includes("cloudinary")
+                                ? data.imgBack
+                                : import.meta.env.VITE_API_URL +
+                                  "/uploads/CCCD/" +
+                                  data.imgBack
+                            }`}
                             className="w-full px-4 py-2"
                           />
                         </div>

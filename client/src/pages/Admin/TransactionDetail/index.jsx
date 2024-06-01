@@ -47,7 +47,7 @@ const TransactionDetail = () => {
       await Payment.getPaymentDetail(transId)
         .then((response) => {
           setTrans(response.data);
-          setRefundAmount(response.data.amount)
+          setRefundAmount(response.data.amount);
           setLoading(false);
         })
         .catch((error) => {

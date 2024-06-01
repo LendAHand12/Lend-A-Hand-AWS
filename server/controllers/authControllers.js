@@ -15,6 +15,7 @@ import axios from "axios";
 const checkLinkRef = asyncHandler(async (req, res) => {
   const { ref, receiveId } = req.body;
   let message = "invalidUrl";
+
   try {
     const userReceive = await User.findOne({
       _id: receiveId,

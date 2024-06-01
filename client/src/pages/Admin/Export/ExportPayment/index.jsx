@@ -30,7 +30,7 @@ const ExportUserPage = () => {
   const [errorDate, setErrorDate] = useState(false);
 
   const exportTrans = async (values) => {
-    const limit = 200;
+    const limit = 100;
     const body = { page: 1, limit };
     if (values.fromDate && values.toDate) {
       const fromDate = moment(values.fromDate);

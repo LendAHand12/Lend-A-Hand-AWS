@@ -75,7 +75,7 @@ connectDB();
 app.use(express.json({ limit: "50mb", extended: true }));
 app.use(express.urlencoded({ extended: false, limit: "2gb" }));
 app.use(cors()); // to avoid CORS errors
-app.use(helmet());
+app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(express.static("public"));
 
 // use cookie sessions

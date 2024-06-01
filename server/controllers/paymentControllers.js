@@ -1669,9 +1669,8 @@ const checkCanRefundPayment = asyncHandler(async (req, res) => {
     const userReceive = await User.findOne({
       walletAddress: { $in: [address_ref] },
     });
-    console.log("requeseting check wallet");
+    console.log({ userReceive });
     const isSerepayWallet = await checkSerepayWallet(userReceive.walletAddress);
-    console.log({ isSerepayWallet });
     if (userReceive) {
       if (userReceive.status === "LOCKED") {
         res.status(404);
@@ -1756,6 +1755,10 @@ const checkCanRefundPayment = asyncHandler(async (req, res) => {
         if (receiveParent.buyPackage !== "A") {
           res.json({
             message: `parent has not paid enough to upgrade to package A`,
+          });
+        } else {
+          res.json({
+            message: "User is OK for a refund",
           });
         }
       } else {

@@ -14,14 +14,15 @@ import "react-phone-number-input/style.css";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import "./index.css";
+import UploadFile from "./UploadInfo";
 
 const Profile = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState();
   const [loadingChangeWallet, setLoadingChangeWallet] = useState(false);
-  const [loadingUploadFileFront, setLoadingUploadFileFront] = useState(false);
-  const [loadingUploadFileBack, setLoadingUploadFileBack] = useState(false);
+  // const [loadingUploadFileFront, setLoadingUploadFileFront] = useState(false);
+  // const [loadingUploadFileBack, setLoadingUploadFileBack] = useState(false);
   const { userInfo } = useSelector((state) => state.auth);
   let {
     email,
@@ -57,6 +58,7 @@ const Profile = () => {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -73,45 +75,45 @@ const Profile = () => {
     dispatch(LOGOUT());
   };
 
-  const uploadFile = (file, forData) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "sdblmpca");
+  // const uploadFile = (file, forData) => {
+  //   const formData = new FormData();
+  //   formData.append("file", file);
+  //   formData.append("upload_preset", "sdblmpca");
 
-    if (forData === "front") {
-      setLoadingUploadFileFront(true);
-    } else {
-      setLoadingUploadFileBack(true);
-    }
-    axios
-      .post(`${import.meta.env.VITE_CLOUDINARY_URL}/image/upload`, formData, {
-        headers: {
-          "content-type": "multipart/form-data",
-        },
-      })
-      .then((response) => {
-        if (forData === "front") {
-          setLoadingUploadFileFront(false);
-          setImgFront(response.data.secure_url);
-        } else {
-          setLoadingUploadFileBack(false);
-          setImgBack(response.data.secure_url);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-        let message =
-          error.response && error.response.data.message
-            ? error.response.data.message
-            : error.message;
-        toast.error(message);
-        if (forData === "front") {
-          setLoadingUploadFileFront(false);
-        } else {
-          setLoadingUploadFileBack(false);
-        }
-      });
-  };
+  //   if (forData === "front") {
+  //     setLoadingUploadFileFront(true);
+  //   } else {
+  //     setLoadingUploadFileBack(true);
+  //   }
+  //   axios
+  //     .post(`${import.meta.env.VITE_CLOUDINARY_URL}/image/upload`, formData, {
+  //       headers: {
+  //         "content-type": "multipart/form-data",
+  //       },
+  //     })
+  //     .then((response) => {
+  //       if (forData === "front") {
+  //         setLoadingUploadFileFront(false);
+  //         setImgFront(response.data.secure_url);
+  //       } else {
+  //         setLoadingUploadFileBack(false);
+  //         setImgBack(response.data.secure_url);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //       let message =
+  //         error.response && error.response.data.message
+  //           ? error.response.data.message
+  //           : error.message;
+  //       toast.error(message);
+  //       if (forData === "front") {
+  //         setLoadingUploadFileFront(false);
+  //       } else {
+  //         setLoadingUploadFileBack(false);
+  //       }
+  //     });
+  // };
 
   const onSubmit = useCallback(
     async (data) => {
@@ -121,12 +123,20 @@ const Profile = () => {
       } else {
         setErrPhone(false);
         setLoading(true);
-        await User.update(id, {
-          phone: phoneNumber.trim(),
-          idCode: idCode.trim(),
-          imgFront,
-          imgBack,
-        })
+        var formData = new FormData();
+
+        const { imgFront } = data;
+        const [fileObjectImgFront] = imgFront;
+
+        const { imgBack } = data;
+        const [fileObjectImgBack] = imgBack;
+
+        formData.append("phone", phoneNumber.trim());
+        formData.append("idCode", idCode.trim());
+        formData.append("imgFront", fileObjectImgFront);
+        formData.append("imgBack", fileObjectImgBack);
+
+        await User.update(id, formData)
           .then((response) => {
             setLoading(false);
             toast.success(t(response.data.message));
@@ -531,55 +541,14 @@ const Profile = () => {
                               {t("idCardFront")}
                             </label>
                             <div className="flex flex-col items-center justify-center w-full">
-                              <label className="flex flex-col w-full h-40 border-4 border-blue-200 border-dashed hover:bg-gray-100 hover:border-gray-300">
-                                {imgFront !== "" ? (
-                                  <img
-                                    src={imgFront}
-                                    className="w-full h-full"
-                                    alt="the front of identity card"
-                                  />
-                                ) : (
-                                  <div className="flex flex-col items-center justify-center pt-7">
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      className="w-8 h-8 text-gray-400 group-hover:text-gray-600"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                      stroke="currentColor"
-                                    >
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                                      />
-                                    </svg>
-                                    <p className="pt-1 text-sm tracking-wider text-gray-400 group-hover:text-gray-600">
-                                      {loadingUploadFileFront
-                                        ? "Uploading..."
-                                        : "Attach a file"}
-                                    </p>
-                                  </div>
-                                )}
-                                <input
-                                  // {...register("imgFrontData", {
-                                  //   required:
-                                  //     "The front of identity card is required",
-                                  // })}
-                                  type="file"
-                                  onChange={(e) => {
-                                    e.preventDefault();
-                                    let file = e.target.files[0];
-                                    if (file && file.type.match("image.*")) {
-                                      uploadFile(file, "front");
-                                    }
-                                  }}
-                                  accept="image/png, imgage/jpg, image/jpeg"
-                                  className="opacity-0"
-                                />
-                              </label>
+                              <UploadFile
+                                register={register}
+                                watch={watch}
+                                required={false}
+                                name="imgFront"
+                              />
                               <p className="error-message-text">
-                                {errors.imgFrontData?.message}
+                                {errors.imgFront?.message}
                               </p>
                             </div>
                           </div>
@@ -592,55 +561,14 @@ const Profile = () => {
                               {t("idCardBack")}
                             </label>
                             <div className="flex flex-col items-center justify-center w-full">
-                              <label className="flex flex-col w-full h-40 border-4 border-blue-200 border-dashed hover:bg-gray-100 hover:border-gray-300">
-                                {imgBack !== "" ? (
-                                  <img
-                                    src={imgBack}
-                                    className="w-full h-full"
-                                    alt="the back of identity card"
-                                  />
-                                ) : (
-                                  <div className="flex flex-col items-center justify-center pt-7">
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      className="w-8 h-8 text-gray-400 group-hover:text-gray-600"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                      stroke="currentColor"
-                                    >
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                                      />
-                                    </svg>
-                                    <p className="pt-1 text-sm tracking-wider text-gray-400 group-hover:text-gray-600">
-                                      {loadingUploadFileBack
-                                        ? "Uploading..."
-                                        : "Attach a file"}
-                                    </p>
-                                  </div>
-                                )}
-                                <input
-                                  // {...register("imgBackData", {
-                                  //   required:
-                                  //     "The back of identity card is required",
-                                  // })}
-                                  type="file"
-                                  onChange={(e) => {
-                                    e.preventDefault();
-                                    let file = e.target.files[0];
-                                    if (file && file.type.match("image.*")) {
-                                      uploadFile(file, "back");
-                                    }
-                                  }}
-                                  accept="image/png, imgage/jpg, image/jpeg"
-                                  className="opacity-0"
-                                />
-                              </label>
+                              <UploadFile
+                                register={register}
+                                watch={watch}
+                                required={false}
+                                name="imgBack"
+                              />
                               <p className="error-message-text">
-                                {errors.imgBackData?.message}
+                                {errors.imgBack?.message}
                               </p>
                             </div>
                           </div>
@@ -654,7 +582,13 @@ const Profile = () => {
                           {t("idCardFront")}
                         </div>
                         <img
-                          src={`${userInfo.imgFront}`}
+                          src={`${
+                            userInfo.imgFront.includes("cloudinary")
+                              ? userInfo.imgFront
+                              : import.meta.env.VITE_API_URL +
+                                "/uploads/CCCD/" +
+                                userInfo.imgFront
+                          }`}
                           className="w-full px-4 py-2"
                         />
                       </div>
@@ -663,7 +597,13 @@ const Profile = () => {
                           {t("idCardBack")}
                         </div>
                         <img
-                          src={`${userInfo.imgBack}`}
+                          src={`${
+                            userInfo.imgBack.includes("cloudinary")
+                              ? userInfo.imgBack
+                              : import.meta.env.VITE_API_URL +
+                                "/uploads/CCCD/" +
+                                userInfo.imgBack
+                          }`}
                           className="w-full px-4 py-2"
                         />
                       </div>
@@ -673,9 +613,7 @@ const Profile = () => {
               </div>
               <button
                 type="submit"
-                disabled={
-                  loading || loadingUploadFileFront || loadingUploadFileBack
-                }
+                disabled={loading}
                 className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
               >
                 {loading && <Loading />}

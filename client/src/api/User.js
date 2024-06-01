@@ -3,7 +3,9 @@ import { URL_API_USER } from "./URL";
 
 const User = {
   update: (userId, body) => {
-    return API.put(`${URL_API_USER}/${userId}`, body);
+    return API.put(`${URL_API_USER}/${userId}`, body, {
+      customContentType: "multipart/form-data",
+    });
   },
   getAllUsers: (pageNumber, keyword, statusSearch) => {
     return API.get(

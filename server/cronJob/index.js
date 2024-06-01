@@ -222,16 +222,21 @@ export const checkCPackage = asyncHandler(async () => {
 export const countChildToData = asyncHandler(async () => {
   const listUser = await User.find({
     $and: [{ isAdmin: false }],
-  }).select("tier countChild");
+  }).select("tier countChild userId");
 
   for (let u of listUser) {
-    const newCountChild = [...u.countChild];
-    for (let i = 1; i <= u.tier; i++) {
-      const countChild = await getCountAllChildren(u._id, i);
-      newCountChild[i - 1] = countChild;
+    console.log({ name: u.userId });
+    try {
+      const newCountChild = [...u.countChild];
+      for (let i = 1; i <= u.tier; i++) {
+        const countChild = await getCountAllChildren(u._id, i);
+        newCountChild[i - 1] = countChild;
+      }
+      u.countChild = newCountChild;
+      await u.save();
+    } catch (error) {
+      console.log({ error });
     }
-    u.countChild = newCountChild;
-    await u.save();
   }
 
   console.log("updated count Child");
