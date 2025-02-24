@@ -44,9 +44,7 @@ const Users = () => {
         })
         .catch((error) => {
           let message =
-            error.response && error.response.data.error
-              ? error.response.data.error
-              : error.message;
+            error.response && error.response.data.error ? error.response.data.error : error.message;
           toast.error(t(message));
           setLoading(false);
         });
@@ -92,9 +90,7 @@ const Users = () => {
       })
       .catch((error) => {
         let message =
-          error.response && error.response.data.error
-            ? error.response.data.error
-            : error.message;
+          error.response && error.response.data.error ? error.response.data.error : error.message;
         toast.error(t(message));
       });
   };
@@ -119,7 +115,7 @@ const Users = () => {
   return (
     <div>
       <ToastContainer />
-      <div className="relative overflow-x-auto shadow-md sm:rounded-lg p-10">
+      <div className="relative p-10 overflow-x-auto shadow-md sm:rounded-lg">
         <div className="flex items-center justify-between pb-4 bg-white">
           <div>
             <select
@@ -166,7 +162,7 @@ const Users = () => {
               <button
                 onClick={handleSearch}
                 disabled={loading}
-                className="h-8 flex text-xs justify-center items-center hover:underline gradient text-white font-bold rounded-full py-1 px-4 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                className="flex items-center justify-center h-8 px-4 py-1 text-xs font-bold text-white transition duration-300 ease-in-out transform rounded-full shadow-lg hover:underline gradient focus:outline-none focus:shadow-outline hover:scale-105"
               >
                 {t("search")}
               </button>
@@ -194,18 +190,13 @@ const Users = () => {
             {data.length > 0 &&
               !loading &&
               data.map((ele) => (
-                <tr
-                  className="bg-white border-b hover:bg-gray-50"
-                  key={ele._id}
-                >
+                <tr className="bg-white border-b hover:bg-gray-50" key={ele._id}>
                   <th
                     scope="row"
                     className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap "
                   >
                     <div className="">
-                      <div className="text-base font-semibold">
-                        {ele.userId}
-                      </div>
+                      <div className="text-base font-semibold">{ele.userId}</div>
                       <div className="font-normal text-gray-500">{ele._id}</div>
                     </div>
                   </th>
@@ -213,8 +204,7 @@ const Users = () => {
                   <td className="px-6 py-4">
                     <div
                       className={`max-w-fit text-white rounded-sm py-1 px-2 text-sm ${
-                        userStatus.find((item) => item.status === ele.status)
-                          .color
+                        userStatus.find((item) => item.status === ele.status).color
                       } mr-2`}
                     >
                       {t(ele.status)}
@@ -222,7 +212,7 @@ const Users = () => {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex gap-6">
-                      {userInfo?.permissions
+                      {/* {userInfo?.permissions
                         .find((p) => p.page.pageName === "admin-users-details")
                         ?.actions.includes("approve") &&
                         ele.status === "PENDING" && (
@@ -251,7 +241,7 @@ const Users = () => {
                               ></polyline>
                             </svg>
                           </button>
-                        )}
+                        )} */}
                       {userInfo?.permissions
                         .find((p) => p.page.pageName === "admin-users-details")
                         ?.actions.includes("read") && (
@@ -284,12 +274,7 @@ const Users = () => {
                               fill="none"
                               xmlns="http://www.w3.org/2000/svg"
                             >
-                              <rect
-                                width="48"
-                                height="48"
-                                fill="white"
-                                fillOpacity="0.01"
-                              />
+                              <rect width="48" height="48" fill="white" fillOpacity="0.01" />
                               <path
                                 d="M13.0448 14C13.5501 8.3935 18.262 4 24 4C29.738 4 34.4499 8.3935 34.9552 14H35C39.9706 14 44 18.0294 44 23C44 27.9706 39.9706 32 35 32H13C8.02944 32 4 27.9706 4 23C4 18.0294 8.02944 14 13 14H13.0448Z"
                                 stroke="currentColor"
@@ -345,24 +330,16 @@ const Users = () => {
           </tbody>
         </table>
         {loading && (
-          <div className="w-full flex justify-center my-4">
+          <div className="flex justify-center w-full my-4">
             <Loading />
           </div>
         )}
         {!loading && data.length === 0 && <NoContent />}
         {!loading && data.length > 0 && (
-          <nav
-            className="flex items-center justify-between pt-4"
-            aria-label="Table navigation"
-          >
+          <nav className="flex items-center justify-between pt-4" aria-label="Table navigation">
             <span className="text-sm font-normal text-gray-500">
-              Showing{" "}
-              <span className="font-semibold text-gray-900">
-                {objectFilter.pageNumber}
-              </span>{" "}
-              of{" "}
-              <span className="font-semibold text-gray-900">{totalPage}</span>{" "}
-              page
+              Showing <span className="font-semibold text-gray-900">{objectFilter.pageNumber}</span>{" "}
+              of <span className="font-semibold text-gray-900">{totalPage}</span> page
             </span>
             {/* <ul className="inline-flex items-center -space-x-px">
               <li>
