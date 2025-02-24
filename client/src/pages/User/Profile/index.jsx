@@ -12,6 +12,7 @@ import { ToastContainer, toast } from "react-toastify";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { confirmAlert } from "react-confirm-alert";
+import UploadFile from "./UploadInfo";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import "./index.css";
 
@@ -57,13 +58,14 @@ const Profile = () => {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
       idCode,
       phone,
-      imgBackData: "",
-      imgFrontData: "",
+      imgBack: "",
+      imgFront: "",
     },
   });
   const { disconnect } = useDisconnect();
@@ -121,12 +123,21 @@ const Profile = () => {
       } else {
         setErrPhone(false);
         setLoading(true);
-        await User.update(id, {
-          phone: phoneNumber.trim(),
-          idCode: idCode.trim(),
-          imgFront,
-          imgBack,
-        })
+
+        var formData = new FormData();
+
+        const { imgFront } = data;
+        const [fileObjectImgFront] = imgFront;
+
+        const { imgBack } = data;
+        const [fileObjectImgBack] = imgBack;
+
+        formData.append("phone", phoneNumber.trim());
+        formData.append("idCode", idCode.trim());
+        formData.append("imgFront", fileObjectImgFront);
+        formData.append("imgBack", fileObjectImgBack);
+
+        await User.update(id, formData)
           .then((response) => {
             setLoading(false);
             toast.success(t(response.data.message));
@@ -173,9 +184,7 @@ const Profile = () => {
       })
       .catch((error) => {
         let message =
-          error.response && error.response.data.error
-            ? error.response.data.error
-            : error.message;
+          error.response && error.response.data.error ? error.response.data.error : error.message;
         toast.error(t(message));
         setLoading(false);
       });
@@ -188,24 +197,22 @@ const Profile = () => {
         customUI: ({ onClose }) => {
           return (
             <div className="custom-ui">
-              <div className="bg-gray-50 p-6 md:mx-auto">
+              <div className="p-6 bg-gray-50 md:mx-auto">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="text-gray-600 w-16 h-16 mx-auto my-6"
+                  className="w-16 h-16 mx-auto my-6 text-gray-600"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
                   <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" />
                 </svg>
                 <div className="text-center">
-                  <p className="text-gray-600 text-xl my-4">
-                    {t("choosePaymentMethod")}
-                  </p>
-                  <div className="text-center mt-10 flex gap-10">
+                  <p className="my-4 text-xl text-gray-600">{t("choosePaymentMethod")}</p>
+                  <div className="flex gap-10 mt-10 text-center">
                     {packages.find((ele) => ele === "A") && (
                       <button
                         onClick={() => handleChoosePaymentMethod("A", onClose)}
-                        className="w-48 flex justify-center items-center hover:underline gradient text-white font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                        className="flex items-center justify-center w-48 px-8 py-4 font-bold text-white transition duration-300 ease-in-out transform rounded-full shadow-lg hover:underline gradient focus:outline-none focus:shadow-outline hover:scale-105"
                       >
                         {t("buyPackage")} A
                       </button>
@@ -213,7 +220,7 @@ const Profile = () => {
                     {packages.find((ele) => ele === "B") && (
                       <button
                         onClick={() => handleChoosePaymentMethod("B", onClose)}
-                        className="w-48 flex justify-center items-center hover:underline gradient text-white font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                        className="flex items-center justify-center w-48 px-8 py-4 font-bold text-white transition duration-300 ease-in-out transform rounded-full shadow-lg hover:underline gradient focus:outline-none focus:shadow-outline hover:scale-105"
                       >
                         {t("buyPackage")} B
                       </button>
@@ -222,7 +229,7 @@ const Profile = () => {
                   {packages.find((ele) => ele === "C") && (
                     <button
                       onClick={() => handleChoosePaymentMethod("C", onClose)}
-                      className="mt-10 w-full flex justify-center items-center hover:underline bg-red-500 text-white font-bold rounded-full py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                      className="flex items-center justify-center w-full px-8 py-4 mt-10 font-bold text-white transition duration-300 ease-in-out transform bg-red-500 rounded-full shadow-lg hover:underline focus:outline-none focus:shadow-outline hover:scale-105"
                     >
                       {t("skip")}
                     </button>
@@ -239,10 +246,10 @@ const Profile = () => {
   return (
     <div>
       <ToastContainer />
-      <div className="container mx-auto p-5">
+      <div className="container p-5 mx-auto">
         {status === "UNVERIFY" && (
           <div
-            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-5"
+            className="relative px-4 py-3 mb-5 text-red-700 bg-red-100 border border-red-400 rounded"
             role="alert"
           >
             <span className="block sm:inline">{t("verifyAccountAlert")}</span>
@@ -251,7 +258,7 @@ const Profile = () => {
 
         {(phone === "" || idCode === "") && (
           <div
-            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-5"
+            className="relative px-4 py-3 mb-5 text-red-700 bg-red-100 border border-red-400 rounded"
             role="alert"
           >
             <span className="block sm:inline">{t("infoAccountAlert")}</span>
@@ -260,7 +267,7 @@ const Profile = () => {
 
         {/* {!isSerepayWallet && (
           <div
-            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-5"
+            className="relative px-4 py-3 mb-5 text-red-700 bg-red-100 border border-red-400 rounded"
             role="alert"
           >
             <span className="block sm:inline">
@@ -281,9 +288,9 @@ const Profile = () => {
           </div>
         )} */}
         <div className="md:flex no-wrap md:-mx-2 ">
-          <div className="w-full lg:w-3/12 lg:mx-2 mb-4 lg:mb-0">
-            <div className="bg-white shadow-md p-3 border-t-4 border-primary">
-              <ul className="bg-gray-100 text-gray-600 hover:text-gray-700 hover:shadow py-2 px-3 mt-3 divide-y rounded shadow-sm">
+          <div className="w-full mb-4 lg:w-3/12 lg:mx-2 lg:mb-0">
+            <div className="p-3 bg-white border-t-4 shadow-md border-primary">
+              <ul className="px-3 py-2 mt-3 text-gray-600 bg-gray-100 divide-y rounded shadow-sm hover:text-gray-700 hover:shadow">
                 <li className="flex items-center py-3">
                   <span>{t("status")}</span>
                   <span className="ml-auto">
@@ -308,62 +315,47 @@ const Profile = () => {
                 </li>
                 <li className="flex items-center py-3">
                   <span>{t("memberSince")}</span>
-                  <span className="ml-auto">
-                    {new Date(createdAt).toLocaleDateString("vi")}
-                  </span>
+                  <span className="ml-auto">{new Date(createdAt).toLocaleDateString("vi")}</span>
                 </li>
                 <li className="flex items-center py-3">
                   <span>{t("tier1Time")}</span>
                   <span className="ml-auto">
-                    {tier1Time
-                      ? new Date(tier1Time).toLocaleDateString("vi")
-                      : ""}
+                    {tier1Time ? new Date(tier1Time).toLocaleDateString("vi") : ""}
                   </span>
                 </li>
                 <li className="flex items-center py-3">
                   <span>{t("tier2Time")}</span>
                   <span className="ml-auto">
-                    {tier2Time
-                      ? new Date(tier2Time).toLocaleDateString("vi")
-                      : ""}
+                    {tier2Time ? new Date(tier2Time).toLocaleDateString("vi") : ""}
                   </span>
                 </li>
                 <li className="flex items-center py-3">
                   <span>{t("tier3Time")}</span>
                   <span className="ml-auto">
-                    {tier3Time
-                      ? new Date(tier3Time).toLocaleDateString("vi")
-                      : ""}
+                    {tier3Time ? new Date(tier3Time).toLocaleDateString("vi") : ""}
                   </span>
                 </li>
                 <li className="flex items-center py-3">
                   <span>{t("tier4Time")}</span>
                   <span className="ml-auto">
-                    {tier4Time
-                      ? new Date(tier4Time).toLocaleDateString("vi")
-                      : ""}
+                    {tier4Time ? new Date(tier4Time).toLocaleDateString("vi") : ""}
                   </span>
                 </li>
                 <li className="flex items-center py-3">
                   <span>{t("tier5Time")}</span>
                   <span className="ml-auto">
-                    {tier5Time
-                      ? new Date(tier1Time).toLocaleDateString("vi")
-                      : ""}
+                    {tier5Time ? new Date(tier1Time).toLocaleDateString("vi") : ""}
                   </span>
                 </li>
               </ul>
             </div>
             {status === "APPROVED" && (
-              <div className="mt-10 bg-white shadow-md p-3 border-t-4 border-primary">
-                <p className="uppercase mt-2 font-bold">{t("children")}</p>
+              <div className="p-3 mt-10 bg-white border-t-4 shadow-md border-primary">
+                <p className="mt-2 font-bold uppercase">{t("children")}</p>
                 <div className="py-2">
                   <ul>
                     {listDirectUser.map((ele) => (
-                      <li
-                        className="bg-white border-b hover:bg-gray-50"
-                        key={ele._id}
-                      >
+                      <li className="bg-white border-b hover:bg-gray-50" key={ele._id}>
                         <div className="py-2">
                           <div className="text-base">
                             <span
@@ -392,27 +384,23 @@ const Profile = () => {
             <form
               onSubmit={handleSubmit(onSubmit)}
               encType="multipart/form-data"
-              className="bg-white p-6 shadow-md rounded-sm border-t-4 border-primary"
+              className="p-6 bg-white border-t-4 rounded-sm shadow-md border-primary"
             >
               <div className="text-gray-700">
                 <div className="grid grid-cols-1 text-sm">
-                  <div className="grid lg:grid-cols-2 grid-cols-1">
-                    <div className="px-4 py-2 font-semibold">
-                      {t("ref code")}
-                    </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2">
+                    <div className="px-4 py-2 font-semibold">{t("ref code")}</div>
                     <div className="px-4 py-2">{id}</div>
                   </div>
-                  <div className="grid lg:grid-cols-2 grid-cols-1">
-                    <div className="px-4 py-2 font-semibold">
-                      {t("username")}
-                    </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2">
+                    <div className="px-4 py-2 font-semibold">{t("username")}</div>
                     <div className="px-4 py-2">{userId}</div>
                   </div>
-                  <div className="grid lg:grid-cols-2 grid-cols-1">
+                  <div className="grid grid-cols-1 lg:grid-cols-2">
                     <div className="px-4 py-2 font-semibold">Email</div>
                     <div className="px-4 py-2">{email}</div>
                   </div>
-                  <div className="grid lg:grid-cols-2 grid-cols-1">
+                  <div className="grid grid-cols-1 lg:grid-cols-2">
                     <div className="px-4 py-2 font-semibold">{t("phone")}</div>
                     <div className="px-4">
                       <PhoneInput
@@ -420,15 +408,11 @@ const Profile = () => {
                         value={phoneNumber}
                         onChange={setPhoneNumber}
                       />
-                      <p className="error-message-text">
-                        {errorPhone && t("Phone is required")}
-                      </p>
+                      <p className="error-message-text">{errorPhone && t("Phone is required")}</p>
                     </div>
                   </div>
-                  <div className="grid lg:grid-cols-2 grid-cols-1">
-                    <div className="px-4 py-2 font-semibold">
-                      {t("id code")}
-                    </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2">
+                    <div className="px-4 py-2 font-semibold">{t("id code")}</div>
                     <div className="px-4">
                       <input
                         className="w-full px-4 py-1.5 rounded-md border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
@@ -437,82 +421,56 @@ const Profile = () => {
                         })}
                         autoComplete="off"
                       />
-                      <p className="error-message-text">
-                        {errors.idCode?.message}
-                      </p>
+                      <p className="error-message-text">{errors.idCode?.message}</p>
                     </div>
                   </div>
-                  <div className="grid lg:grid-cols-2 grid-cols-1">
-                    <div className="px-4 py-2 font-semibold">
-                      {t("walletAddress")} Tier 1
-                    </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2">
+                    <div className="px-4 py-2 font-semibold">{t("walletAddress")} Tier 1</div>
                     <div className="">
-                      <div className="px-4 py-2 break-words">
-                        {walletAddress1}
-                      </div>
+                      <div className="px-4 py-2 break-words">{walletAddress1}</div>
                     </div>
                   </div>
-                  <div className="grid lg:grid-cols-2 grid-cols-1">
-                    <div className="px-4 py-2 font-semibold">
-                      {t("walletAddress")} Tier 2
-                    </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2">
+                    <div className="px-4 py-2 font-semibold">{t("walletAddress")} Tier 2</div>
                     <div className="">
-                      <div className="px-4 py-2 break-words">
-                        {walletAddress2}
-                      </div>
+                      <div className="px-4 py-2 break-words">{walletAddress2}</div>
                     </div>
                   </div>
-                  <div className="grid lg:grid-cols-2 grid-cols-1">
-                    <div className="px-4 py-2 font-semibold">
-                      {t("walletAddress")} Tier 3
-                    </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2">
+                    <div className="px-4 py-2 font-semibold">{t("walletAddress")} Tier 3</div>
                     <div className="">
-                      <div className="px-4 py-2 break-words">
-                        {walletAddress3}
-                      </div>
+                      <div className="px-4 py-2 break-words">{walletAddress3}</div>
                     </div>
                   </div>
-                  <div className="grid lg:grid-cols-2 grid-cols-1">
-                    <div className="px-4 py-2 font-semibold">
-                      {t("walletAddress")} Tier 4
-                    </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2">
+                    <div className="px-4 py-2 font-semibold">{t("walletAddress")} Tier 4</div>
                     <div className="">
-                      <div className="px-4 py-2 break-words">
-                        {walletAddress4}
-                      </div>
+                      <div className="px-4 py-2 break-words">{walletAddress4}</div>
                     </div>
                   </div>
-                  <div className="grid lg:grid-cols-2 grid-cols-1">
-                    <div className="px-4 py-2 font-semibold">
-                      {t("walletAddress")} Tier 5
-                    </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2">
+                    <div className="px-4 py-2 font-semibold">{t("walletAddress")} Tier 5</div>
                     <div className="">
-                      <div className="px-4 py-2 break-words">
-                        {walletAddress5}
-                      </div>
+                      <div className="px-4 py-2 break-words">{walletAddress5}</div>
                     </div>
                   </div>
-                  <div className="grid lg:grid-cols-2 grid-cols-1">
-                    <div className="px-4 py-2 font-semibold">
-                      {t("isRegistered")}
-                    </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2">
+                    <div className="px-4 py-2 font-semibold">{t("isRegistered")}</div>
                     <div className="px-4 py-2">
                       {countPay >= 1 ? t("finished") : t("unfinished")}
                     </div>
                   </div>
-                  <div className="grid lg:grid-cols-2 grid-cols-1">
-                    <div className="px-4 py-2 font-semibold">
-                      {t("count pay")}
-                    </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2">
+                    <div className="px-4 py-2 font-semibold">{t("count pay")}</div>
                     <div className="px-4 py-2">
                       {countPay === 0 ? 0 : countPay - 1} {t("times")}
                     </div>
                   </div>
-                  <div className="grid lg:grid-cols-2 grid-cols-1">
+                  <div className="grid grid-cols-1 lg:grid-cols-2">
                     <div className="px-4 py-2 font-semibold">Tier</div>
                     <div className="px-4 py-2">{tier}</div>
                   </div>
-                  <div className="grid lg:grid-cols-2 grid-cols-1">
+                  <div className="grid grid-cols-1 lg:grid-cols-2">
                     <div className="px-4 py-2 font-semibold">{t("fine")}</div>
                     <div className="px-4 py-2">{fine}</div>
                   </div>
@@ -525,56 +483,13 @@ const Profile = () => {
                               {t("idCardFront")}
                             </label>
                             <div className="flex flex-col items-center justify-center w-full">
-                              <label className="flex flex-col w-full h-40 border-4 border-blue-200 border-dashed hover:bg-gray-100 hover:border-gray-300">
-                                {imgFront !== "" ? (
-                                  <img
-                                    src={imgFront}
-                                    className="w-full h-full"
-                                    alt="the front of identity card"
-                                  />
-                                ) : (
-                                  <div className="flex flex-col items-center justify-center pt-7">
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      className="w-8 h-8 text-gray-400 group-hover:text-gray-600"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                      stroke="currentColor"
-                                    >
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                                      />
-                                    </svg>
-                                    <p className="pt-1 text-sm tracking-wider text-gray-400 group-hover:text-gray-600">
-                                      {loadingUploadFileFront
-                                        ? "Uploading..."
-                                        : "Attach a file"}
-                                    </p>
-                                  </div>
-                                )}
-                                <input
-                                  // {...register("imgFrontData", {
-                                  //   required:
-                                  //     "The front of identity card is required",
-                                  // })}
-                                  type="file"
-                                  onChange={(e) => {
-                                    e.preventDefault();
-                                    let file = e.target.files[0];
-                                    if (file && file.type.match("image.*")) {
-                                      uploadFile(file, "front");
-                                    }
-                                  }}
-                                  accept="image/png, imgage/jpg, image/jpeg"
-                                  className="opacity-0"
-                                />
-                              </label>
-                              <p className="error-message-text">
-                                {errors.imgFrontData?.message}
-                              </p>
+                              <UploadFile
+                                register={register}
+                                watch={watch}
+                                required={false}
+                                name="imgFront"
+                              />
+                              <p className="error-message-text">{errors.imgFront?.message}</p>
                             </div>
                           </div>
                         </div>
@@ -586,56 +501,13 @@ const Profile = () => {
                               {t("idCardBack")}
                             </label>
                             <div className="flex flex-col items-center justify-center w-full">
-                              <label className="flex flex-col w-full h-40 border-4 border-blue-200 border-dashed hover:bg-gray-100 hover:border-gray-300">
-                                {imgBack !== "" ? (
-                                  <img
-                                    src={imgBack}
-                                    className="w-full h-full"
-                                    alt="the back of identity card"
-                                  />
-                                ) : (
-                                  <div className="flex flex-col items-center justify-center pt-7">
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      className="w-8 h-8 text-gray-400 group-hover:text-gray-600"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                      stroke="currentColor"
-                                    >
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                                      />
-                                    </svg>
-                                    <p className="pt-1 text-sm tracking-wider text-gray-400 group-hover:text-gray-600">
-                                      {loadingUploadFileBack
-                                        ? "Uploading..."
-                                        : "Attach a file"}
-                                    </p>
-                                  </div>
-                                )}
-                                <input
-                                  // {...register("imgBackData", {
-                                  //   required:
-                                  //     "The back of identity card is required",
-                                  // })}
-                                  type="file"
-                                  onChange={(e) => {
-                                    e.preventDefault();
-                                    let file = e.target.files[0];
-                                    if (file && file.type.match("image.*")) {
-                                      uploadFile(file, "back");
-                                    }
-                                  }}
-                                  accept="image/png, imgage/jpg, image/jpeg"
-                                  className="opacity-0"
-                                />
-                              </label>
-                              <p className="error-message-text">
-                                {errors.imgBackData?.message}
-                              </p>
+                              <UploadFile
+                                register={register}
+                                watch={watch}
+                                required={false}
+                                name="imgBack"
+                              />
+                              <p className="error-message-text">{errors.imgBack?.message}</p>
                             </div>
                           </div>
                         </div>
@@ -643,21 +515,25 @@ const Profile = () => {
                     </>
                   ) : (
                     <>
-                      <div className="grid lg:grid-cols-2 grid-cols-1">
-                        <div className="px-4 py-2 font-semibold">
-                          {t("idCardFront")}
-                        </div>
+                      <div className="grid grid-cols-1 lg:grid-cols-2">
+                        <div className="px-4 py-2 font-semibold">{t("idCardFront")}</div>
                         <img
-                          src={`${userInfo.imgFront}`}
+                          src={`${
+                            userInfo.imgFront.includes("cloudinary")
+                              ? userInfo.imgFront
+                              : import.meta.env.VITE_API_URL + "/uploads/CCCD/" + userInfo.imgFront
+                          }`}
                           className="w-full px-4 py-2"
                         />
                       </div>
-                      <div className="grid lg:grid-cols-2 grid-cols-1">
-                        <div className="px-4 py-2 font-semibold">
-                          {t("idCardBack")}
-                        </div>
+                      <div className="grid grid-cols-1 lg:grid-cols-2">
+                        <div className="px-4 py-2 font-semibold">{t("idCardBack")}</div>
                         <img
-                          src={`${userInfo.imgBack}`}
+                          src={`${
+                            userInfo.imgBack.includes("cloudinary")
+                              ? userInfo.imgBack
+                              : import.meta.env.VITE_API_URL + "/uploads/CCCD/" + userInfo.imgBack
+                          }`}
                           className="w-full px-4 py-2"
                         />
                       </div>
@@ -667,10 +543,8 @@ const Profile = () => {
               </div>
               <button
                 type="submit"
-                disabled={
-                  loading || loadingUploadFileFront || loadingUploadFileBack
-                }
-                className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                disabled={loading || loadingUploadFileFront || loadingUploadFileBack}
+                className="flex items-center justify-center w-full px-8 py-4 my-6 font-bold text-white transition duration-300 ease-in-out transform rounded-full shadow-lg hover:underline gradient focus:outline-none focus:shadow-outline hover:scale-105"
               >
                 {loading && <Loading />}
                 {t("update")}
@@ -679,7 +553,7 @@ const Profile = () => {
                 <button
                   onClick={handleChangeWallet}
                   disabled={loadingChangeWallet}
-                  className="w-full flex justify-center items-center hover:underline gradient text-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                  className="flex items-center justify-center w-full px-8 py-4 my-6 font-bold text-white transition duration-300 ease-in-out transform rounded-full shadow-lg hover:underline gradient focus:outline-none focus:shadow-outline hover:scale-105"
                 >
                   {loadingChangeWallet && <Loading />}
                   {t("change wallet")}
@@ -687,7 +561,7 @@ const Profile = () => {
               )}
               <button
                 onClick={handleLogout}
-                className="w-full flex justify-center items-center hover:underline border font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+                className="flex items-center justify-center w-full px-8 py-4 my-6 font-bold transition duration-300 ease-in-out transform border rounded-full shadow-lg hover:underline focus:outline-none focus:shadow-outline hover:scale-105"
               >
                 {t("logout")}
               </button>

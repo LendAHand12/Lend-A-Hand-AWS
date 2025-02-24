@@ -31,19 +31,14 @@ import {
   deleteAdmin,
   getAdminById,
 } from "../controllers/userControllers.js";
-import {
-  protectRoute,
-  isAdmin,
-  isSuperAdmin,
-} from "../middleware/authMiddleware.js";
+import { protectRoute, isAdmin, isSuperAdmin } from "../middleware/authMiddleware.js";
 import uploadCloud from "../middleware/uploadCloud.js";
+import uploadCCCD from "../middleware/uploadCCCD.js";
 
 const router = express.Router();
 
 router.route("/").get(protectRoute, isAdmin, getAllUsers);
-router
-  .route("/getAllDeletedUsers")
-  .get(protectRoute, isAdmin, getAllDeletedUsers);
+router.route("/getAllDeletedUsers").get(protectRoute, isAdmin, getAllDeletedUsers);
 router.route("/profile").get(protectRoute, getUserProfile);
 router
   .route("/changeWallet")
@@ -54,13 +49,9 @@ router.route("/tree").get(protectRoute, getTree);
 router.route("/tree/:id").get(protectRoute, isAdmin, getTreeOfUser);
 router.route("/treeNode").post(protectRoute, getChildsOfUserForTree);
 router.route("/changeSystem").post(protectRoute, isAdmin, changeSystem);
-router
-  .route("/getAllUsersForExport")
-  .post(protectRoute, isAdmin, getAllUsersForExport);
+router.route("/getAllUsersForExport").post(protectRoute, isAdmin, getAllUsersForExport);
 
-router
-  .route("/getAllUsersWithKeyword")
-  .post(protectRoute, isAdmin, getAllUsersWithKeyword);
+router.route("/getAllUsersWithKeyword").post(protectRoute, isAdmin, getAllUsersWithKeyword);
 router.route("/listChild").get(protectRoute, getListChildOfUser);
 
 router
@@ -80,7 +71,7 @@ router
   .get(protectRoute, isAdmin, getUserById)
   .put(
     protectRoute,
-    uploadCloud.fields([
+    uploadCCCD.fields([
       { name: "imgFront", maxCount: 1 },
       { name: "imgBack", maxCount: 1 },
     ]),
@@ -93,22 +84,14 @@ router.route("/tier/increase").post(protectRoute, onAcceptIncreaseTier);
 
 router.route("/create").post(protectRoute, isAdmin, adminCreateUser);
 
-router
-  .route("/listNextUserTier")
-  .post(protectRoute, isAdmin, getListNextUserWithTier);
+router.route("/listNextUserTier").post(protectRoute, isAdmin, getListNextUserWithTier);
 
 router.route("/getUsersWithTier").post(protectRoute, isAdmin, getUsersWithTier);
 
-router
-  .route("/changeNextUserTier")
-  .post(protectRoute, isAdmin, changeNextUserTier);
+router.route("/changeNextUserTier").post(protectRoute, isAdmin, changeNextUserTier);
 
-router
-  .route("/getLastUserInTier")
-  .post(protectRoute, isAdmin, getLastUserInTier);
+router.route("/getLastUserInTier").post(protectRoute, isAdmin, getLastUserInTier);
 
-router
-  .route("/removeLastUserInTier")
-  .post(protectRoute, isAdmin, removeLastUserInTier);
+router.route("/removeLastUserInTier").post(protectRoute, isAdmin, removeLastUserInTier);
 
 export default router;
